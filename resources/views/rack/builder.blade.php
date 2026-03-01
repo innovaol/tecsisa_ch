@@ -266,9 +266,11 @@
                                 </div>
                             </template>
                         </div>
-                    </div> <!-- Closes Left Panel -->
+                    </div> <!-- Closes Grid (Line 234) -->
+                </div> <!-- Closes Matrix Area (Line 233) -->
+            </div> <!-- Closes Left Panel (Line 222) -->
 
-                    <!-- Panel Derecho: Asistente de Enlace -->
+            <!-- Panel Derecho: Asistente de Enlace -->
                     <div x-show="wizardOpen" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="opacity-0 translate-x-8" x-transition:enter-end="opacity-100 translate-x-0" class="w-full md:w-1/3 shrink-0 flex flex-col">
                         <div class="bg-gradient-to-br from-white/5 to-transparent border border-white/10 rounded-xl p-5 shadow-2xl relative">
                             <!-- Wizard Header -->
@@ -685,17 +687,17 @@
                     
                     // Filter rack units to find other occupied equipment
                     let units = this.rackUnits.filter(u => {
+                        // Check if it's occupied, not hidden (for multi-U), has a valid ID and is NOT me
                         return u.occupied && 
-                               !u.hidden && 
                                u.db_id && 
                                String(u.db_id) !== myId;
                     });
                     
-                    // Use a Map to ensure unique equipment in the dropdown
-                    const uniqueEquipment = new Map();
+                    // Use a Map to ensure unique equipment in the dropdown (unique by DB ID)
+                    const uniqueMap = new Map();
                     units.forEach(u => {
-                        if (!uniqueEquipment.has(u.db_id)) {
-                            uniqueEquipment.set(u.db_id, {
+                        if (!uniqueMap.has(String(u.db_id))) {
+                            uniqueMap.set(String(u.db_id), {
                                 db_id: u.db_id,
                                 eq_id: u.eq_id || 'S/N',
                                 eq_name: u.eq_name || 'Equipo'
@@ -703,7 +705,9 @@
                         }
                     });
 
-                    return Array.from(uniqueEquipment.values());
+                    let result = Array.from(uniqueMap.values());
+                    console.log("Targets encontrados:", result.length, result);
+                    return result;
                 },
 
                 async fetchTargetPorts() {
