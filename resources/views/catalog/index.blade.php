@@ -186,16 +186,17 @@
     </div>
 
     <!-- Modal: Alta de Equipo -->
-    <x-modal name="create-equipment" :show="false" focusable>
-        <form x-data="{ 
+    <x-modal name="create-equipment" :show="false" maxWidth="4xl" focusable>
+        <div x-data="{ 
                 system_id: '{{ $systems->first()->id ?? '' }}', 
-                systems: @json($systems),
+                systems: Object.values(@json($systems)),
                 get activeSchema() {
                     let sys = this.systems.find(s => s.id == this.system_id);
                     return sys ? (sys.form_schema || []) : [];
                 }
-              }" 
-              method="post" action="{{ route('catalog.equipment.store') }}" class="p-6 bg-tecsisa-dark border border-white/10 rounded-2xl">
+             }" 
+             class="bg-tecsisa-dark p-0 border border-white/10 overflow-hidden">
+            <form method="post" action="{{ route('catalog.equipment.store') }}" class="p-8">
             @csrf
             <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
                 <svg class="w-6 h-6 text-tecsisa-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -293,5 +294,6 @@
                 </button>
             </div>
         </form>
-    </x-modal>
+    </div>
+</x-modal>
 </x-app-layout>
