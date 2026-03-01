@@ -16,22 +16,22 @@ class RackBuilderController extends Controller
         $rackId = $request->query('rack_id');
 
         if ($rackId) {
-            $rack = Rack::with(['units.equipment'])->findOrFail($rackId);
+            $rack = Rack::with(['units.equipment.system'])->findOrFail($rackId);
         }
         else {
-            $rack = Rack::with(['units.equipment'])->first();
+            $rack = Rack::with(['units.equipment.system'])->first();
         }
 
         $racks = Rack::all();
 
         // 1. Equipos en inventario que sí son de rack y no han sido instalados
         $assignedEquipmentIds = RackUnit::whereNotNull('equipment_id')->pluck('equipment_id');
-        $unassignedEquipment = Equipment::where('form_factor', 'rackmount')
+        $unassignedEquipment = Equipment::with('system')->where('form_factor', 'rackmount')
             ->whereNotIn('id', $assignedEquipmentIds)
             ->get();
 
         // 2. Equipos periféricos o puntos de red (no van en rack pero se pueden cablear)
-        $externalTargets = Equipment::whereIn('form_factor', ['peripheral', 'network_point'])->get();
+        $externalTargets = Equipment::with('system')->whereIn('form_factor', ['peripheral', 'network_point'])->get();
 
         return view('rack.builder', compact('rack', 'racks', 'unassignedEquipment', 'externalTargets'));
     }

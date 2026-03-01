@@ -8,7 +8,7 @@
 
     <!-- Implementación Drag and Drop con HTML5 API usando Alpine -->
     <div class="py-6 min-h-[calc(100vh-140px)] md:h-[calc(100vh-140px)]">
-        <div x-data="rackBuilder()" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col md:flex-row gap-6">
+        <div x-data="rackBuilder(@js($unassignedEquipment))" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col md:flex-row gap-6">
             
             <!-- CONTROLES Y CATÁLOGO DE EQUIPACIÓN (LEFT PANEL) -->
             <div class="w-full md:w-1/3 flex flex-col gap-6 h-[400px] md:h-full shrink-0">
@@ -26,7 +26,17 @@
                 <div class="bg-tecsisa-card backdrop-blur-md rounded-2xl shadow-lg border border-white/10 flex-1 flex flex-col overflow-hidden">
                     <div class="p-4 border-b border-white/10 bg-white/5 flex justify-between items-center">
                         <h3 class="text-sm font-bold text-white uppercase tracking-wider">Activos en BDR (Sin Enrackar)</h3>
-                        <span class="text-xs text-tecsisa-yellow">{{ count($unassignedEquipment) }} Items</span>
+                        <span class="text-xs text-tecsisa-yellow"><span x-text="filteredCount"></span> Items</span>
+                    </div>
+                    
+                    <div class="px-4 py-3 bg-black/20 border-b border-white/5">
+                        <div class="relative">
+                            <input type="text" x-model="catalogSearch" placeholder="Filtro rápido (ID, Marca, Modelo...)" 
+                                   class="w-full bg-black/40 border-white/10 rounded-lg text-xs text-white placeholder-gray-600 focus:ring-tecsisa-yellow focus:border-tecsisa-yellow h-8 pl-8 pr-3 transition-all">
+                            <div class="absolute left-2.5 top-2 text-gray-600">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="p-4 overflow-y-auto flex-1 h-full scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
@@ -34,19 +44,49 @@
                             <!-- Aquí irían los elementos arrastrables (Source objects) -->
                             @foreach($unassignedEquipment as $eq)
                                 <div draggable="true" 
-                                     x-show="!isPlaced('{{ $eq->id }}')"
+                                     x-show="!isPlaced('{{ $eq->id }}') && matchesSearch('{{ strtolower($eq->internal_id) }}', '{{ strtolower($eq->name) }}')"
                                      x-transition
-                                     @dragstart="startDrag($event, '{{ $eq->id }}', '{{ $eq->internal_id }}', '{{ $eq->name }}', {{ $eq->u_height }})"
-                                     @click="selectEquipment('{{ $eq->id }}', '{{ $eq->internal_id }}', '{{ $eq->name }}', {{ $eq->u_height }})"
+                                     @dragstart="startDrag($event, '{{ $eq->id }}', '{{ $eq->internal_id }}', '{{ $eq->name }}', {{ $eq->u_height }}, '{{ $eq->system->name ?? 'SC' }}')"
+                                     @click="selectEquipment('{{ $eq->id }}', '{{ $eq->internal_id }}', '{{ $eq->name }}', {{ $eq->u_height }}, '{{ $eq->system->name ?? 'SC' }}')"
                                      :class="{'border-l-tecsisa-yellow bg-tecsisa-yellow/10 scale-[1.02] shadow-[0_0_15px_rgba(255,209,0,0.3)]': selectedItem && selectedItem.db_id === '{{ $eq->id }}', 'border-l-blue-500 bg-black/30 hover:bg-white/5': !selectedItem || selectedItem.db_id !== '{{ $eq->id }}'}"
                                      class="p-3 border border-white/5 rounded-lg border-l-4 cursor-pointer transition-all flex justify-between items-center group">
-                                    <div>
-                                        <div class="text-xs font-mono font-bold" :class="{'text-tecsisa-yellow': selectedItem && selectedItem.db_id === '{{ $eq->id }}', 'text-tecsisa-yellow': !selectedItem || selectedItem.db_id !== '{{ $eq->id }}'}">{{ $eq->internal_id }}</div>
-                                        <div class="text-sm font-medium whitespace-nowrap overflow-hidden text-ellipsis max-w-[180px]" :class="{'text-white': selectedItem && selectedItem.db_id === '{{ $eq->id }}', 'text-gray-300': !selectedItem || selectedItem.db_id !== '{{ $eq->id }}'}">{{ $eq->name }}</div>
+                                    <div class="flex-1 overflow-hidden">
+                                        <div class="flex items-center gap-2 mb-0.5">
+                                            <div class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-black/40" :class="{'text-tecsisa-yellow': selectedItem && selectedItem.db_id === '{{ $eq->id }}', 'text-tecsisa-yellow': !selectedItem || selectedItem.db_id !== '{{ $eq->id }}'}">{{ $eq->internal_id }}</div>
+                                            @if($eq->system)
+                                                <span class="text-[8px] uppercase tracking-tighter text-gray-500 font-bold border border-white/5 px-1 rounded">{{ $eq->system->name }}</span>
+                                            @endif
+                                        </div>
+                                        <div class="text-xs font-medium whitespace-nowrap overflow-hidden text-ellipsis" :class="{'text-white': selectedItem && selectedItem.db_id === '{{ $eq->id }}', 'text-gray-400': !selectedItem || selectedItem.db_id !== '{{ $eq->id }}'}">{{ $eq->name }}</div>
                                     </div>
-                                    <div class="bg-white/10 text-gray-400 text-xs px-2 py-1 rounded">{{ $eq->u_height }}U</div>
+                                    <div class="bg-black/40 text-gray-500 text-[10px] px-1.5 py-1 rounded font-black border border-white/5 ml-2">{{ $eq->u_height }}U</div>
                                 </div>
                             @endforeach
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estadísticas del Rack -->
+                <div class="bg-tecsisa-card backdrop-blur-md rounded-2xl shadow-lg border border-white/10 p-5 mt-auto">
+                    <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4">Estado de Ocupación</h4>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between text-xs mb-1.5 flex-wrap gap-1">
+                                <span class="text-gray-500 font-bold uppercase tracking-tighter">Espacio del Rack</span>
+                                <span class="text-tecsisa-yellow font-mono font-bold"><span x-text="occupancyStats.used"></span> / <span x-text="totalU"></span>U</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+                                <div class="h-full bg-tecsisa-yellow shadow-[0_0_10px_rgba(255,209,0,0.5)] transition-all duration-700 ease-out" :style="'width: ' + occupancyStats.percent + '%'"></div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-end">
+                            <div class="space-y-0.5">
+                                <div class="text-xs text-white font-bold"><span x-text="occupancyStats.count"></span> Equipos instalados</div>
+                                <div class="text-[10px] text-green-400 font-medium uppercase tracking-tighter"><span x-text="totalU - occupancyStats.used"></span>U Disponibles</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-[10px] text-gray-600 font-bold uppercase" x-text="occupancyStats.percent.toFixed(1) + '%'"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -118,31 +158,45 @@
                                         <span class="text-xs text-white/30 tracking-widest uppercase font-mono" x-text="selectedItem ? 'Click aquí para instalar' : 'Espacio Libre'"></span>
                                     </div>
 
-                                    <!-- Slot Lleno (Equipo) -->
+                                     <!-- Slot Lleno (Equipo) -->
                                     <div x-show="unit.occupied" class="flex-1 w-full h-full relative cursor-pointer group/equip transition-all"
                                          draggable="true"
-                                         @dragstart="startDrag($event, unit.db_id, unit.eq_id, unit.eq_name, unit.size)"
-                                         @click.stop="selectEquipment(unit.db_id, unit.eq_id, unit.eq_name, unit.size)"
+                                         @dragstart="startDrag($event, unit.db_id, unit.eq_id, unit.eq_name, unit.size, unit.system)"
+                                         @click.stop="selectEquipment(unit.db_id, unit.eq_id, unit.eq_name, unit.size, unit.system)"
                                          :class="{'ring-2 ring-tecsisa-yellow ring-offset-2 ring-offset-[#0a0f18] z-20': selectedItem && selectedItem.db_id === unit.db_id}">
                                         
                                         <!-- Diseño estilo Switch Realista -->
                                         <div class="absolute inset-0 bg-[#1e2329] border-y border-gray-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.5)] flex items-center px-4 overflow-hidden">
                                             
+                                            <!-- Color System Indicator -->
+                                            <div class="absolute top-0 bottom-0 left-2 w-1 opacity-60" :class="{
+                                                'bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]': getSystemColor(unit.system) === 'blue',
+                                                'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.5)]': getSystemColor(unit.system) === 'red',
+                                                'bg-tecsisa-yellow shadow-[0_0_10px_rgba(255,209,0,0.5)]': getSystemColor(unit.system) === 'yellow',
+                                                'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]': getSystemColor(unit.system) === 'green',
+                                                'bg-gray-500': getSystemColor(unit.system) === 'gray'
+                                            }"></div>
+
                                             <!-- Orejas de Rack (Mounting Ears) -->
                                             <div class="absolute left-0 top-0 bottom-0 w-2 bg-gray-400 border-r border-black shadow-[inset_1px_0_2px_rgba(255,255,255,0.5)]"></div>
                                             <div class="absolute right-0 top-0 bottom-0 w-2 bg-gray-400 border-l border-black shadow-[inset_-1px_0_2px_rgba(255,255,255,0.5)]"></div>
 
                                             <!-- Led de Encendido (Verde) -->
-                                            <div class="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_5px_rgba(34,197,94,1)] mr-3"></div>
+                                            <div class="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_5px_rgba(34,197,94,1)] mr-3 ml-2"></div>
 
                                             <!-- Marca / ID Corto -->
                                             <div class="text-[10px] font-black text-gray-400 w-24 truncate"><span x-text="unit.eq_id"></span></div>
 
                                             <!-- Puertos Simulados Visibles (Si es tamaño 1U) -->
                                             <div class="flex-1 flex gap-0.5 justify-end" x-show="unit.size == 1">
-                                                <template x-for="i in 24">
-                                                    <div class="w-2.5 h-3 bg-black border border-gray-700/50 rounded-sm relative">
-                                                        <div class="absolute top-0 right-0 w-0.5 h-0.5 bg-green-500 rounded-full"></div>
+                                                <template x-for="i in 12">
+                                                    <div class="flex gap-0.5">
+                                                        <div class="w-1.5 h-1.5 bg-black border border-gray-700/50 rounded-sm relative mt-1">
+                                                            <div class="absolute -top-1.5 left-0 w-0.5 h-0.5 bg-green-500 rounded-full opacity-40"></div>
+                                                        </div>
+                                                        <div class="w-1.5 h-1.5 bg-black border border-gray-700/50 rounded-sm relative mt-1">
+                                                            <div class="absolute -top-1.5 left-0 w-0.5 h-0.5 bg-green-500 rounded-full opacity-40"></div>
+                                                        </div>
                                                     </div>
                                                 </template>
                                             </div>
@@ -409,12 +463,13 @@
     <!-- Alpine.js Logic para el Constructor de Rack -->
     <script>
         document.addEventListener('alpine:init', () => {
-            Alpine.data('rackBuilder', () => ({
+            Alpine.data('rackBuilder', (unassignedCatalog = []) => ({
                 rackId: {{ $rack->id }},
                 totalU: {{ $rack->total_units }}, // Total units from PHP ($rack->total_units)
                 rackUnits: [],
                 existingUnits: @json($rack->units),
                 externalTargets: @json($externalTargets ?? []),
+                unassignedCatalog: unassignedCatalog,
                 saving: false,
                 
                 // Variable para el equipo seleccionado mediante CLICK (Modo Móvil/Tablet)
@@ -436,6 +491,30 @@
                 wizardCableType: 'utp',
                 wizardCableColor: 'blue',
                 savingConnection: false,
+                catalogSearch: '',
+
+                get occupancyStats() {
+                    const used = this.rackUnits.reduce((acc, u) => acc + (u.occupied && !u.hidden ? u.size : 0), 0);
+                    const count = this.rackUnits.filter(u => u.occupied && !u.hidden).length;
+                    return {
+                        used,
+                        count,
+                        percent: (used / this.totalU) * 100
+                    };
+                },
+
+                get filteredCount() {
+                    return this.unassignedCatalog.filter(eq => 
+                        !this.isPlaced(eq.id) && 
+                        this.matchesSearch(eq.internal_id.toLowerCase(), eq.name.toLowerCase())
+                    ).length;
+                },
+
+                matchesSearch(id, name) {
+                    if (!this.catalogSearch) return true;
+                    const search = this.catalogSearch.toLowerCase();
+                    return id.includes(search) || name.includes(search);
+                },
 
                 init() {
                     // Inicializar rack vacio de arriba hacia abajo
@@ -448,6 +527,7 @@
                             eq_id: null,
                             eq_name: null,
                             db_id: null,
+                            system: null,
                             dragHover: false
                         });
                     }
@@ -462,6 +542,7 @@
                                 this.rackUnits[unitIndex].db_id = exU.equipment.id;
                                 this.rackUnits[unitIndex].eq_id = exU.equipment.internal_id;
                                 this.rackUnits[unitIndex].eq_name = exU.equipment.name;
+                                this.rackUnits[unitIndex].system = exU.equipment.system ? exU.equipment.system.name : 'SC';
 
                                 // Hide slots below the top slot based on size (simulating rack constraints)
                                 for(let s = 1; s < exU.position_size; s++) {
@@ -480,7 +561,7 @@
                     return this.rackUnits.some(u => u.occupied && u.db_id == dbId);
                 },
 
-                selectEquipment(dbId, displayId, name, size) {
+                selectEquipment(dbId, displayId, name, size, systemName = null) {
                     // Toggle selection logic
                     if (this.selectedItem && this.selectedItem.db_id === dbId) {
                         this.selectedItem = null;
@@ -490,14 +571,15 @@
                             db_id: dbId,
                             eq_id: displayId,
                             eq_name: name,
-                            size: parseInt(size)
+                            size: parseInt(size),
+                            system: systemName
                         };
                         this.draggedItem = this.selectedItem; // Keep drag compatible with click
                     }
                 },
 
-                startDrag(event, dbId, displayId, name, size) {
-                    this.selectEquipment(dbId, displayId, name, size);
+                startDrag(event, dbId, displayId, name, size, systemName = null) {
+                    this.selectEquipment(dbId, displayId, name, size, systemName);
                     event.dataTransfer.effectAllowed = 'move';
                     // Pequeña trampita para Alpine
                     setTimeout(() => { event.target.classList.add('opacity-50'); }, 0);
@@ -583,6 +665,7 @@
                         targetUnit.eq_id = this.draggedItem.eq_id;
                         targetUnit.eq_name = this.draggedItem.eq_name;
                         targetUnit.db_id = this.draggedItem.db_id;
+                        targetUnit.system = this.draggedItem.system;
 
                         // Esconder las unidades inferiores que este equipo "tapa" fisicamente
                         for(let i = 1; i < this.draggedItem.size; i++) {
@@ -634,6 +717,17 @@
                     unit.eq_id = null;
                     unit.eq_name = null;
                     unit.db_id = null;
+                    unit.system = null;
+                },
+
+                getSystemColor(name) {
+                    if (!name) return 'gray';
+                    const n = name.toLowerCase();
+                    if (n.includes('red') || n.includes('datos')) return 'blue';
+                    if (n.includes('seguridad') || n.includes('cctv')) return 'red';
+                    if (n.includes('ups') || n.includes('energía') || n.includes('electrico')) return 'yellow';
+                    if (n.includes('voz') || n.includes('video') || n.includes('clinico')) return 'green';
+                    return 'gray';
                 },
 
                 // ---- PORT VIEWER ACTIONS ----
