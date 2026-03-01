@@ -49,6 +49,7 @@ class TaskController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'priority' => 'required|in:low,medium,high,critical',
+            'task_type' => 'required|in:maintenance,replacement,installation',
             'form_data' => 'nullable|array',
         ]);
 
@@ -57,6 +58,7 @@ class TaskController extends Controller
             'title' => $validated['title'],
             'description' => $validated['description'],
             'priority' => $validated['priority'],
+            'task_type' => $validated['task_type'],
             'assigned_to' => Auth::id(), // Automatically assign to creator for now
             'status' => 'draft', // Initial state
             'form_data' => $validated['form_data'] ?? [],
