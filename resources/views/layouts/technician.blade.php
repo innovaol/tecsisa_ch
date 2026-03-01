@@ -84,6 +84,7 @@
     </main>
 
     <!-- Bottom Navigation Bar (App Nativa Flow) -->
+    @if(!$hideNav)
     <nav class="bg-[#0f1217]/95 backdrop-blur-2xl border-t border-white/10 shrink-0 pb-safe-bottom z-40 relative">
         <div class="flex justify-around items-center px-2 py-3">
             <a href="{{ route('technician.dashboard') }}" class="flex flex-col items-center gap-1 {{ request()->routeIs('technician.dashboard') ? 'text-tecsisa-yellow' : 'text-gray-500 hover:text-gray-400' }} transition-colors">
@@ -111,6 +112,7 @@
             </form>
         </div>
     </nav>
+    @endif
 
     <!-- Modal Fondo Intento (Bottom Sheet) -->
     <div x-show="showScannerMenu" style="display: none;" class="fixed inset-0 z-[100] flex flex-col justify-end">

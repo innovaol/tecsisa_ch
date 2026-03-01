@@ -1,4 +1,4 @@
-<x-technician-layout>
+<x-technician-layout :hideNav="true">
     <div class="fixed top-0 inset-x-0 z-[60] bg-[#0a0d14]/95 backdrop-blur-3xl border-b border-white/5 pt-safe">
         <div class="px-4 py-4 flex items-center justify-between">
             <a href="{{ route('technician.scanner.result', $task->equipment_id) }}" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white transition shadow-lg">
@@ -156,22 +156,23 @@
             </div>
 
             <!-- Botones Flotantes de Acción Fijos Inferiores -->
-            <div class="fixed bottom-0 inset-x-0 bg-[#0a0d14]/95 backdrop-blur-3xl border-t border-white/10 pb-safe z-50 p-5">
-                <div class="flex gap-4 max-w-lg mx-auto">
-                    <button type="button" @click="doSubmit('save_draft')" class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold py-5 rounded-2xl text-[10px] uppercase tracking-widest transition" :class="{'opacity-50 cursor-not-allowed': isSubmitting}">
-                        <span x-show="!isSubmitting">Guardar Avance</span>
-                        <span x-show="isSubmitting">Procesando...</span>
+            <div class="fixed bottom-0 inset-x-0 bg-[#0a0d14]/98 backdrop-blur-3xl border-t border-white/10 pb-safe z-[70]">
+                <div class="flex gap-4 p-5 max-w-lg mx-auto">
+                    <button type="button" @click="doSubmit('save_draft')" class="flex-1 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold py-5 rounded-2xl text-[10px] uppercase tracking-[0.2em] transition" :class="{'opacity-50 cursor-not-allowed': isSubmitting}">
+                        <span x-show="!isSubmitting">Borrador</span>
+                        <span x-show="isSubmitting">...</span>
                     </button>
                     
-                    <button type="button" @click="doSubmit('submit')" class="flex-[2] bg-tecsisa-yellow hover:bg-yellow-400 text-black font-black py-5 rounded-2xl text-[10px] uppercase tracking-widest shadow-[0_15px_35px_rgba(255,209,0,0.4)] transition active:scale-95" :class="{'opacity-50 cursor-not-allowed': isSubmitting}">
+                    <button type="button" @click="doSubmit('submit')" class="flex-[2] bg-tecsisa-yellow hover:bg-yellow-400 text-black font-black py-5 rounded-2xl text-[10px] uppercase tracking-[0.2em] shadow-[0_15px_40px_rgba(255,209,0,0.4)] transition active:scale-95 flex items-center justify-center gap-2" :class="{'opacity-50 cursor-not-allowed': isSubmitting}">
                         <span x-show="!isSubmitting">Finalizar Reporte</span>
-                        <span x-show="isSubmitting">Enviando...</span>
+                        <span x-show="isSubmitting">Enviando Tarea...</span>
+                        <svg x-show="!isSubmitting" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                     </button>
                 </div>
             </div>
             
             <!-- Safe Spacer for fixed bottom buttons -->
-            <div class="h-20"></div>
+            <div class="h-32"></div>
         </form>
     </div>
 </x-technician-layout>

@@ -115,12 +115,12 @@ class TaskController extends Controller
         if ($validated['action'] === 'submit') {
             $task->status = 'pending'; // Moves from draft to pending verification
             $task->save();
-            return redirect()->route('technician.dashboard')->with('success', 'Tarea enviada para revisión final.');
+            return redirect()->route('technician.scanner.result', $task->equipment_id)->with('success', 'Tarea enviada para revisión final.');
         }
         else {
             // Just saving draft
             $task->save();
-            return back()->with('success', 'Borrador guardado correctamente. Puedes continuar luego.');
+            return redirect()->route('technician.scanner.result', $task->equipment_id)->with('success', 'Borrador guardado correctamente. Puedes continuar luego.');
         }
     }
 }

@@ -7,6 +7,13 @@ use Illuminate\View\View;
 
 class TechnicianLayout extends Component
 {
+    public $hideNav;
+
+    public function __construct($hideNav = false)
+    {
+        $this->hideNav = $hideNav;
+    }
+
     /**
      * Get the view / contents that represents the component.
      */
