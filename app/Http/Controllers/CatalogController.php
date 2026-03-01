@@ -25,6 +25,7 @@ class CatalogController extends Controller
     {
         $validated = $request->validate([
             'internal_id' => 'required|unique:equipment,internal_id,' . $equipment->id,
+            'serial_number' => 'nullable|string|unique:equipment,serial_number,' . $equipment->id,
             'name' => 'required|string|max:255',
             'form_factor' => 'required|in:rackmount,peripheral,network_point',
             'u_height' => 'required_if:form_factor,rackmount|nullable|integer|min:1|max:42',
@@ -52,6 +53,7 @@ class CatalogController extends Controller
     {
         $validated = $request->validate([
             'internal_id' => 'required|unique:equipment,internal_id',
+            'serial_number' => 'nullable|string|unique:equipment,serial_number',
             'name' => 'required|string|max:255',
             'form_factor' => 'required|in:rackmount,peripheral,network_point',
             'u_height' => 'required_if:form_factor,rackmount|nullable|integer|min:1|max:42',

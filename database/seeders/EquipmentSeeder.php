@@ -25,6 +25,7 @@ class EquipmentSeeder extends Seeder
         // Switch de Cobre y Fibra
         Equipment::create([
             'internal_id' => 'SW-MDF-001',
+            'serial_number' => 'FOC2345678',
             'name' => 'Switch Core Principal',
             'system_id' => $vozip->id,
             'location_id' => $mdf->id,
@@ -41,6 +42,7 @@ class EquipmentSeeder extends Seeder
         // Cámara en Urgencias
         Equipment::create([
             'internal_id' => 'CAM-URG-001',
+            'serial_number' => 'HIK987654',
             'name' => 'Cámara PTZ Sala Espera',
             'system_id' => $cctv->id,
             'location_id' => $urgencias->id,
@@ -57,6 +59,7 @@ class EquipmentSeeder extends Seeder
         // Cámara Pasillo
         Equipment::create([
             'internal_id' => 'CAM-QRO-001',
+            'serial_number' => 'DAH112233',
             'name' => 'Cámara Fija Quirófanos',
             'system_id' => $cctv->id,
             'location_id' => $quir->id,
@@ -73,6 +76,7 @@ class EquipmentSeeder extends Seeder
         // Switch IDF
         Equipment::create([
             'internal_id' => 'SW-IDF2-001',
+            'serial_number' => 'ARU554433',
             'name' => 'Switch Distribución Piso 2',
             'system_id' => $vozip->id,
             'location_id' => $idfPiso2->id,

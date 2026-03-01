@@ -540,6 +540,14 @@
                                        placeholder="Ej: SW-MDF-001">
                             </div>
 
+                            <!-- Serial Number -->
+                            <div>
+                                <label class="block text-gray-400 text-xs font-bold uppercase mb-1">N/S Fabricante (Código de Barras)</label>
+                                <input type="text" name="serial_number" x-model="formData.serial_number" 
+                                       class="w-full bg-black/40 border-white/10 rounded-lg text-white focus:border-tecsisa-yellow focus:ring-tecsisa-yellow transition h-10 px-3" 
+                                       placeholder="Ej: FOC2345678">
+                            </div>
+
                             <!-- Nombre -->
                             <div>
                                 <label class="block text-gray-400 text-xs font-bold uppercase mb-1">Nombre del Equipo / Modelo</label>
@@ -801,7 +809,7 @@
                 this.editMode = false;
                 this.formAction = '/catalogos/equipment';
                 this.formData = {
-                    id: '', internal_id: '', name: '', form_factor: '',
+                    id: '', internal_id: '', serial_number: '', name: '', form_factor: '',
                     u_height: 1, system_id: '', location_id: '',
                     status: '', installation_date: '', last_maintenance_at: '',
                     specs: {}, notes: ''
@@ -815,6 +823,7 @@
                 this.formData = {
                     id: eq.id,
                     internal_id: String(eq.internal_id || ''),
+                    serial_number: String(eq.serial_number || ''),
                     name: String(eq.name || ''),
                     form_factor: String(eq.form_factor || 'rackmount'),
                     u_height: eq.u_height || 1,

@@ -26,17 +26,22 @@ class ScannerController extends Controller
 
         $query = $validated['query'];
 
-        // Find equipment exactly matching internal_id (Simulation of QR reading)
-        $equipment = Equipment::with('system', 'location')->where('internal_id', $query)->first();
+        // Find equipment exactly matching internal_id or serial_number (Simulation of barcode/QR reading)
+        $equipment = Equipment::with('system', 'location')
+            ->where('internal_id', $query)
+            ->orWhere('serial_number', $query)
+            ->first();
 
         if ($equipment) {
-            // Found exact match via "QR"
+            // Found exact match "QR / Barcode"
             return view('scanner.result', ['equipment' => $equipment]);
         }
 
         // Otherwise, do a soft search
-        $results = Equipment::where('name', 'LIKE', "%{$query}%")
+        $results = Equipment::with('system', 'location')
+            ->where('name', 'LIKE', "%{$query}%")
             ->orWhere('internal_id', 'LIKE', "%{$query}%")
+            ->orWhere('serial_number', 'LIKE', "%{$query}%")
             ->take(10)
             ->get();
 
