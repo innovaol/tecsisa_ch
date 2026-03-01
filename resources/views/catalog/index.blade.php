@@ -1,117 +1,70 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-bold text-2xl text-white tracking-wide leading-tight flex items-center gap-3">
-            <svg class="w-6 h-6 text-tecsisa-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-            {{ __('Gestión de Catálogos (BDR)') }}
+        <h2 class="font-semibold text-xl text-white leading-tight">
+            {{ __('Gestión de Catálogos y Activos') }}
         </h2>
     </x-slot>
 
-    <div class="py-12" x-data="inventoryManager()">
+    <div class="py-12" x-data="inventoryManager(@js($locations), @js($systems))">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             
             <!-- Tabs Navigation -->
-            <div class="flex space-x-2 mb-6 ml-2 overflow-x-auto">
-                <button @click="activeTab = 'locations'" :class="{ 'bg-tecsisa-yellow text-tecsisa-dark font-bold shadow-[0_0_15px_rgba(255,209,0,0.3)]': activeTab === 'locations', 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10': activeTab !== 'locations' }" class="px-5 py-2.5 rounded-xl text-sm transition-all duration-300 border border-white/10">
-                    Edificios y Áreas
+            <div class="flex gap-4 mb-8 border-b border-white/10 pb-4">
+                <button @click="activeTab = 'locations'" 
+                        :class="activeTab === 'locations' ? 'text-tecsisa-yellow border-b-2 border-tecsisa-yellow' : 'text-gray-500 hover:text-gray-300'"
+                        class="px-4 py-2 font-bold transition-all uppercase text-sm tracking-widest">
+                    Ubicaciones / Racks
                 </button>
-                <button @click="activeTab = 'systems'" :class="{ 'bg-tecsisa-yellow text-tecsisa-dark font-bold shadow-[0_0_15px_rgba(255,209,0,0.3)]': activeTab === 'systems', 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10': activeTab !== 'systems' }" class="px-5 py-2.5 rounded-xl text-sm transition-all duration-300 border border-white/10">
+                <button @click="activeTab = 'systems'" 
+                        :class="activeTab === 'systems' ? 'text-tecsisa-yellow border-b-2 border-tecsisa-yellow' : 'text-gray-500 hover:text-gray-300'"
+                        class="px-4 py-2 font-bold transition-all uppercase text-sm tracking-widest">
                     Sistemas Técnicos
                 </button>
-                <button @click="activeTab = 'equipment'" :class="{ 'bg-tecsisa-yellow text-tecsisa-dark font-bold shadow-[0_0_15px_rgba(255,209,0,0.3)]': activeTab === 'equipment', 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10': activeTab !== 'equipment' }" class="px-5 py-2.5 rounded-xl text-sm transition-all duration-300 border border-white/10">
-                    Inventario Base Físico
+                <button @click="activeTab = 'equipment'" 
+                        :class="activeTab === 'equipment' ? 'text-tecsisa-yellow border-b-2 border-tecsisa-yellow' : 'text-gray-500 hover:text-gray-300'"
+                        class="px-4 py-2 font-bold transition-all uppercase text-sm tracking-widest">
+                    Inventario de Equipos
                 </button>
             </div>
 
-            <!-- Content Area: Locations -->
-            <div x-show="activeTab === 'locations'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="bg-tecsisa-card backdrop-blur-xl rounded-2xl shadow-lg border border-white/10 overflow-hidden" style="display: none;">
-                <div class="flex justify-between items-center p-6 border-b border-white/5 bg-white/5">
-                    <h3 class="text-xl font-semibold text-white">Estructura Hospitalaria</h3>
-                    <button class="bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 border border-blue-500/30 px-4 py-2 rounded-lg text-sm font-medium transition shadow-sm">
-                        + Nueva Ubicación
-                    </button>
+            <!-- Tab: Locations -->
+            <div x-show="activeTab === 'locations'" x-transition>
+                <div class="bg-tecsisa-dark/40 backdrop-blur-md border border-white/10 rounded-2xl p-8">
+                    <h3 class="text-white text-lg font-bold mb-4">Ubicaciones y Site Rooms</h3>
+                    <p class="text-gray-400 text-sm">Próximamente: CRUD de Ubicaciones</p>
                 </div>
-                <div class="p-6">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="text-xs font-semibold tracking-wide text-gray-400 uppercase border-b border-white/10">
-                                    <th class="pb-3 pr-4">ID</th>
-                                    <th class="pb-3 pr-4">Nombre de la Ubicación</th>
-                                    <th class="pb-3 pr-4">Nivel Jurídico/Físico</th>
-                                    <th class="pb-3 pr-4">Ubicación Padre</th>
-                                    <th class="pb-3 text-right">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-white/5">
-                                @forelse($locations as $loc)
-                                <tr class="hover:bg-white/5 transition-colors group">
-                                    <td class="py-4 pr-4 font-mono text-xs text-gray-500">LOC-{{ str_pad($loc->id, 3, '0', STR_PAD_LEFT) }}</td>
-                                    <td class="py-4 pr-4 text-sm font-medium text-gray-200 group-hover:text-white">{{ $loc->name }}</td>
-                                    <td class="py-4 pr-4 text-sm text-gray-400">
-                                        <span class="px-2.5 py-0.5 rounded-full text-xs font-medium 
-                                            @if($loc->level === 'edificio') bg-purple-500/10 text-purple-400 border border-purple-500/20
-                                            @elseif($loc->level === 'piso') bg-blue-500/10 text-blue-400 border border-blue-500/20
-                                            @else bg-green-500/10 text-green-400 border border-green-500/20 @endif">
-                                            {{ ucfirst($loc->level) }}
-                                        </span>
-                                    </td>
-                                    <td class="py-4 pr-4 text-sm text-gray-500">{{ $loc->parent ? $loc->parent->name : '-- Raíz --' }}</td>
-                                    <td class="py-4 text-right">
-                                        <button class="text-gray-400 hover:text-tecsisa-yellow transition"><svg class="w-5 h-5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg></button>
-                                        <button class="text-gray-400 hover:text-red-400 transition ml-2"><svg class="w-5 h-5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
-                                    </td>
-                                </tr>
-                                @empty
-                                <tr><td colspan="5" class="py-6 text-center text-gray-500">No hay ubicaciones registradas</td></tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+            </div>
+
+            <!-- Tab: Systems -->
+            <div x-show="activeTab === 'systems'" x-transition>
+                <div class="bg-tecsisa-dark/40 backdrop-blur-md border border-white/10 rounded-2xl p-8 text-white">
+                    <h3 class="text-lg font-bold mb-4">Sistemas de Baja Tensión</h3>
+                    <p class="text-gray-400 text-sm mb-6">Próximamente: Definición de esquemas personalizados por sistema</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        @foreach($systems as $sys)
+                        <div class="bg-black/20 p-4 rounded-xl border border-white/5">
+                            <h4 class="font-bold text-tecsisa-yellow">{{ $sys->name }}</h4>
+                            <p class="text-xs text-gray-500 mt-1 uppercase">{{ $sys->slug }}</p>
+                            <div class="mt-3 flex gap-2">
+                                <span class="text-[10px] bg-white/5 px-2 py-0.5 rounded text-gray-400">
+                                    {{ count($sys->form_schema ?? []) }} campos
+                                </span>
+                            </div>
+                        </div>
+                        @endforeach
                     </div>
                 </div>
             </div>
 
-            <!-- Content Area: Systems -->
-            <div x-show="activeTab === 'systems'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="bg-tecsisa-card backdrop-blur-xl rounded-2xl shadow-lg border border-white/10 overflow-hidden" style="display: none;">
-                <div class="flex justify-between items-center p-6 border-b border-white/5 bg-white/5">
-                    <h3 class="text-xl font-semibold text-white">Sistemas Clínicos y Tecnológicos</h3>
-                    <button class="bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 border border-blue-500/30 px-4 py-2 rounded-lg text-sm font-medium transition shadow-sm">
-                        + Registrar Sistema
-                    </button>
-                </div>
-                <!-- Grids of System Cards instead of Tables for variety -->
-                <div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    @forelse($systems as $sys)
-                    <div class="bg-white/5 border border-white/10 rounded-xl p-5 hover:border-tecsisa-yellow/30 transition group">
-                        <div class="flex items-center justify-between mb-4">
-                            <h4 class="text-lg font-bold text-gray-200 group-hover:text-tecsisa-yellow transition">{{ $sys->name }}</h4>
-                            <span class="bg-white/10 text-gray-400 text-xs px-2 py-1 rounded">{{ count($sys->form_schema ?? []) }} Atributos</span>
-                        </div>
-                        <div class="space-y-2 mt-4">
-                            @foreach(array_slice($sys->form_schema ?? [], 0, 3) as $field)
-                                <div class="text-xs text-gray-400 font-mono bg-black/20 p-1.5 rounded flex justify-between">
-                                    <span>{{ $field['label'] }}</span>
-                                    <span class="text-gray-500">[{{ $field['type'] }}]</span>
-                                </div>
-                            @endforeach
-                            @if(count($sys->form_schema ?? []) > 3)
-                                <div class="text-xs text-center text-gray-500 w-full mt-2 italic">+ {{ count($sys->form_schema) - 3 }} campos más</div>
-                            @endif
-                        </div>
-                        <div class="mt-6 flex justify-end space-x-2">
-                             <button class="text-xs border border-white/10 text-gray-300 hover:bg-white/10 px-3 py-1.5 rounded transition">Editar Esquema</button>
-                        </div>
+            <!-- Tab: Equipment (Main Catalog) -->
+            <div x-show="activeTab === 'equipment'" x-transition>
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h3 class="text-white text-xl font-bold">Catálogo Maestro de Activos</h3>
+                        <p class="text-gray-500 text-sm">Gestiona todo el hardware, periféricos y puntos de red.</p>
                     </div>
-                    @empty
-                    <div class="col-span-full py-6 text-center text-gray-500">No hay sistemas registrados</div>
-                    @endforelse
-                </div>
-            </div>
-
-            <!-- Content Area: Equipment -->
-            <div x-show="activeTab === 'equipment'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="bg-tecsisa-card backdrop-blur-xl rounded-2xl shadow-lg border border-white/10 overflow-hidden" style="display: none;">
-                <div class="flex justify-between items-center p-6 border-b border-white/5 bg-white/5">
-                    <h3 class="text-xl font-semibold text-white">Inventario (Asset DB)</h3>
-                    <div class="flex space-x-3">
+                    <div class="flex gap-4">
                         <div class="relative">
                             <input type="text" placeholder="Buscar por ID Interno..." class="bg-black/30 border border-white/10 text-sm text-gray-300 rounded-lg pl-10 pr-4 py-2 focus:ring-tecsisa-yellow focus:border-tecsisa-yellow">
                             <svg class="w-4 h-4 text-gray-500 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
@@ -121,194 +74,221 @@
                         </button>
                     </div>
                 </div>
-                <div class="p-0">
+
+                <div class="bg-tecsisa-dark/60 border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
                     <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="bg-black/20 text-xs font-semibold tracking-wide text-gray-400 uppercase border-b border-white/10">
-                                    <th class="py-4 pl-6 pr-4">ID de Placa</th>
-                                    <th class="py-4 pr-4">Nombre / Modelo</th>
-                                    <th class="py-4 pr-4">Tipo (Form Factor)</th>
-                                    <th class="py-4 pr-4">Sistema</th>
-                                    <th class="py-4 pr-4">Ubicación Actual</th>
-                                    <th class="py-4 pr-4">Estatus</th>
-                                    <th class="py-4 pr-6 text-right">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-white/5">
-                                @forelse($equipments as $eq)
-                                <tr class="hover:bg-white/5 transition-colors group cursor-pointer">
-                                    <td class="py-4 pl-6 pr-4 font-mono text-sm tracking-tight text-tecsisa-yellow font-bold">{{ $eq->internal_id }}</td>
-                                    <td class="py-4 pr-4 text-sm font-medium text-gray-200 group-hover:text-white">{{ $eq->name }}</td>
-                                    <td class="py-4 pr-4 text-sm text-gray-400">
-                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase border 
-                                            @if($eq->form_factor === 'rackmount') border-blue-500/30 text-blue-400 bg-blue-500/5
-                                            @elseif($eq->form_factor === 'peripheral') border-purple-500/30 text-purple-400 bg-purple-500/5
-                                            @else border-amber-500/30 text-amber-400 bg-amber-500/5 @endif">
-                                            {{ $eq->form_factor }}
-                                        </span>
-                                    </td>
-                                    <td class="py-4 pr-4 text-sm text-gray-400">
-                                        <div class="flex items-center gap-1.5">
-                                            <div class="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
-                                            {{ $eq->system->name }}
-                                        </div>
-                                    </td>
-                                    <td class="py-4 pr-4 text-sm text-gray-400">
-                                        {{ $eq->location ? $eq->location->name : 'N/A' }}
-                                    </td>
-                                    <td class="py-4 pr-4 text-sm text-gray-400">
-                                        @if($eq->status === 'operative')
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-500/10 text-green-400 border border-green-500/20">Operativo</span>
-                                        @elseif($eq->status === 'under_maintenance')
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-500/10 text-yellow-400 border border-yellow-500/20">Mantenimiento</span>
-                                        @else
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-500/10 text-red-400 border border-red-500/20">De Baja</span>
-                                        @endif
-                                    </td>
-                                    <td class="py-4 pr-6 text-right flex justify-end gap-2">
-                                        <button @click="openEditModal(@js($eq))" class="text-gray-400 hover:text-white transition p-1"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg></button>
-                                        <form action="{{ route('catalog.equipment.destroy', $eq) }}" method="POST" onsubmit="return confirm('¿Eliminar este equipo del inventario?')">
-                                            @csrf @method('DELETE')
-                                            <button class="text-gray-500 hover:text-red-400 transition p-1"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
-                                        </form>
-                                    </td>
-                                </tr>
-                                @empty
-                                <tr><td colspan="6" class="py-8 text-center text-gray-500">El catálogo de equipos está vacío.</td></tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                        <thead>
+                            <tr class="bg-white/5 text-[10px] font-black uppercase text-gray-500 tracking-widest border-b border-white/10">
+                                <th class="py-4 pl-6">ID Interno</th>
+                                <th class="py-4">Nombre / Modelo</th>
+                                <th class="py-4">Tipo (Form Factor)</th>
+                                <th class="py-4">Sistema</th>
+                                <th class="py-4">Estatus</th>
+                                <th class="py-4 pr-6 text-right">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm">
+                            @forelse($equipments as $eq)
+                            <tr class="border-b border-white/5 hover:bg-white/[0.02] transition-colors group">
+                                <td class="py-4 pl-6">
+                                    <span class="font-mono text-tecsisa-yellow font-bold">{{ $eq->internal_id }}</span>
+                                </td>
+                                <td class="py-4">
+                                    <div class="flex flex-col">
+                                        <span class="font-bold text-gray-200">{{ $eq->name }}</span>
+                                        <span class="text-[10px] text-gray-500 uppercase">{{ $eq->location->name ?? 'Sin ubicación' }}</span>
+                                    </div>
+                                </td>
+                                <td class="py-4">
+                                    @if($eq->form_factor === 'rackmount')
+                                        <span class="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded border border-blue-500/20 uppercase font-bold">Rackmount</span>
+                                    @elseif($eq->form_factor === 'peripheral')
+                                        <span class="text-[10px] bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded border border-purple-500/20 uppercase font-bold">Periférico</span>
+                                    @else
+                                        <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20 uppercase font-bold">Red (Pared)</span>
+                                    @endif
+                                </td>
+                                <td class="py-4">
+                                    <span class="text-gray-400 font-medium">{{ $eq->system->name ?? 'N/A' }}</span>
+                                </td>
+                                <td class="py-4 text-center">
+                                    @if($eq->status === 'operative')
+                                        <span class="w-2 h-2 rounded-full bg-green-500 inline-block shadow-[0_0_8px_rgba(34,197,94,0.6)]" title="Operativo"></span>
+                                    @elseif($eq->status === 'under_maintenance')
+                                        <span class="w-2 h-2 rounded-full bg-yellow-500 inline-block shadow-[0_0_8px_rgba(234,179,8,0.6)]" title="Mantenimiento"></span>
+                                    @else
+                                        <span class="w-2 h-2 rounded-full bg-red-500 inline-block shadow-[0_0_8px_rgba(239,68,68,0.6)]" title="Fuera de Servicio"></span>
+                                    @endif
+                                </td>
+                                <td class="py-4 pr-6 text-right flex justify-end gap-2">
+                                    <button @click="openEditModal(@js($eq))" class="text-gray-400 hover:text-white transition p-1 cursor-pointer">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                    </button>
+                                    <form action="{{ route('catalog.equipment.destroy', $eq) }}" method="POST" onsubmit="return confirm('¿Eliminar este equipo del inventario?')">
+                                        @csrf @method('DELETE')
+                                        <button class="text-gray-500 hover:text-red-400 transition p-1"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                                    </form>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr><td colspan="6" class="py-8 text-center text-gray-500">El catálogo de equipos está vacío.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
         </div>
-    </div>
-    </div>
 
-    <!-- Modal: Alta/Edición de Equipo -->
-    <x-modal name="equipment-modal" :show="false" maxWidth="4xl" focusable>
-        <div class="bg-tecsisa-dark p-0 border border-white/10 overflow-hidden">
-            <form method="post" :action="formAction" class="p-8">
-                @csrf
-                <template x-if="editMode">
-                    @method('PUT')
-                </template>
+        <!-- Custom Modal Implementation (Integrated into root x-data scope) -->
+        <div x-show="showEquipmentModal" 
+             style="display: none;"
+             class="fixed inset-0 z-50 overflow-y-auto"
+             role="dialog" aria-modal="true">
+            
+            <!-- Backdrop -->
+            <div x-show="showEquipmentModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" 
+                 class="fixed inset-0 bg-black/80 backdrop-blur-sm transition-all" @click="showEquipmentModal = false"></div>
 
-                <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
-                    <svg class="w-6 h-6 text-tecsisa-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    <span x-text="editMode ? 'Editar Activo: ' + formData.internal_id : 'Registrar Nuevo Activo (Asset)'"></span>
-                </h2>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- ID Interno -->
-                    <div>
-                        <x-input-label for="internal_id" value="ID de Placa / Tag" class="text-gray-400 text-xs font-bold uppercase" />
-                        <x-text-input id="internal_id" name="internal_id" type="text" x-model="formData.internal_id" class="mt-1 block w-full bg-black/40 border-white/10 focus:border-tecsisa-yellow text-white" required placeholder="Ej: SW-MDF-001" />
-                    </div>
-
-                    <!-- Nombre -->
-                    <div>
-                        <x-input-label for="name" value="Nombre del Equipo / Modelo" class="text-gray-400 text-xs font-bold uppercase" />
-                        <x-text-input id="name" name="name" type="text" x-model="formData.name" class="mt-1 block w-full bg-black/40 border-white/10 focus:border-tecsisa-yellow text-white" required placeholder="Ej: Cisco Catalyst 9300" />
-                    </div>
-
-                    <!-- Form Factor -->
-                    <div>
-                        <x-input-label for="form_factor" value="Tipo de Activo (Form Factor)" class="text-gray-400 text-xs font-bold uppercase" />
-                        <select id="form_factor" name="form_factor" x-model="formData.form_factor" class="mt-1 block w-full bg-black/40 border-white/10 rounded-md shadow-sm focus:border-tecsisa-yellow focus:ring-tecsisa-yellow text-white">
-                            <option value="rackmount">Rackmount (Switch/Servidor)</option>
-                            <option value="peripheral">Periférico (Cámara/PC/AP)</option>
-                            <option value="network_point">Punto de Red (Roseta/Pared)</option>
-                        </select>
-                    </div>
-
-                    <!-- Sistema -->
-                    <div>
-                        <x-input-label for="system_id" value="Sistema Perteneciente" class="text-gray-400 text-xs font-bold uppercase" />
-                        <select id="system_id" name="system_id" x-model="formData.system_id" class="mt-1 block w-full bg-black/40 border-white/10 rounded-md shadow-sm focus:border-tecsisa-yellow focus:ring-tecsisa-yellow text-white">
-                            <option value="">-- Seleccione Sistema --</option>
-                            @foreach($systems as $sys)
-                                <option value="{{ $sys->id }}">{{ $sys->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <!-- Ubicación -->
-                    <div>
-                        <x-input-label for="location_id" value="Ubicación Física" class="text-gray-400 text-xs font-bold uppercase" />
-                        <select id="location_id" name="location_id" x-model="formData.location_id" class="mt-1 block w-full bg-black/40 border-white/10 rounded-md shadow-sm focus:border-tecsisa-yellow focus:ring-tecsisa-yellow text-white">
-                            <option value="">Seleccione ubicación...</option>
-                            @foreach($locations as $loc)
-                                <option value="{{ $loc->id }}">{{ $loc->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <!-- Estatus -->
-                    <div>
-                        <x-input-label for="status" value="Estado Operativo Inicial" class="text-gray-400 text-xs font-bold uppercase" />
-                        <select id="status" name="status" x-model="formData.status" class="mt-1 block w-full bg-black/40 border-white/10 rounded-md shadow-sm focus:border-tecsisa-yellow focus:ring-tecsisa-yellow text-white">
-                            <option value="operative">Operativo</option>
-                            <option value="under_maintenance">En Mantenimiento</option>
-                            <option value="out_of_service">Fuera de Servicio</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- SECCIÓN DINÁMICA: Especificaciones Técnicas del Sistema -->
-                <div x-show="activeSchema.length > 0" x-transition class="mt-8 p-4 bg-white/5 border border-white/10 rounded-xl">
-                    <h3 class="text-sm font-bold text-tecsisa-yellow uppercase tracking-widest mb-4 flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                        Especificaciones del Sistema
-                    </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <template x-for="(field, index) in activeSchema" :key="index">
-                            <div>
-                                <label class="block text-[10px] font-black text-gray-500 uppercase mb-1" x-text="field.label"></label>
-                                <input :type="field.type === 'number' ? 'number' : 'text'" 
-                                       :name="'specs[' + field.label + ']'" 
-                                       x-model="formData.specs[field.label]"
-                                       class="block w-full bg-black/60 border-white/5 rounded-lg text-sm text-white focus:border-tecsisa-yellow focus:ring-0 transition"
-                                       :placeholder="'Ingresar ' + field.label.toLowerCase() + '...'">
-                            </div>
+            <!-- Panel -->
+            <div class="flex min-h-full items-center justify-center p-4">
+                <div x-show="showEquipmentModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                     class="relative w-full max-w-4xl bg-tecsisa-dark border border-white/10 rounded-2xl shadow-2xl overflow-hidden transition-all">
+                    
+                    <form method="post" :action="formAction" class="p-8">
+                        @csrf
+                        <template x-if="editMode">
+                            <input type="hidden" name="_method" value="PUT">
                         </template>
-                    </div>
-                </div>
 
-                <!-- Notas -->
-                <div class="mt-6">
-                    <x-input-label for="notes" value="Notas Técnicas" class="text-gray-400 text-xs font-bold uppercase" />
-                    <textarea id="notes" name="notes" x-model="formData.notes" rows="3" class="mt-1 block w-full bg-black/40 border-white/10 rounded-md shadow-sm focus:border-tecsisa-yellow focus:ring-tecsisa-yellow text-white text-sm" placeholder="Detalles adicionales, número de serie, versión firmware..."></textarea>
-                </div>
+                        <div class="flex justify-between items-center mb-6 border-b border-white/5 pb-4">
+                            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                                <svg class="w-6 h-6 text-tecsisa-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <span x-text="editMode ? 'Editar Activo: ' + formData.internal_id : 'Registrar Nuevo Activo (Asset)'"></span>
+                            </h2>
+                            <button type="button" @click="showEquipmentModal = false" class="text-gray-500 hover:text-white transition">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                        </div>
 
-                <div class="mt-8 flex justify-end gap-3 text-white">
-                    <x-secondary-button x-on:click="$dispatch('close-modal', 'equipment-modal')" class="border-white/10 hover:bg-white/5">
-                        Cancelar
-                    </x-secondary-button>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- ID Interno -->
+                            <div>
+                                <label class="block text-gray-400 text-xs font-bold uppercase mb-1">ID de Placa / Tag</label>
+                                <input type="text" name="internal_id" x-model="formData.internal_id" required 
+                                       class="w-full bg-black/40 border-white/10 rounded-lg text-white focus:border-tecsisa-yellow focus:ring-tecsisa-yellow transition h-10 px-3" 
+                                       placeholder="Ej: SW-MDF-001">
+                            </div>
 
-                    <button type="submit" class="bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-black px-6 py-2 rounded-xl transition shadow-xl">
-                        <span x-text="editMode ? 'Actualizar Cambios' : 'Guardar en Catálogo'"></span>
-                    </button>
+                            <!-- Nombre -->
+                            <div>
+                                <label class="block text-gray-400 text-xs font-bold uppercase mb-1">Nombre del Equipo / Modelo</label>
+                                <input type="text" name="name" x-model="formData.name" required 
+                                       class="w-full bg-black/40 border-white/10 rounded-lg text-white focus:border-tecsisa-yellow focus:ring-tecsisa-yellow transition h-10 px-3" 
+                                       placeholder="Ej: Cisco Catalyst 9300">
+                            </div>
+
+                            <!-- Form Factor -->
+                            <div>
+                                <label class="block text-gray-400 text-xs font-bold uppercase mb-1">Tipo de Activo (Form Factor)</label>
+                                <select name="form_factor" x-model="formData.form_factor" 
+                                        class="w-full bg-black/40 border-white/10 rounded-lg text-white focus:border-tecsisa-yellow focus:ring-tecsisa-yellow transition h-10 px-3">
+                                    <option value="rackmount">Rackmount (Switch/Servidor)</option>
+                                    <option value="peripheral">Periférico (Cámara/PC/AP)</option>
+                                    <option value="network_point">Punto de Red (Roseta/Pared)</option>
+                                </select>
+                            </div>
+
+                            <!-- Sistema -->
+                            <div>
+                                <label class="block text-gray-400 text-xs font-bold uppercase mb-1">Sistema Perteneciente</label>
+                                <select name="system_id" x-model="formData.system_id" 
+                                        class="w-full bg-black/40 border-white/10 rounded-lg text-white focus:border-tecsisa-yellow focus:ring-tecsisa-yellow transition h-10 px-3">
+                                    <option value="">-- Seleccione Sistema --</option>
+                                    @foreach($systems as $sys)
+                                        <option value="{{ $sys->id }}">{{ $sys->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <!-- Ubicación -->
+                            <div>
+                                <label class="block text-gray-400 text-xs font-bold uppercase mb-1">Ubicación Física</label>
+                                <select name="location_id" x-model="formData.location_id" 
+                                        class="w-full bg-black/40 border-white/10 rounded-lg text-white focus:border-tecsisa-yellow focus:ring-tecsisa-yellow transition h-10 px-3">
+                                    <option value="">Seleccione ubicación...</option>
+                                    @foreach($locations as $loc)
+                                        <option value="{{ $loc->id }}">{{ $loc->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <!-- Estatus -->
+                            <div>
+                                <label class="block text-gray-400 text-xs font-bold uppercase mb-1">Estado Operativo</label>
+                                <select name="status" x-model="formData.status" 
+                                        class="w-full bg-black/40 border-white/10 rounded-lg text-white focus:border-tecsisa-yellow focus:ring-tecsisa-yellow transition h-10 px-3">
+                                    <option value="operative">Operativo</option>
+                                    <option value="under_maintenance">En Mantenimiento</option>
+                                    <option value="out_of_service">Fuera de Servicio</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- SECCIÓN DINÁMICA: Especificaciones Técnicas -->
+                        <div x-show="activeSchema.length > 0" x-transition class="mt-8 p-6 bg-white/5 border border-white/5 rounded-xl">
+                            <h3 class="text-sm font-bold text-tecsisa-yellow uppercase tracking-widest mb-4 flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                Parámetros Técnicos
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <template x-for="(field, index) in activeSchema" :key="index">
+                                    <div>
+                                        <label class="block text-[10px] font-black text-gray-500 uppercase mb-1" x-text="field.label"></label>
+                                        <input :type="field.type === 'number' ? 'number' : 'text'" 
+                                               :name="'specs[' + field.label + ']'" 
+                                               x-model="formData.specs[field.label]"
+                                               class="w-full bg-black/60 border-white/5 rounded-lg text-sm text-white focus:border-tecsisa-yellow focus:ring-0 transition h-9 px-3"
+                                               :placeholder="'Valor ' + field.label.toLowerCase()">
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Notas -->
+                        <div class="mt-6">
+                            <label class="block text-gray-400 text-xs font-bold uppercase mb-1">Notas Técnicas</label>
+                            <textarea name="notes" x-model="formData.notes" rows="3" 
+                                      class="w-full bg-black/40 border-white/10 rounded-lg text-white focus:border-tecsisa-yellow focus:ring-tecsisa-yellow transition p-3 text-sm" 
+                                      placeholder="Detalles adicionales..."></textarea>
+                        </div>
+
+                        <div class="mt-8 flex justify-end gap-3">
+                            <button type="button" @click="showEquipmentModal = false" class="px-6 py-2 rounded-xl text-gray-400 hover:text-white transition font-bold uppercase text-xs">
+                                Cancelar
+                            </button>
+
+                            <button type="submit" class="bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-black px-8 py-2 rounded-xl transition shadow-xl shadow-yellow-400/10">
+                                <span x-text="editMode ? 'Actualizar Cambios' : 'Guardar en Catálogo'"></span>
+                            </button>
+                        </div>
+                    </form>
                 </div>
-            </form>
+            </div>
         </div>
-    </x-modal>
+    </div>
 
 <script>
-    window.inventoryData = {
-        locations: @json($locations->values()),
-        systems: @json($systems->values())
-    };
-
-    function inventoryManager() {
+    function inventoryManager(locations, systems) {
         return {
             activeTab: 'equipment',
-            allLocations: window.inventoryData.locations,
-            allSystems: window.inventoryData.systems,
+            allLocations: locations,
+            allSystems: systems,
             
             // Modal state
+            showEquipmentModal: false,
             editMode: false,
-            formAction: '{{ route("catalog.equipment.store") }}',
+            formAction: '/catalogos/equipment',
             formData: {
                 id: '',
                 internal_id: '',
@@ -322,53 +302,48 @@
             },
 
             get activeSchema() {
-                if (!this.formData || !this.formData.system_id) return [];
+                if (!this.formData.system_id) return [];
                 const sysId = String(this.formData.system_id);
-                console.log("Buscando esquema para sistema ID:", sysId);
                 const found = this.allSystems.find(s => String(s.id) === sysId);
-                
-                const schema = found ? (found.form_schema || []) : [];
-                console.log("Esquema encontrado:", schema);
-                return schema;
+                return found ? (found.form_schema || []) : [];
             },
 
             openCreateModal() {
                 this.editMode = false;
-                this.formAction = '{{ route("catalog.equipment.store") }}';
+                this.formAction = '/catalogos/equipment';
                 this.formData = {
                     id: '',
                     internal_id: '',
                     name: '',
                     form_factor: 'rackmount',
-                    system_id: this.allSystems.length > 0 ? this.allSystems[0].id : '',
+                    system_id: '',
                     location_id: '',
                     status: 'operative',
                     specs: {},
                     notes: ''
                 };
-                this.$dispatch('open-modal', 'equipment-modal');
+                this.showEquipmentModal = true;
             },
 
             openEditModal(eq) {
-                console.log("Abriendo edición para:", eq);
+                console.log("Editando:", eq);
                 this.editMode = true;
                 this.formAction = `/catalogos/equipment/${eq.id}`;
                 
-                // Deep copy de los datos para asegurar reactividad
+                // Forzamos strings para los selects
                 this.formData = {
                     id: eq.id,
-                    internal_id: eq.internal_id || '',
-                    name: eq.name || '',
-                    form_factor: eq.form_factor || 'rackmount',
-                    system_id: eq.system_id || '',
-                    location_id: eq.location_id || '',
-                    status: eq.status || 'operative',
+                    internal_id: String(eq.internal_id || ''),
+                    name: String(eq.name || ''),
+                    form_factor: String(eq.form_factor || 'rackmount'),
+                    system_id: eq.system_id ? String(eq.system_id) : '',
+                    location_id: eq.location_id ? String(eq.location_id) : '',
+                    status: String(eq.status || 'operative'),
                     specs: eq.specs ? JSON.parse(JSON.stringify(eq.specs)) : {},
-                    notes: eq.notes || ''
+                    notes: String(eq.notes || '')
                 };
                 
-                console.log("FormData hidratado:", this.formData);
-                this.$dispatch('open-modal', 'equipment-modal');
+                this.showEquipmentModal = true;
             }
         };
     }
