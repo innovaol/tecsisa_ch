@@ -28,6 +28,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/dashboard', [\App\Http\Controllers\TechnicianController::class , 'dashboard'])->name('dashboard');
             Route::get('/tasks/{task}', [\App\Http\Controllers\TechnicianController::class , 'showTask'])->name('task.show');
             Route::put('/tasks/{task}', [\App\Http\Controllers\TechnicianController::class , 'updateTaskStatus'])->name('task.update');
+
+            Route::get('/scanner', [\App\Http\Controllers\ScannerController::class , 'index'])->name('scanner');
+            Route::post('/scanner/search', [\App\Http\Controllers\ScannerController::class , 'search'])->name('scanner.search');
         }
         );
 

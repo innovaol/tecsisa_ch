@@ -91,7 +91,7 @@
                 <span class="text-[10px] font-bold uppercase tracking-widest">Tareas</span>
             </a>
             
-            <a href="#" class="flex flex-col items-center gap-1 text-gray-500 hover:text-gray-400 transition-colors">
+            <a href="{{ route('technician.scanner') }}" class="flex flex-col items-center gap-1 {{ request()->routeIs('technician.scanner') ? 'text-tecsisa-yellow' : 'text-gray-500 hover:text-gray-400' }} transition-colors">
                 <div class="relative"> <!-- Escáner central flotante -->
                     <div class="absolute -top-6 left-1/2 transform -translate-x-1/2 w-12 h-12 bg-tecsisa-yellow rounded-full shadow-[0_5px_20px_rgba(255,209,0,0.4)] flex items-center justify-center text-black border-4 border-[#05080f]">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
