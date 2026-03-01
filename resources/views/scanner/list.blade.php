@@ -1,57 +1,45 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-bold text-2xl text-white tracking-wide leading-tight flex items-center gap-3">
-            <svg class="w-6 h-6 text-tecsisa-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-            {{ __('Resultados de Búsqueda') }}
-        </h2>
-    </x-slot>
-
-    <div class="py-12">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-tecsisa-card backdrop-blur-xl rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] border border-white/10 overflow-hidden relative">
-                
-                <div class="p-6 border-b border-white/5 bg-black/30 flex justify-between items-center">
-                    <h3 class="text-xl font-semibold text-white">Equipos Coincidentes con "{{ $query }}"</h3>
-                    <span class="text-xs text-gray-500 bg-white/5 px-3 py-1 rounded-full border border-white/10">{{ count($results) }} resultados</span>
-                </div>
-
-                <div class="p-0">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-white/5 text-xs font-semibold tracking-wide text-gray-400 uppercase border-b border-white/10">
-                                <th class="py-4 pl-6 pr-4">ID de Placa</th>
-                                <th class="py-4 pr-4">Nombre</th>
-                                <th class="py-4 pr-6 text-right">Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-white/5">
-                            @forelse($results as $res)
-                            <tr class="hover:bg-white/5 transition-colors group">
-                                <td class="py-4 pl-6 pr-4 font-mono text-sm tracking-tight text-tecsisa-yellow font-bold">{{ $res->internal_id }}</td>
-                                <td class="py-4 pr-4 text-sm font-medium text-gray-200 group-hover:text-white">{{ $res->name }}</td>
-                                <td class="py-4 pr-6 text-right">
-                                    <form action="{{ route('scanner.search') }}" method="POST">
-                                        @csrf
-                                        <input type="hidden" name="query" value="{{ $res->internal_id }}">
-                                        <button type="submit" class="text-blue-400 hover:text-white font-medium text-xs border border-blue-500/30 px-3 py-1.5 rounded bg-blue-500/10 hover:bg-blue-500 transition">
-                                            Seleccionar Exactamente
-                                        </button>
-                                    </form>
-                                </td>
-                            </tr>
-                            @empty
-                            <tr><td colspan="3" class="py-8 text-center text-gray-500">No se encontraron equipos bajo ese criterio.</td></tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            
-            <div class="mt-6 text-center">
-                 <a href="{{ route('scanner.index') }}" class="text-gray-400 hover:text-white transition text-sm">
-                     &larr; Volver al Buscador
-                 </a>
-            </div>
+<x-technician-layout>
+    <div class="fixed top-0 inset-x-0 z-40 bg-[#0a0d14]/90 backdrop-blur-xl border-b border-white/5 pt-safe">
+        <div class="px-4 py-3 flex items-center justify-between">
+            <a href="{{ route('technician.scanner') }}" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            </a>
+            <h1 class="text-xs font-black text-white uppercase tracking-widest">Coincidencias: {{ count($results) }}</h1>
+            <div class="w-10 h-10"></div>
         </div>
     </div>
-</x-app-layout>
+
+    <div class="pt-20 pb-24 px-5">
+        <h2 class="text-xs font-black text-gray-500 uppercase tracking-widest mb-4">Buscando: "{{ $query }}"</h2>
+
+        <div class="space-y-3">
+            @forelse($results as $res)
+                <form action="{{ route('technician.scanner.search') }}" method="POST" class="w-full">
+                    @csrf
+                    <input type="hidden" name="query" value="{{ $res->internal_id }}">
+                    <button type="submit" class="w-full text-left bg-[#12161f] border border-white/5 hover:border-tecsisa-yellow/30 rounded-2xl p-4 flex items-center justify-between group transition">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-black/50 rounded-full border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-tecsisa-yellow/10 group-hover:border-tecsisa-yellow/30 transition">
+                                <svg class="w-5 h-5 text-gray-500 group-hover:text-tecsisa-yellow transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path></svg>
+                            </div>
+                            <div class="overflow-hidden">
+                                <span class="block text-tecsisa-yellow font-mono text-[10px] uppercase font-bold tracking-widest mb-1">{{ $res->internal_id }}</span>
+                                <h3 class="text-sm font-bold text-white truncate">{{ $res->name }}</h3>
+                                <p class="text-xs text-gray-500 truncate">{{ $res->location ? $res->location->name : 'Sin ubicación' }}</p>
+                            </div>
+                        </div>
+                        <svg class="w-5 h-5 text-gray-600 group-hover:text-tecsisa-yellow shrink-0 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </button>
+                </form>
+            @empty
+                <div class="w-full flex flex-col items-center justify-center py-12 px-6 bg-[#12161f] rounded-3xl border border-dashed border-white/10 text-center">
+                    <div class="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <h3 class="font-bold text-white text-lg">Sin Resultados</h3>
+                    <p class="text-sm text-gray-500 mt-1">No se halló ningún equipo bajo ese parámetro.</p>
+                </div>
+            @endforelse
+        </div>
+    </div>
+</x-technician-layout>
