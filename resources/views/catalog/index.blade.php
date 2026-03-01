@@ -296,8 +296,8 @@
 
 <script>
     window.inventoryData = {
-        locations: @json($locations),
-        systems: @json($systems)
+        locations: Object.values(@json($locations)),
+        systems: Object.values(@json($systems))
     };
 
     function inventoryManager() {
@@ -323,8 +323,19 @@
 
             get activeSchema() {
                 if (!this.formData.system_id) return [];
-                const found = this.allSystems.find(s => String(s.id) === String(this.formData.system_id));
-                return found ? (found.form_schema || []) : [];
+                const sysId = String(this.formData.system_id);
+                const found = this.allSystems.find(s => String(s.id) === sysId);
+                
+                let schema = found ? (found.form_schema || []) : [];
+                
+                // Aseguramos que formData.specs tenga las llaves necesarias para la reactividad
+                schema.forEach(field => {
+                    if (this.formData.specs[field.label] === undefined) {
+                        this.formData.specs[field.label] = '';
+                    }
+                });
+                
+                return schema;
             },
 
             openCreateModal() {
