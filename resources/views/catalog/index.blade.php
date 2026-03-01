@@ -187,7 +187,15 @@
 
     <!-- Modal: Alta de Equipo -->
     <x-modal name="create-equipment" :show="false" focusable>
-        <form method="post" action="{{ route('catalog.equipment.store') }}" class="p-6 bg-tecsisa-dark border border-white/10 rounded-2xl">
+        <form x-data="{ 
+                system_id: '{{ $systems->first()->id ?? '' }}', 
+                systems: @json($systems),
+                get activeSchema() {
+                    let sys = this.systems.find(s => s.id == this.system_id);
+                    return sys ? (sys.form_schema || []) : [];
+                }
+              }" 
+              method="post" action="{{ route('catalog.equipment.store') }}" class="p-6 bg-tecsisa-dark border border-white/10 rounded-2xl">
             @csrf
             <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
                 <svg class="w-6 h-6 text-tecsisa-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -220,7 +228,8 @@
                 <!-- Sistema -->
                 <div>
                     <x-input-label for="system_id" value="Sistema Perteneciente" class="text-gray-400 text-xs font-bold uppercase" />
-                    <select id="system_id" name="system_id" class="mt-1 block w-full bg-black/40 border-white/10 rounded-md shadow-sm focus:border-tecsisa-yellow focus:ring-tecsisa-yellow text-white">
+                    <select id="system_id" name="system_id" x-model="system_id" class="mt-1 block w-full bg-black/40 border-white/10 rounded-md shadow-sm focus:border-tecsisa-yellow focus:ring-tecsisa-yellow text-white">
+                        <option value="">-- Seleccione Sistema --</option>
                         @foreach($systems as $sys)
                             <option value="{{ $sys->id }}">{{ $sys->name }}</option>
                         @endforeach
@@ -246,6 +255,25 @@
                         <option value="under_maintenance">En Mantenimiento</option>
                         <option value="out_of_service">Fuera de Servicio</option>
                     </select>
+                </div>
+            </div>
+
+            <!-- SECCIÓN DINÁMICA: Especificaciones Técnicas del Sistema -->
+            <div x-show="activeSchema.length > 0" x-transition class="mt-8 p-4 bg-white/5 border border-white/10 rounded-xl">
+                <h3 class="text-sm font-bold text-tecsisa-yellow uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    Especificaciones del Sistema
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <template x-for="(field, index) in activeSchema" :key="index">
+                        <div>
+                            <label class="block text-[10px] font-black text-gray-500 uppercase mb-1" x-text="field.label"></label>
+                            <input :type="field.type === 'number' ? 'number' : 'text'" 
+                                   :name="'specs[' + field.label + ']'" 
+                                   class="block w-full bg-black/60 border-white/5 rounded-lg text-sm text-white focus:border-tecsisa-yellow focus:ring-0 transition"
+                                   :placeholder="'Ingresar ' + field.label.toLowerCase() + '...'">
+                        </div>
+                    </template>
                 </div>
             </div>
 

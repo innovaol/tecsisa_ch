@@ -28,6 +28,7 @@ class CatalogController extends Controller
             'location_id' => 'nullable|exists:locations,id',
             'status' => 'required|in:operative,under_maintenance,out_of_service',
             'notes' => 'nullable|string',
+            'specs' => 'nullable|array',
         ]);
 
         Equipment::create($validated);
@@ -45,6 +46,7 @@ class CatalogController extends Controller
             'location_id' => 'nullable|exists:locations,id',
             'status' => 'required|in:operative,under_maintenance,out_of_service',
             'notes' => 'nullable|string',
+            'specs' => 'nullable|array',
         ]);
 
         $equipment->update($validated);
