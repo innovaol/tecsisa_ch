@@ -40,6 +40,12 @@
                         class="px-4 py-2 font-bold transition-all uppercase text-sm tracking-widest">
                     Inventario de Equipos
                 </button>
+                <button @click="activeTab = 'maintenance'" 
+                        :class="activeTab === 'maintenance' ? 'text-blue-400 border-b-2 border-blue-400' : 'text-gray-500 hover:text-gray-300'"
+                        class="px-4 py-2 font-bold transition-all uppercase text-sm tracking-widest flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></span>
+                    Plan de Mantenimiento
+                </button>
             </div>
 
             <!-- Tab: Locations -->
@@ -103,20 +109,146 @@
                             </div>
                         </div>
                         
-                        <div class="space-y-2">
-                            <p class="text-[10px] text-gray-500 uppercase font-black tracking-widest">Esquema de Datos:</p>
-                            <div class="flex flex-wrap gap-2">
-                                @forelse($sys->form_schema ?? [] as $field)
-                                    <span class="text-[10px] bg-white/5 border border-white/10 px-2 py-1 rounded text-gray-400">
-                                        {{ $field['label'] }} <span class="text-tecsisa-yellow/50">({{ $field['type'] }})</span>
-                                    </span>
-                                @empty
-                                    <span class="text-[10px] text-gray-600 italic">Sin campos personalizados</span>
-                                @endforelse
+                        <div class="space-y-4">
+                            <div class="flex gap-4 border-b border-white/5 pb-3">
+                                <div class="flex-1">
+                                    <p class="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-1">Ciclo de Servicio:</p>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs text-blue-400 font-bold">{{ $sys->maintenance_interval_days ?? 90 }} Días</span>
+                                        <span class="text-[9px] text-gray-600 bg-white/5 px-1.5 py-0.5 rounded border border-white/5">Auto-programable</span>
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-1">Plantilla Puertos:</p>
+                                    @if($sys->has_ports)
+                                        <div class="flex flex-wrap gap-1">
+                                            @forelse($sys->port_config ?? [] as $p)
+                                                <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/20 font-mono">{{ $p['count'] }}{{ strtoupper($p['type']) }}</span>
+                                            @empty
+                                                <span class="text-[10px] text-gray-500 italic">No configurada</span>
+                                            @endforelse
+                                        </div>
+                                    @else
+                                        <div class="flex items-center gap-1.5 mt-1">
+                                            <svg class="w-3.5 h-3.5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
+                                            <span class="text-[10px] text-gray-600 italic font-bold uppercase tracking-wider">Sin gestión física</span>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <div class="space-y-2">
+                                <p class="text-[10px] text-gray-500 uppercase font-black tracking-widest">Esquema de Especificaciones:</p>
+                                <div class="flex flex-wrap gap-2">
+                                    @forelse($sys->form_schema ?? [] as $field)
+                                        <span class="text-[10px] bg-white/5 border border-white/10 px-2 py-1 rounded text-gray-400">
+                                            {{ $field['label'] }} <span class="text-tecsisa-yellow/50">({{ $field['type'] }})</span>
+                                        </span>
+                                    @empty
+                                        <span class="text-[10px] text-gray-600 italic">Sin campos personalizados</span>
+                                    @endforelse
+                                </div>
                             </div>
                         </div>
                     </div>
                     @endforeach
+                </div>
+            </div>
+
+            <!-- Tab: Maintenance Planning -->
+            <div x-show="activeTab === 'maintenance'" x-transition class="space-y-8">
+                <div class="flex justify-between items-end">
+                    <div>
+                        <h3 class="text-white text-2xl font-black uppercase tracking-wider">Plan de Mantenimiento Preventivo</h3>
+                        <p class="text-gray-500 text-sm italic">Sincronización basada en ciclos programados por cada sistema técnico.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    <!-- Left: Urgency Sidebar -->
+                    <div class="lg:col-span-4 space-y-4">
+                        <div class="bg-red-500/10 border border-red-500/20 rounded-2xl p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h4 class="text-red-400 font-black uppercase text-xs tracking-widest flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+                                    Vencidos / Críticos
+                                </h4>
+                                <span class="text-2xl font-black text-red-500">{{ $equipments->filter(fn($e) => $e->next_maintenance_at && $e->next_maintenance_at->isPast())->count() }}</span>
+                            </div>
+                            <p class="text-[10px] text-red-400/60 leading-relaxed uppercase font-bold">Equipos que han superado su periodo de gracia y requieren inspección técnica inmediata.</p>
+                        </div>
+
+                        <div class="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h4 class="text-blue-400 font-black uppercase text-xs tracking-widest flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    Próximos (7 Días)
+                                </h4>
+                                <span class="text-2xl font-black text-blue-400">{{ $equipments->filter(fn($e) => $e->next_maintenance_at && $e->next_maintenance_at->isFuture() && $e->next_maintenance_at->diffInDays(now()) <= 7)->count() }}</span>
+                            </div>
+                            <p class="text-[10px] text-blue-400/60 leading-relaxed uppercase font-bold">Activos entrando en ventana de mantenimiento preventivo.</p>
+                        </div>
+                    </div>
+
+                    <!-- Right: Timeline / List -->
+                    <div class="lg:col-span-8">
+                        <div class="bg-black/40 border border-white/5 rounded-3xl overflow-hidden">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-white/5 text-[10px] font-black uppercase text-gray-400 tracking-widest border-b border-white/10">
+                                        <th class="py-4 pl-6">Equipo / ID</th>
+                                        <th class="py-4">Último Servicio</th>
+                                        <th class="py-4">Próxima Fecha</th>
+                                        <th class="py-4">Estado Salud</th>
+                                        <th class="py-4 pr-6 text-right">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-xs">
+                                    @php
+                                        $sortedEquip = $equipments->filter(fn($e) => $e->next_maintenance_at)->sortBy('next_maintenance_at');
+                                    @endphp
+                                    @forelse($sortedEquip as $eq)
+                                    @php
+                                        $isOverdue = $eq->next_maintenance_at->isPast();
+                                        $isSoon = !$isOverdue && $eq->next_maintenance_at->diffInDays(now()) <= 7;
+                                    @endphp
+                                    <tr class="border-b border-white/5 hover:bg-white/[0.02] transition-colors group">
+                                        <td class="py-4 pl-6">
+                                            <div class="flex flex-col">
+                                                <span class="font-bold text-gray-200">{{ $eq->internal_id }}</span>
+                                                <span class="text-[10px] text-gray-500 truncate w-32">{{ $eq->name }}</span>
+                                            </div>
+                                        </td>
+                                        <td class="py-4">
+                                            <span class="text-gray-400">{{ $eq->last_maintenance_at ? $eq->last_maintenance_at->format('d/m/Y') : ($eq->installation_date ? $eq->installation_date->format('d/m/Y') . ' (Inst)' : 'N/A') }}</span>
+                                        </td>
+                                        <td class="py-4">
+                                            <span class="{{ $isOverdue ? 'text-red-500 font-black' : ($isSoon ? 'text-blue-400 font-bold' : 'text-gray-300') }}">
+                                                {{ $eq->next_maintenance_at->format('d/m/Y') }}
+                                            </span>
+                                        </td>
+                                        <td class="py-4">
+                                            @if($isOverdue)
+                                                <span class="text-[9px] bg-red-500/10 text-red-500 px-2 py-0.5 rounded border border-red-500/20 uppercase font-black">Crítico</span>
+                                            @elseif($isSoon)
+                                                <span class="text-[9px] bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded border border-blue-500/20 uppercase font-black">Programado</span>
+                                            @else
+                                                <span class="text-[9px] bg-emerald-500/10 text-emerald-500 px-2 py-0.5 rounded border border-emerald-500/20 uppercase font-black">Saludable</span>
+                                            @endif
+                                        </td>
+                                        <td class="py-4 pr-6 text-right">
+                                            <button @click="openEditModal(@js($eq))" class="text-[10px] font-black uppercase text-tecsisa-yellow hover:underline">Ver Guía</button>
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="5" class="py-12 text-center text-gray-600 italic">No hay datos de mantenimiento registrados en el catálogo.</td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -314,7 +446,7 @@
                             </button>
                         </div>
 
-                        <div class="space-y-6">
+                        <div class="space-y-6 max-h-[60vh] overflow-y-auto px-1 custom-scrollbar">
                             <div>
                                 <label class="block text-gray-400 text-xs font-bold uppercase mb-1">Nombre del Sistema</label>
                                 <input type="text" name="name" x-model="systemFormData.name" required 
@@ -322,9 +454,98 @@
                                        placeholder="Ej: CCTV, Control de Acceso, Redes...">
                             </div>
 
+                            <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10 group hover:border-tecsisa-yellow/30 transition-all">
+                                <div class="flex items-center gap-3">
+                                    <div class="p-2 bg-emerald-500/10 rounded-lg text-emerald-400">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                                    </div>
+                                    <div>
+                                        <h4 class="text-sm font-bold text-white mb-0.5">Gestión de Puertos Físicos</h4>
+                                        <p class="text-[10px] text-gray-500 uppercase font-black">Activar para Switches, Patch Panels o Cámaras IP</p>
+                                    </div>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" name="has_ports" x-model="systemFormData.has_ports" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-black border border-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gray-400 after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600 after:shadow-md"></div>
+                                </label>
+                            </div>
+
+                            <!-- Mantenimiento -->
+                            <div class="bg-blue-500/5 rounded-xl p-6 border border-blue-500/10">
+                                <h3 class="text-xs font-black text-blue-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    Ciclo de Mantenimiento Planificado
+                                </h3>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                    <div class="md:col-span-1">
+                                        <label class="text-[10px] text-gray-500 block mb-1">Frecuencia (Días)</label>
+                                        <input type="number" name="maintenance_interval_days" x-model="systemFormData.maintenance_interval_days" required
+                                               class="w-full bg-black/40 border-white/10 rounded-lg text-sm text-white h-10 px-3">
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <p class="text-[10px] text-gray-600 mt-6 italic">Se generarán alertas automáticamente cada vez que el equipo cumpla este periodo sin revisión.</p>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="text-[10px] text-gray-500 block mb-1">Guía Rápida de Mantenimiento</label>
+                                    <textarea name="maintenance_guide" x-model="systemFormData.maintenance_guide" 
+                                              placeholder="Puntos clave a revisar (Limpieza, Firmware, Cableado...)"
+                                              class="w-full bg-black/40 border-white/10 rounded-lg text-sm text-white p-3 h-20"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Port Layout -->
+                            <div x-show="systemFormData.has_ports" x-transition.opacity class="bg-emerald-500/5 rounded-xl p-6 border border-emerald-500/10 shadow-[0_10px_40px_rgba(16,185,129,0.05)]">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-xs font-black text-emerald-400 uppercase tracking-widest flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
+                                        Plantilla de Puertos (Default)
+                                    </h3>
+                                    <button type="button" @click="addPortToConfig()" class="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full font-bold hover:bg-emerald-500/20 transition">
+                                        + Agregar Puertos
+                                    </button>
+                                </div>
+                                <div class="space-y-3">
+                                    <template x-for="(pconfig, pindex) in systemFormData.port_config" :key="pindex">
+                                        <div class="flex gap-2 items-center bg-black/20 p-2 rounded-lg border border-white/5 relative group/port">
+                                            <div class="w-16">
+                                                <label class="text-[9px] text-gray-600 block">Prefijo</label>
+                                                <input type="text" :name="'port_config[' + pindex + '][label_prefix]'" x-model="pconfig.label_prefix" required
+                                                       class="w-full bg-black/40 border-white/10 rounded text-xs text-white h-7 px-1 text-center">
+                                            </div>
+                                            <div class="flex-1">
+                                                <label class="text-[9px] text-gray-600 block">Tipo</label>
+                                                <select :name="'port_config[' + pindex + '][type]'" x-model="pconfig.type" required
+                                                        class="w-full bg-black/40 border-white/10 rounded text-xs text-white h-7 px-1">
+                                                    <option value="rj45">RJ45 (Ethernet)</option>
+                                                    <option value="sfp">SFP (1G)</option>
+                                                    <option value="sfp_plus">SFP+ (10G)</option>
+                                                    <option value="sc">SC (Fiber)</option>
+                                                    <option value="lc">LC (Fiber)</option>
+                                                </select>
+                                            </div>
+                                            <div class="w-20">
+                                                <label class="text-[9px] text-gray-600 block">Cantidad</label>
+                                                <input type="number" :name="'port_config[' + pindex + '][count]'" x-model="pconfig.count" required
+                                                       class="w-full bg-black/40 border-white/10 rounded text-xs text-white h-7 px-1 text-center">
+                                            </div>
+                                            <button type="button" @click="removePortFromConfig(pindex)" class="text-gray-600 hover:text-red-400 mt-2">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                            </button>
+                                        </div>
+                                    </template>
+                                    <template x-if="systemFormData.port_config.length === 0">
+                                        <p class="text-center text-[10px] text-gray-600 italic">No hay puertos configurados. Se usará el default del sistema (24+2).</p>
+                                    </template>
+                                </div>
+                            </div>
+
                             <div class="bg-white/5 rounded-xl p-6 border border-white/5">
                                 <div class="flex justify-between items-center mb-4">
-                                    <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest">Esquema Técnico (Campos Dinámicos)</h3>
+                                    <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                        Esquema de Especificaciones (Campos Dinámicos)
+                                    </h3>
                                     <button type="button" @click="addFieldToSchema()" class="text-[10px] bg-tecsisa-yellow/10 text-tecsisa-yellow border border-tecsisa-yellow/20 px-3 py-1 rounded-full font-bold hover:bg-tecsisa-yellow/20 transition">
                                         + Agregar Campo
                                     </button>
@@ -359,7 +580,7 @@
                                             </button>
                                         </div>
                                     </template>
-                                    
+
                                     <template x-if="systemFormData.form_schema.length === 0">
                                         <p class="text-center text-xs text-gray-600 py-4 italic">No has definido campos técnicos para este sistema.</p>
                                     </template>
@@ -486,6 +707,41 @@
                             </div>
                         </div>
 
+                        <!-- Ciclo de Vida / Mantenimiento -->
+                        <div class="mt-8 p-6 bg-white/5 border border-white/5 rounded-xl">
+                            <h3 class="text-sm font-bold text-blue-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                Ciclo de Vida / Mantenimiento
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-gray-400 text-xs font-bold uppercase mb-1">Fecha de Instalación / Puesta en Marcha</label>
+                                    <div class="relative">
+                                        <input type="text" name="installation_date" 
+                                               x-init="flatpickr($el, { dateFormat: 'Y-m-d', theme: 'dark', locale: 'es' })"
+                                               x-model="formData.installation_date"
+                                               class="w-full bg-black/40 border-white/10 rounded-lg text-white h-10 px-3 pl-10">
+                                        <div class="absolute left-3 top-2.5 text-gray-600">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-400 text-xs font-bold uppercase mb-1">Último Mantenimiento Preventivo</label>
+                                    <div class="relative">
+                                        <input type="text" name="last_maintenance_at" 
+                                               x-init="flatpickr($el, { dateFormat: 'Y-m-d', theme: 'dark', locale: 'es' })"
+                                               x-model="formData.last_maintenance_at"
+                                               class="w-full bg-black/40 border-white/10 rounded-lg text-white h-10 px-3 pl-10">
+                                        <div class="absolute left-3 top-2.5 text-gray-600">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg>
+                                        </div>
+                                    </div>
+                                    <p class="text-[10px] text-gray-600 mt-2 italic">Si se deja vacío, se calculará desde la fecha de instalación.</p>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- SECCIÓN DINÁMICA: Especificaciones Técnicas -->
                         <div x-show="activeSchema.length > 0" x-transition class="mt-8 p-6 bg-white/5 border border-white/5 rounded-xl">
                             <h3 class="text-sm font-bold text-tecsisa-yellow uppercase tracking-widest mb-4 flex items-center gap-2">
@@ -593,6 +849,8 @@
                 system_id: '',
                 location_id: '',
                 status: '',
+                installation_date: '',
+                last_maintenance_at: '',
                 specs: {},
                 notes: ''
             },
@@ -604,7 +862,11 @@
             systemFormData: {
                 id: '',
                 name: '',
-                form_schema: []
+                has_ports: false,
+                form_schema: [],
+                port_config: [],
+                maintenance_interval_days: 90,
+                maintenance_guide: ''
             },
 
             // Locations Modal state
@@ -645,7 +907,8 @@
                 this.formData = {
                     id: '', internal_id: '', name: '', form_factor: '',
                     u_height: 1, system_id: '', location_id: '',
-                    status: '', specs: {}, notes: ''
+                    status: '', installation_date: '', last_maintenance_at: '',
+                    specs: {}, notes: ''
                 };
                 this.showEquipmentModal = true;
             },
@@ -662,6 +925,8 @@
                     system_id: eq.system_id ? String(eq.system_id) : '',
                     location_id: eq.location_id ? String(eq.location_id) : '',
                     status: String(eq.status || 'operative'),
+                    installation_date: eq.installation_date ? eq.installation_date.split('T')[0] : '',
+                    last_maintenance_at: eq.last_maintenance_at ? eq.last_maintenance_at.split('T')[0] : '',
                     specs: eq.specs ? JSON.parse(JSON.stringify(eq.specs)) : {},
                     notes: String(eq.notes || '')
                 };
@@ -673,7 +938,13 @@
                 this.systemEditMode = false;
                 this.systemFormAction = '/catalogos/systems';
                 this.systemFormData = {
-                    id: '', name: '', form_schema: []
+                    id: '', 
+                    name: '', 
+                    has_ports: false,
+                    form_schema: [],
+                    port_config: [],
+                    maintenance_interval_days: 90,
+                    maintenance_guide: ''
                 };
                 this.showSystemModal = true;
             },
@@ -684,7 +955,11 @@
                 this.systemFormData = {
                     id: sys.id,
                     name: sys.name,
-                    form_schema: sys.form_schema ? JSON.parse(JSON.stringify(sys.form_schema)) : []
+                    has_ports: !!sys.has_ports,
+                    form_schema: sys.form_schema ? JSON.parse(JSON.stringify(sys.form_schema)) : [],
+                    port_config: sys.port_config ? JSON.parse(JSON.stringify(sys.port_config)) : [],
+                    maintenance_interval_days: sys.maintenance_interval_days || 90,
+                    maintenance_guide: sys.maintenance_guide || ''
                 };
                 this.showSystemModal = true;
             },
@@ -695,6 +970,14 @@
 
             removeFieldFromSchema(index) {
                 this.systemFormData.form_schema.splice(index, 1);
+            },
+
+            addPortToConfig() {
+                this.systemFormData.port_config.push({ label_prefix: 'P', type: 'rj45', count: 24 });
+            },
+
+            removePortFromConfig(index) {
+                this.systemFormData.port_config.splice(index, 1);
             },
 
             // --- Locations Logic ---

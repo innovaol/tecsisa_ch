@@ -1,17 +1,29 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-bold text-2xl text-white tracking-wide leading-tight flex items-center gap-3">
-            <svg class="w-6 h-6 text-tecsisa-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-            {{ __('Distribución de Racks (Pixel-Perfect)') }}
-        </h2>
-    </x-slot>
+    <!-- Se personaliza el header incrustado dentro del contexto de Alpine para tener acceso al estado "saving" -->
 
     <!-- Implementación Drag and Drop con HTML5 API usando Alpine -->
-    <div class="py-6 min-h-[calc(100vh-140px)] md:h-[calc(100vh-140px)]">
-        <div x-data="rackBuilder(@js($unassignedEquipment))" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col md:flex-row gap-6">
-            
-            <!-- CONTROLES Y CATÁLOGO DE EQUIPACIÓN (LEFT PANEL) -->
-            <div class="w-full md:w-1/3 flex flex-col gap-6 h-[400px] md:h-full shrink-0">
+    <div x-data="rackBuilder(@js($unassignedEquipment))" class="flex flex-col overflow-hidden" style="height: calc(100vh - 74px);">
+        
+        <!-- Header con el Botón Guardar Topología Movido al lado del Título -->
+        <header class="bg-tecsisa-dark/40 backdrop-blur-md border-b border-white/5 shrink-0">
+            <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center w-full">
+                <h2 class="font-bold text-2xl text-white tracking-wide leading-tight flex items-center gap-3">
+                    <svg class="w-6 h-6 text-tecsisa-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    Distribución de Racks
+                </h2>
+                <button @click="saveTopology()" :disabled="saving" class="bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-black px-6 py-2.5 rounded-xl shadow-[0_5px_15px_rgba(255,209,0,0.3)] transition transform flex justify-center items-center gap-2" :class="saving ? 'opacity-70 cursor-not-allowed' : 'hover:-translate-y-0.5'">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+                    <svg x-show="saving" class="animate-spin -ml-6 mr-1 h-5 w-5 text-gray-900 absolute" style="display: none;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    <span x-text="saving ? 'Guardando...' : 'Guardar Topología'"></span>
+                </button>
+            </div>
+        </header>
+
+        <div class="flex-1 py-6 overflow-hidden">
+            <div class="max-w-[95rem] mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col md:flex-row gap-6">
+                
+                <!-- CONTROLES Y CATÁLOGO DE EQUIPACIÓN (LEFT PANEL) -->
+                <div class="w-full md:w-80 lg:w-96 flex flex-col gap-6 h-[400px] md:h-full shrink-0">
                 <!-- Selector de Gabinete -->
                 <div class="bg-tecsisa-card backdrop-blur-md rounded-2xl shadow-[0_4px_30px_rgba(0,0,0,0.2)] border border-white/10 p-5">
                     <label class="block text-sm font-medium text-gray-400 uppercase tracking-widest mb-2">Gabinete Activo</label>
@@ -41,66 +53,73 @@
                     
                     <div class="p-4 overflow-y-auto flex-1 h-full scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
                         <div class="space-y-3">
-                            <!-- Aquí irían los elementos arrastrables (Source objects) -->
-                            @foreach($unassignedEquipment as $eq)
+                            <template x-for="eq in unassignedCatalog" :key="eq.id">
                                 <div draggable="true" 
-                                     x-show="!isPlaced('{{ $eq->id }}') && matchesSearch('{{ strtolower($eq->internal_id) }}', '{{ strtolower($eq->name) }}')"
+                                     x-show="!isPlaced(eq.id) && matchesSearch(eq.internal_id, eq.name)"
                                      x-transition
-                                     @dragstart="startDrag($event, '{{ $eq->id }}', '{{ $eq->internal_id }}', '{{ $eq->name }}', {{ $eq->u_height }}, '{{ $eq->system->name ?? 'SC' }}')"
-                                     @click="selectEquipment('{{ $eq->id }}', '{{ $eq->internal_id }}', '{{ $eq->name }}', {{ $eq->u_height }}, '{{ $eq->system->name ?? 'SC' }}')"
-                                     :class="{'border-l-tecsisa-yellow bg-tecsisa-yellow/10 scale-[1.02] shadow-[0_0_15px_rgba(255,209,0,0.3)]': selectedItem && selectedItem.db_id === '{{ $eq->id }}', 'border-l-blue-500 bg-black/30 hover:bg-white/5': !selectedItem || selectedItem.db_id !== '{{ $eq->id }}'}"
+                                     @dragstart="startDrag($event, eq.id, eq.internal_id, eq.name, eq.u_height, eq.system ? eq.system.name : 'SC')"
+                                     @click="selectEquipment(eq.id, eq.internal_id, eq.name, eq.u_height, eq.system ? eq.system.name : 'SC')"
+                                     :class="{
+                                         'border-l-tecsisa-yellow bg-tecsisa-yellow/10 scale-[1.02] shadow-[0_0_15px_rgba(255,209,0,0.3)]': selectedItem && selectedItem.db_id == eq.id, 
+                                         'border-l-blue-500 bg-black/30 hover:bg-white/5': !selectedItem || selectedItem.db_id != eq.id
+                                     }"
                                      class="p-3 border border-white/5 rounded-lg border-l-4 cursor-pointer transition-all flex justify-between items-center group">
                                     <div class="flex-1 overflow-hidden">
                                         <div class="flex items-center gap-2 mb-0.5">
-                                            <div class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-black/40" :class="{'text-tecsisa-yellow': selectedItem && selectedItem.db_id === '{{ $eq->id }}', 'text-tecsisa-yellow': !selectedItem || selectedItem.db_id !== '{{ $eq->id }}'}">{{ $eq->internal_id }}</div>
-                                            @if($eq->system)
-                                                <span class="text-[8px] uppercase tracking-tighter text-gray-500 font-bold border border-white/5 px-1 rounded">{{ $eq->system->name }}</span>
-                                            @endif
+                                            <div class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-black/40" 
+                                                 :class="selectedItem && selectedItem.db_id == eq.id ? 'text-tecsisa-yellow' : 'text-tecsisa-yellow'">
+                                                <span x-text="eq.internal_id"></span>
+                                            </div>
+                                            <template x-if="eq.system">
+                                                <span class="text-[8px] uppercase tracking-tighter text-gray-500 font-bold border border-white/5 px-1 rounded" x-text="eq.system.name"></span>
+                                            </template>
                                         </div>
-                                        <div class="text-xs font-medium whitespace-nowrap overflow-hidden text-ellipsis" :class="{'text-white': selectedItem && selectedItem.db_id === '{{ $eq->id }}', 'text-gray-400': !selectedItem || selectedItem.db_id !== '{{ $eq->id }}'}">{{ $eq->name }}</div>
+                                        <div class="text-xs font-medium whitespace-nowrap overflow-hidden text-ellipsis" 
+                                             :class="selectedItem && selectedItem.db_id == eq.id ? 'text-white' : 'text-gray-400'"
+                                             x-text="eq.name"></div>
                                     </div>
-                                    <div class="bg-black/40 text-gray-500 text-[10px] px-1.5 py-1 rounded font-black border border-white/5 ml-2">{{ $eq->u_height }}U</div>
+                                    <div class="bg-black/40 text-gray-500 text-[10px] px-1.5 py-1 rounded font-black border border-white/5 ml-2">
+                                        <span x-text="eq.u_height"></span>U
+                                    </div>
                                 </div>
-                            @endforeach
+                            </template>
+
+                            <div x-show="filteredCount === 0" class="py-8 text-center text-gray-600 text-[10px] uppercase font-bold tracking-widest italic animate-pulse">
+                                No hay activos disponibles
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Estadísticas del Rack -->
-                <div class="bg-tecsisa-card backdrop-blur-md rounded-2xl shadow-lg border border-white/10 p-5 mt-auto">
-                    <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4">Estado de Ocupación</h4>
-                    <div class="space-y-4">
-                        <div>
-                            <div class="flex justify-between text-xs mb-1.5 flex-wrap gap-1">
-                                <span class="text-gray-500 font-bold uppercase tracking-tighter">Espacio del Rack</span>
-                                <span class="text-tecsisa-yellow font-mono font-bold"><span x-text="occupancyStats.used"></span> / <span x-text="totalU"></span>U</span>
-                            </div>
-                            <div class="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
-                                <div class="h-full bg-tecsisa-yellow shadow-[0_0_10px_rgba(255,209,0,0.5)] transition-all duration-700 ease-out" :style="'width: ' + occupancyStats.percent + '%'"></div>
-                            </div>
-                        </div>
-                        <div class="flex justify-between items-end">
-                            <div class="space-y-0.5">
-                                <div class="text-xs text-white font-bold"><span x-text="occupancyStats.count"></span> Equipos instalados</div>
-                                <div class="text-[10px] text-green-400 font-medium uppercase tracking-tighter"><span x-text="totalU - occupancyStats.used"></span>U Disponibles</div>
-                            </div>
-                            <div class="text-right">
-                                <div class="text-[10px] text-gray-600 font-bold uppercase" x-text="occupancyStats.percent.toFixed(1) + '%'"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <!-- VISUALIZADOR PIXEL-PERFECT DEL RACK (RIGHT PANEL) -->
-            <div class="w-full md:w-2/3 h-[600px] md:h-full flex flex-col bg-tecsisa-card backdrop-blur-md rounded-2xl shadow-[0_4px_40px_rgba(0,0,0,0.4)] border border-white/10 overflow-hidden relative">
+            <div class="flex-1 h-[600px] md:h-full flex flex-col bg-tecsisa-card backdrop-blur-md rounded-2xl shadow-[0_4px_40px_rgba(0,0,0,0.4)] border border-white/10 overflow-hidden relative">
                 
-                <div class="p-4 border-b border-white/10 bg-black/40 flex justify-between items-center" style="box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);">
+                <div class="p-4 border-b border-white/10 bg-black/40 flex flex-col md:flex-row justify-between items-center gap-4 z-20" style="box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);">
                     <div class="flex items-center gap-3">
                         <div class="w-3 h-3 rounded-full bg-green-500 animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.5)]"></div>
-                        <h3 class="text-lg font-bold text-white tracking-widest">{{ $rack->name }}</h3>
+                        <h3 class="text-lg font-bold text-white tracking-widest whitespace-nowrap">{{ $rack->name }}</h3>
                     </div>
-                    <div class="text-xs text-gray-400 bg-white/5 px-2 py-1 rounded font-mono border border-white/10">Estándar EIA-310-D (19")</div>
+                    
+                    <!-- Horizontal Stats Widget -->
+                    <div class="flex-1 max-w-xl w-full flex items-center gap-6 px-4 hidden md:flex">
+                        <div class="flex-1">
+                            <div class="flex justify-between text-[10px] mb-1.5">
+                                <span class="text-gray-400 font-bold uppercase tracking-widest">Ocupación (<span x-text="occupancyStats.count"></span> equipos)</span>
+                                <span class="text-tecsisa-yellow font-mono font-bold"><span x-text="occupancyStats.used"></span>/<span x-text="totalU"></span>U (<span x-text="occupancyStats.percent.toFixed(1) + '%'"></span>)</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-black/60 rounded-full overflow-hidden border border-white/5 bg-[#0a0f18] shadow-inner">
+                                <div class="h-full bg-tecsisa-yellow shadow-[0_0_10px_rgba(255,209,0,0.8)] transition-all duration-700 ease-out" :style="'width: ' + occupancyStats.percent + '%'"></div>
+                            </div>
+                        </div>
+                        <div class="text-[10px] text-center hidden lg:block shrink-0 border-l border-white/10 pl-6">
+                            <span class="block text-green-400 font-black text-sm" x-text="totalU - occupancyStats.used + 'U'"></span>
+                            <span class="text-gray-500 uppercase font-bold tracking-tighter">Libres</span>
+                        </div>
+                    </div>
+
+                    <div class="text-[10px] text-gray-500 bg-white/5 px-2 py-1 rounded font-mono border border-white/10 shrink-0 hidden lg:block">EIA-310-D</div>
                 </div>
 
                 <!-- EL RACK REAL -->
@@ -230,15 +249,8 @@
                     </div>
                 </div>
 
-                <!-- Footer Button Panel -->
-                <div class="p-4 bg-black/60 border-t border-white/10 flex justify-end shrink-0" style="box-shadow: 0 -4px 10px rgba(0,0,0,0.5);">
-                    <button @click="saveTopology()" :disabled="saving" class="w-full md:w-auto bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-black px-8 py-3 rounded-xl shadow-[0_5px_15px_rgba(255,209,0,0.3)] transition transform flex justify-center items-center gap-2" :class="saving ? 'opacity-70 cursor-not-allowed' : 'hover:-translate-y-0.5'">
-                        <svg x-show="!saving" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
-                        <svg x-show="saving" class="animate-spin -ml-1 mr-2 h-5 w-5 text-gray-900" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                        <span x-text="saving ? 'Guardando Topología...' : 'Guardar Topología'"></span>
-                    </button>
-                </div>
             </div>
+        </div>
     
     <!-- Modal: Visor de Puertos (Glassmorphism) -->
     <div x-show="showPortModal" 
@@ -283,44 +295,55 @@
                         
                         <!-- Area de Matriz -->
                         <div class="bg-black/20 p-5 rounded-2xl border border-white/5 shadow-inner">
-                            <div class="grid grid-cols-8 md:grid-cols-12 gap-3" x-transition>
-                            <template x-for="port in equipmentPorts" :key="port.id">
-                                <div @click="selectPort(port)" class="col-span-1 aspect-square bg-gradient-to-b from-[#1a1f26] to-[#0f1217] border border-gray-700 rounded shadow-[inset_0_2px_4px_rgba(0,0,0,0.5)] relative group/port cursor-pointer transition transform hover:scale-105 flex flex-col items-center justify-center overflow-hidden"
-                                     :class="{
-                                        'ring-2 ring-tecsisa-yellow ring-offset-2 ring-offset-[#05080f] scale-110 z-10 block': selectedPort && selectedPort.id === port.id,
-                                        'border-green-500/50 shadow-[0_0_10px_rgba(34,197,94,0.3)]': port.status === 'connected',
-                                        'border-red-500/50 shadow-[0_0_10px_rgba(239,68,68,0.3)]': port.status === 'broken',
-                                        'opacity-50 grayscale hover:opacity-100 hover:grayscale-0': wizardOpen && selectedPort && selectedPort.id !== port.id && port.status !== 'connected'
-                                     }">
-                                    <div class="text-[10px] font-mono text-gray-400 font-bold mb-1.5" x-text="port.label"></div>
-                                    
-                                    <!-- RJ45 Graphic (simplified) -->
-                                    <div class="w-5 h-5 bg-black border border-gray-800 rounded-sm relative overflow-hidden flex-shrink-0" x-show="port.type == 'rj45'">
-                                        <div class="absolute top-0 right-1 w-1 h-full" :class="port.status === 'connected' ? 'bg-green-500/80 animate-pulse' : 'bg-gray-800'"></div>
-                                    </div>
+                            <template x-if="equipmentPorts.length > 0">
+                                <div class="grid grid-cols-8 md:grid-cols-12 gap-3" x-transition>
+                                    <template x-for="port in equipmentPorts" :key="port.id">
+                                        <div @click="selectPort(port)" class="col-span-1 aspect-square bg-gradient-to-b from-[#1a1f26] to-[#0f1217] border border-gray-700 rounded shadow-[inset_0_2px_4px_rgba(0,0,0,0.5)] relative group/port cursor-pointer transition transform hover:scale-105 flex flex-col items-center justify-center overflow-hidden"
+                                             :class="{
+                                                'ring-2 ring-tecsisa-yellow ring-offset-2 ring-offset-[#05080f] scale-110 z-10 block': selectedPort && selectedPort.id === port.id,
+                                                'border-green-500/50 shadow-[0_0_10px_rgba(34,197,94,0.3)]': port.status === 'connected',
+                                                'border-red-500/50 shadow-[0_0_10px_rgba(239,68,68,0.3)]': port.status === 'broken',
+                                                'opacity-50 grayscale hover:opacity-100 hover:grayscale-0': wizardOpen && selectedPort && selectedPort.id !== port.id && port.status !== 'connected'
+                                             }">
+                                            <div class="text-[10px] font-mono text-gray-400 font-bold mb-1.5" x-text="port.label"></div>
+                                            
+                                            <!-- RJ45 Graphic (simplified) -->
+                                            <div class="w-5 h-5 bg-black border border-gray-800 rounded-sm relative overflow-hidden flex-shrink-0" x-show="port.type == 'rj45'">
+                                                <div class="absolute top-0 right-1 w-1 h-full" :class="port.status === 'connected' ? 'bg-green-500/80 animate-pulse' : 'bg-gray-800'"></div>
+                                            </div>
 
-                                    <!-- SFP Graphic -->
-                                    <div class="w-6 h-4 bg-black border border-gray-800 rounded-sm flex items-center justify-center flex-shrink-0" x-show="port.type == 'sfp' || port.type == 'sfp_plus'">
-                                        <div class="w-2.5 h-1.5 bg-gray-600 rounded-sm"></div>
-                                    </div>
-                                    
-                                    <!-- Status Indicator -->
-                                    <div class="absolute bottom-1 right-1 w-2 h-2 rounded-full border border-black" 
-                                         :class="{
-                                            'bg-green-500 shadow-[0_0_5px_rgba(34,197,94,1)]': port.status === 'connected',
-                                            'bg-red-500 shadow-[0_0_5px_rgba(239,68,68,1)]': port.status === 'broken',
-                                            'bg-gray-600': port.status === 'free'
-                                         }"></div>
+                                            <!-- SFP Graphic -->
+                                            <div class="w-6 h-4 bg-black border border-gray-800 rounded-sm flex items-center justify-center flex-shrink-0" x-show="port.type == 'sfp' || port.type == 'sfp_plus'">
+                                                <div class="w-2.5 h-1.5 bg-gray-600 rounded-sm"></div>
+                                            </div>
+                                            
+                                            <!-- Status Indicator -->
+                                            <div class="absolute bottom-1 right-1 w-2 h-2 rounded-full border border-black" 
+                                                 :class="{
+                                                    'bg-green-500 shadow-[0_0_5px_rgba(34,197,94,1)]': port.status === 'connected',
+                                                    'bg-red-500 shadow-[0_0_5px_rgba(239,68,68,1)]': port.status === 'broken',
+                                                    'bg-gray-600': port.status === 'free'
+                                                 }"></div>
 
-                                    <!-- Hover Tooltip Port -->
-                                    <div class="absolute z-50 left-1/2 -translate-x-1/2 -top-10 bg-black text-white px-2 py-1 rounded text-xs opacity-0 group-hover/port:opacity-100 transition pointer-events-none whitespace-nowrap shadow-xl border border-gray-700">
-                                        Puerto <span class="text-white font-bold" x-text="port.label"></span> (<span x-text="port.type"></span>)
+                                            <!-- Hover Tooltip Port -->
+                                            <div class="absolute z-50 left-1/2 -translate-x-1/2 -top-10 bg-black text-white px-2 py-1 rounded text-xs opacity-0 group-hover/port:opacity-100 transition pointer-events-none whitespace-nowrap shadow-xl border border-gray-700">
+                                                Puerto <span class="text-white font-bold" x-text="port.label"></span> (<span x-text="port.type"></span>)
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                            <template x-if="equipmentPorts.length === 0 && !loadingPorts && !portError">
+                                <div class="py-12 flex flex-col items-center justify-center text-center">
+                                    <div class="w-16 h-16 bg-gray-600/10 rounded-full flex items-center justify-center mb-4">
+                                        <svg class="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
                                     </div>
+                                    <h4 class="text-gray-300 font-bold mb-2">Sin Gestión de Puertos</h4>
+                                    <p class="text-gray-500 text-xs max-w-sm leading-relaxed">El sistema técnico de este hardware no tiene habilitada la gestión física de puertos. No es posible crear parches virtuales.</p>
                                 </div>
                             </template>
                         </div>
                     </div> 
-                </div> 
 
                 <!-- Panel Derecho: Asistente de Enlace (Sticky para evitar scroll) -->
                 <div x-show="wizardOpen" 
@@ -449,7 +472,8 @@
                     <span class="font-bold">Error de Conexión</span>
                     <span class="text-sm">El equipo no respondió a la consulta física de puertos. Es posible que sea un equipo simulado (no guardado) o un error de red.</span>
                 </div>
-            </div>
+            </div> <!-- Close flex-row container (Matrix + Wizard) -->
+        </div>
             
             <div class="px-6 py-4 bg-black/40 border-t border-white/5 flex justify-end">
                 <button @click="closePortViewer()" class="px-5 py-2 text-sm font-bold text-gray-300 hover:text-white transition">Cerrar</button>
@@ -506,14 +530,16 @@
                 get filteredCount() {
                     return this.unassignedCatalog.filter(eq => 
                         !this.isPlaced(eq.id) && 
-                        this.matchesSearch(eq.internal_id.toLowerCase(), eq.name.toLowerCase())
+                        this.matchesSearch(eq.internal_id, eq.name)
                     ).length;
                 },
 
                 matchesSearch(id, name) {
                     if (!this.catalogSearch) return true;
-                    const search = this.catalogSearch.toLowerCase();
-                    return id.includes(search) || name.includes(search);
+                    const search = String(this.catalogSearch).toLowerCase();
+                    const targetId = String(id || '').toLowerCase();
+                    const targetName = String(name || '').toLowerCase();
+                    return targetId.includes(search) || targetName.includes(search);
                 },
 
                 init() {

@@ -98,18 +98,28 @@ class RackBuilderController extends Controller
         // we generate a standard 24-port switch layout for it.
         if ($equipment->ports()->count() === 0) {
             $portsToCreate = [];
-            for ($i = 1; $i <= 24; $i++) {
-                $portsToCreate[] = [
-                    'number_label' => str_pad($i, 2, '0', STR_PAD_LEFT),
-                    'port_type' => 'rj45',
-                    'status' => 'free',
-                ];
-            }
-            // Add 2 SFP ports
-            $portsToCreate[] = ['number_label' => 'SFP 1', 'port_type' => 'sfp', 'status' => 'free'];
-            $portsToCreate[] = ['number_label' => 'SFP 2', 'port_type' => 'sfp', 'status' => 'free'];
+            $system = $equipment->system;
 
-            $equipment->ports()->createMany($portsToCreate);
+            if ($system && $system->has_ports && !empty($system->port_config)) {
+                // Generación Dinámica basada en el Sistema
+                foreach ($system->port_config as $config) {
+                    $prefix = $config['label_prefix'] ?? 'P';
+                    $count = (int)($config['count'] ?? 0);
+                    $type = $config['type'] ?? 'rj45';
+
+                    for ($i = 1; $i <= $count; $i++) {
+                        $portsToCreate[] = [
+                            'number_label' => $prefix . str_pad($i, 2, '0', STR_PAD_LEFT),
+                            'port_type' => $type,
+                            'status' => 'free',
+                        ];
+                    }
+                }
+            }
+
+            if (!empty($portsToCreate)) {
+                $equipment->ports()->createMany($portsToCreate);
+            }
         }
 
         $ports = $equipment->ports()->orderBy('id')->get();

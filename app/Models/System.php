@@ -9,10 +9,19 @@ class System extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'form_schema'];
+    protected $fillable = [
+        'name',
+        'has_ports',
+        'form_schema',
+        'port_config',
+        'maintenance_interval_days',
+        'maintenance_guide'
+    ];
 
     protected $casts = [
+        'has_ports' => 'boolean',
         'form_schema' => 'array',
+        'port_config' => 'array',
     ];
 
     public function equipments()
