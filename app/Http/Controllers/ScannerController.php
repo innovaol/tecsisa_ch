@@ -15,6 +15,12 @@ class ScannerController extends Controller
         return view('scanner.index');
     }
 
+    public function showResult(Equipment $equipment)
+    {
+        $equipment->load('system', 'location');
+        return view('scanner.result', ['equipment' => $equipment]);
+    }
+
     /**
      * Process a search or scan result.
      */
@@ -33,8 +39,8 @@ class ScannerController extends Controller
             ->first();
 
         if ($equipment) {
-            // Found exact match "QR / Barcode"
-            return view('scanner.result', ['equipment' => $equipment]);
+            // Found exact match "QR / Barcode", redirect to result status page
+            return redirect()->route('technician.scanner.result', $equipment->id);
         }
 
         // Otherwise, do a soft search

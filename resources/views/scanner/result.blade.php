@@ -1,17 +1,17 @@
 <x-technician-layout>
-    <div class="fixed top-0 inset-x-0 z-40 bg-[#0a0d14]/90 backdrop-blur-xl border-b border-white/5 pt-safe">
-        <div class="px-4 py-3 flex items-center justify-between">
-            <a href="{{ route('technician.scanner') }}" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition">
+    <div class="fixed top-0 inset-x-0 z-[60] bg-[#0a0d14]/95 backdrop-blur-3xl border-b border-white/5 pt-safe">
+        <div class="px-4 py-4 flex items-center justify-between">
+            <a href="{{ route('technician.scanner') }}" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white transition shadow-lg">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
             </a>
             <h1 class="text-xs font-black text-white uppercase tracking-widest flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span> Equipo B.D.R
+                <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span> Equipo Identificado
             </h1>
             <div class="w-10 h-10"></div>
         </div>
     </div>
 
-    <div class="pt-20 pb-24 px-5">
+    <div class="pt-24 pb-20 px-5 relative z-10">
         
         <!-- Info Principal -->
         <div class="bg-gradient-to-br from-[#12161f] to-[#0a0d14] rounded-3xl border border-white/10 p-6 shadow-2xl relative overflow-hidden mb-6">

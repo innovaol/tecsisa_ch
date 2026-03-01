@@ -30,6 +30,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::put('/tasks/{task}', [\App\Http\Controllers\TechnicianController::class , 'updateTaskStatus'])->name('task.update');
 
             Route::get('/scanner', [\App\Http\Controllers\ScannerController::class , 'index'])->name('scanner');
+            Route::get('/scanner/result/{equipment}', [\App\Http\Controllers\ScannerController::class , 'showResult'])->name('scanner.result');
             Route::post('/scanner/search', [\App\Http\Controllers\ScannerController::class , 'search'])->name('scanner.search');
         }
         );
