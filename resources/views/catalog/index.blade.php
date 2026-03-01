@@ -7,6 +7,7 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
         <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+        <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
         <style>
             .flatpickr-calendar { background: #0f1217 !important; border-color: rgba(255,255,255,0.1) !important; box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important; }
             .flatpickr-day.selected { background: #ffd100 !important; color: #000 !important; border-color: #ffd100 !important; }
@@ -404,7 +405,7 @@
                                         <template x-if="field.type === 'date'">
                                             <div class="relative">
                                                 <input type="text" :name="'specs[' + field.label + ']'" 
-                                                       x-init="flatpickr($el, { dateFormat: 'Y-m-d', allowInput: true, theme: 'dark' })"
+                                                       x-init="flatpickr($el, { dateFormat: 'Y-m-d', allowInput: true, theme: 'dark', locale: 'es' })"
                                                        x-model="formData.specs[field.label]"
                                                        class="w-full bg-black/60 border-white/5 rounded-lg text-sm text-white focus:border-tecsisa-yellow focus:ring-0 transition h-9 px-3"
                                                        placeholder="YYYY-MM-DD">
