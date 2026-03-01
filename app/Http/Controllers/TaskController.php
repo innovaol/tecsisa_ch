@@ -95,9 +95,15 @@ class TaskController extends Controller
         }
 
         $validated = $request->validate([
+            'description' => 'nullable|string',
             'form_data' => 'nullable|array',
             'action' => 'required|in:save_draft,submit',
         ]);
+
+        // Update basic task info
+        if ($request->has('description')) {
+            $task->description = $validated['description'];
+        }
 
         // Merge existing form data with new
         $currentData = $task->form_data ?? [];
@@ -109,7 +115,7 @@ class TaskController extends Controller
         if ($validated['action'] === 'submit') {
             $task->status = 'pending'; // Moves from draft to pending verification
             $task->save();
-            return redirect()->route('tasks.index')->with('success', 'Tarea enviada para revisión final.');
+            return redirect()->route('technician.dashboard')->with('success', 'Tarea enviada para revisión final.');
         }
         else {
             // Just saving draft
