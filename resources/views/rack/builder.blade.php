@@ -221,16 +221,16 @@
                                 'border-green-500/50 shadow-[0_0_10px_rgba(34,197,94,0.3)]': port.status === 'connected',
                                 'border-red-500/50 shadow-[0_0_10px_rgba(239,68,68,0.3)]': port.status === 'broken'
                              }">
-                            <div class="text-[9px] font-mono text-gray-500 absolute top-0.5" x-text="port.label"></div>
+                            <div class="text-[10px] font-mono text-gray-400 font-bold mb-1.5" x-text="port.label"></div>
                             
                             <!-- RJ45 Graphic (simplified) -->
-                            <div class="w-4 h-4 bg-black border border-gray-800 rounded-sm mt-2 relative overflow-hidden" x-show="port.type == 'rj45'">
-                                <div class="absolute top-0 right-1 w-0.5 h-full" :class="port.status === 'connected' ? 'bg-green-500/80 animate-pulse' : 'bg-gray-800'"></div>
+                            <div class="w-5 h-5 bg-black border border-gray-800 rounded-sm relative overflow-hidden flex-shrink-0" x-show="port.type == 'rj45'">
+                                <div class="absolute top-0 right-1 w-1 h-full" :class="port.status === 'connected' ? 'bg-green-500/80 animate-pulse' : 'bg-gray-800'"></div>
                             </div>
 
                             <!-- SFP Graphic -->
-                            <div class="w-5 h-3 bg-black border border-gray-800 rounded-sm mt-2 flex items-center justify-center" x-show="port.type == 'sfp' || port.type == 'sfp_plus'">
-                                <div class="w-2 h-1 bg-gray-600 rounded-sm"></div>
+                            <div class="w-6 h-4 bg-black border border-gray-800 rounded-sm flex items-center justify-center flex-shrink-0" x-show="port.type == 'sfp' || port.type == 'sfp_plus'">
+                                <div class="w-2.5 h-1.5 bg-gray-600 rounded-sm"></div>
                             </div>
                             
                             <!-- Status Indicator -->
