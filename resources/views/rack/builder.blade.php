@@ -216,8 +216,9 @@
                 </div>
             </div>
 
+            </div>
+
         </div>
-    </div>
     
     <!-- Modal: Visor de Puertos (Glassmorphism) -->
     <div x-show="showPortModal" 
@@ -294,6 +295,8 @@
             </div>
         </div>
     </div>
+
+    </div> <!-- Close of x-data div -->
     
     <!-- Alpine.js Logic para el Constructor de Rack -->
     <script>
