@@ -70,9 +70,15 @@
                                         <option value="true" {{ $fieldValue == 'true' ? 'selected' : '' }}>Sí / Correcto</option>
                                         <option value="false" {{ $fieldValue == 'false' ? 'selected' : '' }}>No / Falla</option>
                                     @else
-                                        @foreach(explode(',', $field['options'] ?? '') as $opt)
-                                            @php $optTrimmed = trim($opt); @endphp
-                                            <option value="{{ $optTrimmed }}" {{ $fieldValue === $optTrimmed ? 'selected' : '' }}>{{ $optTrimmed }}</option>
+                                        @php
+                                            $optsRaw = $field['options'] ?? '';
+                                            $optsArray = is_array($optsRaw) ? $optsRaw : explode(',', (string)$optsRaw);
+                                        @endphp
+                                        @foreach($optsArray as $opt)
+                                            @php $optTrimmed = trim((string)$opt); @endphp
+                                            @if($optTrimmed !== '')
+                                                <option value="{{ $optTrimmed }}" {{ $fieldValue === $optTrimmed ? 'selected' : '' }}>{{ $optTrimmed }}</option>
+                                            @endif
                                         @endforeach
                                     @endif
                                 </select>
