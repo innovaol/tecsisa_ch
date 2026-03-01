@@ -93,7 +93,7 @@
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('scannerApp', () => ({
-                activeTab: 'scan',
+                activeTab: new URLSearchParams(window.location.search).get('mode') || 'scan',
                 query: '',
                 isScanning: false,
                 html5QrCode: null,
