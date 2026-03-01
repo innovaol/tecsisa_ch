@@ -37,23 +37,46 @@
 
             <!-- Tab: Systems -->
             <div x-show="activeTab === 'systems'" x-transition>
-                <div class="bg-tecsisa-dark/40 backdrop-blur-md border border-white/10 rounded-2xl p-8 text-white">
-                    <h3 class="text-lg font-bold mb-4">Sistemas de Baja Tensión</h3>
-                    <p class="text-gray-400 text-sm mb-6">Próximamente: Definición de esquemas personalizados por sistema</p>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        @foreach($systems as $sys)
-                        <div class="bg-black/20 p-4 rounded-xl border border-white/5">
-                            <h4 class="font-bold text-tecsisa-yellow">{{ $sys->name }}</h4>
-                            <p class="text-xs text-gray-500 mt-1 uppercase">{{ $sys->slug }}</p>
-                            <div class="mt-3 flex gap-2">
-                                <span class="text-[10px] bg-white/5 px-2 py-0.5 rounded text-gray-400">
-                                    {{ count($sys->form_schema ?? []) }} campos
-                                </span>
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h3 class="text-white text-xl font-bold">Sistemas de Baja Tensión</h3>
+                        <p class="text-gray-500 text-sm">Define los sistemas y sus parámetros técnicos personalizados.</p>
+                    </div>
+                    <button @click="openCreateSystemModal()" class="bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-bold px-4 py-2 rounded-lg text-sm transition shadow-[0_0_10px_rgba(255,209,0,0.2)]">
+                        + Nuevo Sistema
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    @foreach($systems as $sys)
+                    <div class="bg-tecsisa-dark/40 backdrop-blur-md p-6 rounded-2xl border border-white/10 group hover:border-tecsisa-yellow/50 transition-all">
+                        <div class="flex justify-between items-start mb-4">
+                            <h4 class="font-bold text-lg text-white group-hover:text-tecsisa-yellow transition-colors">{{ $sys->name }}</h4>
+                            <div class="flex gap-2">
+                                <button @click="openEditSystemModal(@js($sys))" class="text-gray-500 hover:text-white transition">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                </button>
+                                <form action="{{ route('catalog.systems.destroy', $sys) }}" method="POST" onsubmit="return confirm('¿Eliminar este sistema? No podrá eliminarse si tiene equipos asociados.')">
+                                    @csrf @method('DELETE')
+                                    <button class="text-gray-600 hover:text-red-400 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                                </form>
                             </div>
                         </div>
-                        @endforeach
+                        
+                        <div class="space-y-2">
+                            <p class="text-[10px] text-gray-500 uppercase font-black tracking-widest">Esquema de Datos:</p>
+                            <div class="flex flex-wrap gap-2">
+                                @forelse($sys->form_schema ?? [] as $field)
+                                    <span class="text-[10px] bg-white/5 border border-white/10 px-2 py-1 rounded text-gray-400">
+                                        {{ $field['label'] }} <span class="text-tecsisa-yellow/50">({{ $field['type'] }})</span>
+                                    </span>
+                                @empty
+                                    <span class="text-[10px] text-gray-600 italic">Sin campos personalizados</span>
+                                @endforelse
+                            </div>
+                        </div>
                     </div>
+                    @endforeach
                 </div>
             </div>
 
@@ -138,6 +161,94 @@
                 </div>
             </div>
 
+        </div>
+
+        <!-- System Modal (Managing Schemas) -->
+        <div x-show="showSystemModal" 
+             style="display: none;"
+             class="fixed inset-0 z-50 overflow-y-auto"
+             role="dialog" aria-modal="true">
+            
+            <div x-show="showSystemModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" 
+                 class="fixed inset-0 bg-black/80 backdrop-blur-sm transition-all" @click="showSystemModal = false"></div>
+
+            <div class="flex min-h-full items-center justify-center p-4">
+                <div x-show="showSystemModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                     class="relative w-full max-w-2xl bg-tecsisa-dark border border-white/10 rounded-2xl shadow-2xl overflow-hidden transition-all">
+                    
+                    <form method="post" :action="systemFormAction" class="p-8">
+                        @csrf
+                        <template x-if="systemEditMode">
+                            <input type="hidden" name="_method" value="PUT">
+                        </template>
+
+                        <div class="flex justify-between items-center mb-6 border-b border-white/5 pb-4">
+                            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                                <svg class="w-6 h-6 text-tecsisa-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg>
+                                <span x-text="systemEditMode ? 'Editar Sistema Técnico' : 'Definir Nuevo Sistema'"></span>
+                            </h2>
+                            <button type="button" @click="showSystemModal = false" class="text-gray-500 hover:text-white transition">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                        </div>
+
+                        <div class="space-y-6">
+                            <div>
+                                <label class="block text-gray-400 text-xs font-bold uppercase mb-1">Nombre del Sistema</label>
+                                <input type="text" name="name" x-model="systemFormData.name" required 
+                                       class="w-full bg-black/40 border-white/10 rounded-lg text-white focus:border-tecsisa-yellow focus:ring-tecsisa-yellow transition h-10 px-3" 
+                                       placeholder="Ej: CCTV, Control de Acceso, Redes...">
+                            </div>
+
+                            <div class="bg-white/5 rounded-xl p-6 border border-white/5">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest">Esquema Técnico (Campos Dinámicos)</h3>
+                                    <button type="button" @click="addFieldToSchema()" class="text-[10px] bg-tecsisa-yellow/10 text-tecsisa-yellow border border-tecsisa-yellow/20 px-3 py-1 rounded-full font-bold hover:bg-tecsisa-yellow/20 transition">
+                                        + Agregar Campo
+                                    </button>
+                                </div>
+
+                                <div class="space-y-3">
+                                    <template x-for="(field, index) in systemFormData.form_schema" :key="index">
+                                        <div class="flex gap-2 items-end bg-black/20 p-3 rounded-lg border border-white/5">
+                                            <div class="flex-1">
+                                                <label class="text-[10px] text-gray-600 block mb-1">Etiqueta (Label)</label>
+                                                <input type="text" :name="'form_schema[' + index + '][label]'" x-model="field.label" 
+                                                       class="w-full bg-black/40 border-white/10 rounded-lg text-xs text-white h-8 px-2" placeholder="Ej: Resolución, IP, Piso...">
+                                            </div>
+                                            <div class="w-32">
+                                                <label class="text-[10px] text-gray-600 block mb-1">Tipo de Dato</label>
+                                                <select :name="'form_schema[' + index + '][type]'" x-model="field.type"
+                                                        class="w-full bg-black/40 border-white/10 rounded-lg text-xs text-white h-8 px-2">
+                                                    <option value="text">Texto</option>
+                                                    <option value="number">Número</option>
+                                                </select>
+                                            </div>
+                                            <button type="button" @click="removeFieldFromSchema(index)" class="text-gray-600 hover:text-red-400 p-2">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                            </button>
+                                        </div>
+                                    </template>
+                                    
+                                    <template x-if="systemFormData.form_schema.length === 0">
+                                        <p class="text-center text-xs text-gray-600 py-4 italic">No has definido campos técnicos para este sistema.</p>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-8 flex justify-end gap-3">
+                            <button type="button" @click="showSystemModal = false" class="px-6 py-2 rounded-xl text-gray-400 hover:text-white transition font-bold uppercase text-xs">
+                                Cancelar
+                            </button>
+
+                            <button type="submit" class="bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-black px-8 py-2 rounded-xl transition shadow-xl shadow-yellow-400/10">
+                                <span x-text="systemEditMode ? 'Actualizar Sistema' : 'Crear Sistema'"></span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
 
         <!-- Custom Modal Implementation (Integrated into root x-data scope) -->
@@ -312,6 +423,16 @@
                 notes: ''
             },
 
+            // Systems (Schema) Modal state
+            showSystemModal: false,
+            systemEditMode: false,
+            systemFormAction: '/catalogos/systems',
+            systemFormData: {
+                id: '',
+                name: '',
+                form_schema: []
+            },
+
             get activeSchema() {
                 if (!this.formData.system_id) return [];
                 const sysId = String(this.formData.system_id);
@@ -357,6 +478,37 @@
                 };
                 
                 this.showEquipmentModal = true;
+            },
+
+            // --- Systems Logic ---
+            openCreateSystemModal() {
+                this.systemEditMode = false;
+                this.systemFormAction = '/catalogos/systems';
+                this.systemFormData = {
+                    id: '',
+                    name: '',
+                    form_schema: []
+                };
+                this.showSystemModal = true;
+            },
+
+            openEditSystemModal(sys) {
+                this.systemEditMode = true;
+                this.systemFormAction = `/catalogos/systems/${sys.id}`;
+                this.systemFormData = {
+                    id: sys.id,
+                    name: sys.name,
+                    form_schema: sys.form_schema ? JSON.parse(JSON.stringify(sys.form_schema)) : []
+                };
+                this.showSystemModal = true;
+            },
+
+            addFieldToSchema() {
+                this.systemFormData.form_schema.push({ label: '', type: 'text' });
+            },
+
+            removeFieldFromSchema(index) {
+                this.systemFormData.form_schema.splice(index, 1);
             }
         };
     }

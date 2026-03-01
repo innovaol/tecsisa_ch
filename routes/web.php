@@ -24,6 +24,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/catalogos/equipment/{equipment}', [\App\Http\Controllers\CatalogController::class , 'updateEquipment'])->name('catalog.equipment.update');
         Route::delete('/catalogos/equipment/{equipment}', [\App\Http\Controllers\CatalogController::class , 'destroyEquipment'])->name('catalog.equipment.destroy');
 
+        Route::post('/catalogos/systems', [\App\Http\Controllers\CatalogController::class , 'storeSystem'])->name('catalog.systems.store');
+        Route::put('/catalogos/systems/{system}', [\App\Http\Controllers\CatalogController::class , 'updateSystem'])->name('catalog.systems.update');
+        Route::delete('/catalogos/systems/{system}', [\App\Http\Controllers\CatalogController::class , 'destroySystem'])->name('catalog.systems.destroy');
+
         Route::get('/racks', [\App\Http\Controllers\RackBuilderController::class , 'index'])->name('rack.builder');
         Route::post('/racks/{rack}/save', [\App\Http\Controllers\RackBuilderController::class , 'save'])->name('rack.save');
         Route::get('/api/equipment/{equipment}/ports', [\App\Http\Controllers\RackBuilderController::class , 'getEquipmentPorts'])->name('api.equipment.ports');

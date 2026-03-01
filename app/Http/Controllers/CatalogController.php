@@ -63,4 +63,41 @@ class CatalogController extends Controller
 
         return redirect()->back()->with('success', 'Equipo eliminado del inventario.');
     }
+
+    // --- Systems Management ---
+
+    public function storeSystem(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'form_schema' => 'nullable|array',
+        ]);
+
+        System::create($validated);
+
+        return redirect()->back()->with('success', 'Sistema técnico creado correctamente.');
+    }
+
+    public function updateSystem(Request $request, System $system)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'form_schema' => 'nullable|array',
+        ]);
+
+        $system->update($validated);
+
+        return redirect()->back()->with('success', 'Sistema técnico actualizado correctamente.');
+    }
+
+    public function destroySystem(System $system)
+    {
+        if ($system->equipments()->count() > 0) {
+            return redirect()->back()->with('error', 'No se puede eliminar un sistema que tiene equipos asociados.');
+        }
+
+        $system->delete();
+
+        return redirect()->back()->with('success', 'Sistema técnico eliminado.');
+    }
 }
