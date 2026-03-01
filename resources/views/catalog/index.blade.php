@@ -3,6 +3,20 @@
         <h2 class="font-semibold text-xl text-white leading-tight">
             {{ __('Gestión de Catálogos y Activos') }}
         </h2>
+        <!-- Flatpickr for Premium Date Selection -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+        <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+        <style>
+            .flatpickr-calendar { background: #0f1217 !important; border-color: rgba(255,255,255,0.1) !important; box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important; }
+            .flatpickr-day.selected { background: #ffd100 !important; color: #000 !important; border-color: #ffd100 !important; }
+            .flatpickr-day:hover { background: rgba(255,209,0,0.2) !important; }
+            .flatpickr-current-month .flatpickr-monthDropdown-months { background: #0f1217 !important; }
+            input[type="date"]::-webkit-calendar-picker-indicator {
+                filter: invert(1) brightness(1.5);
+                cursor: pointer;
+            }
+        </style>
     </x-slot>
 
     <div class="py-12" x-data="inventoryManager(@js($locations), @js($systems))">
@@ -221,8 +235,9 @@
                                                 <select :name="'form_schema[' + index + '][type]'" x-model="field.type"
                                                         class="w-full bg-black/40 border-white/10 rounded-lg text-xs text-white h-8 px-2">
                                                     <option value="text">Texto Corto</option>
+                                                    <option value="long_text">Texto Largo (Área)</option>
                                                     <option value="number">Número</option>
-                                                    <option value="date">Fecha</option>
+                                                    <option value="date">Fecha (Calendario)</option>
                                                     <option value="select">Lista (Dropdown)</option>
                                                 </select>
                                             </div>
@@ -385,11 +400,26 @@
                                             </select>
                                         </template>
 
-                                        <!-- Case: Date -->
+                                        <!-- Case: Date (Flatpickr) -->
                                         <template x-if="field.type === 'date'">
-                                            <input type="date" :name="'specs[' + field.label + ']'" 
+                                            <div class="relative">
+                                                <input type="text" :name="'specs[' + field.label + ']'" 
+                                                       x-init="flatpickr($el, { dateFormat: 'Y-m-d', allowInput: true, theme: 'dark' })"
+                                                       x-model="formData.specs[field.label]"
+                                                       class="w-full bg-black/60 border-white/5 rounded-lg text-sm text-white focus:border-tecsisa-yellow focus:ring-0 transition h-9 px-3"
+                                                       placeholder="YYYY-MM-DD">
+                                                <div class="absolute right-3 top-2.5 text-gray-500 pointer-events-none">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                                </div>
+                                            </div>
+                                        </template>
+
+                                        <!-- Case: Long Text -->
+                                        <template x-if="field.type === 'long_text'">
+                                            <textarea :name="'specs[' + field.label + ']'" 
                                                    x-model="formData.specs[field.label]"
-                                                   class="w-full bg-black/60 border-white/5 rounded-lg text-sm text-white focus:border-tecsisa-yellow focus:ring-0 transition h-9 px-3">
+                                                   class="w-full bg-black/60 border-white/5 rounded-lg text-sm text-white focus:border-tecsisa-yellow focus:ring-0 transition p-3 h-24"
+                                                   :placeholder="'Detalles de ' + field.label.toLowerCase()"></textarea>
                                         </template>
 
                                         <!-- Case: Number -->
