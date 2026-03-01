@@ -191,8 +191,9 @@
                 system_id: '{{ $systems->first()->id ?? '' }}', 
                 systems: Object.values(@json($systems)),
                 get activeSchema() {
-                    let sys = this.systems.find(s => s.id == this.system_id);
-                    return sys ? (sys.form_schema || []) : [];
+                    if (!this.system_id) return [];
+                    let found = this.systems.find(s => String(s.id) === String(this.system_id));
+                    return found ? (found.form_schema || []) : [];
                 }
              }" 
              class="bg-tecsisa-dark p-0 border border-white/10 overflow-hidden">
