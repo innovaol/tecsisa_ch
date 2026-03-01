@@ -34,6 +34,8 @@
                             <!-- Aquí irían los elementos arrastrables (Source objects) -->
                             @foreach($unassignedEquipment as $eq)
                                 <div draggable="true" 
+                                     x-show="!isPlaced('{{ $eq->id }}')"
+                                     x-transition
                                      @dragstart="startDrag($event, '{{ $eq->id }}', '{{ $eq->internal_id }}', '{{ $eq->name }}', 1)"
                                      @click="selectEquipment('{{ $eq->id }}', '{{ $eq->internal_id }}', '{{ $eq->name }}', 1)"
                                      :class="{'border-l-tecsisa-yellow bg-tecsisa-yellow/10 scale-[1.02] shadow-[0_0_15px_rgba(255,209,0,0.3)]': selectedItem && selectedItem.db_id === '{{ $eq->id }}', 'border-l-blue-500 bg-black/30 hover:bg-white/5': !selectedItem || selectedItem.db_id !== '{{ $eq->id }}'}"
@@ -48,6 +50,8 @@
                             
                              <!-- Ejemplos extras para llenar -->
                              <div draggable="true" 
+                                     x-show="!isPlaced('PP-01')"
+                                     x-transition
                                      @dragstart="startDrag($event, 'PP-01', 'PTC-FO-01', 'Bandeja ODF 24 Hilos', 1)"
                                      @click="selectEquipment('PP-01', 'PTC-FO-01', 'Bandeja ODF 24 Hilos', 1)"
                                      :class="{'border-l-tecsisa-yellow bg-tecsisa-yellow/10 scale-[1.02] shadow-[0_0_15px_rgba(255,209,0,0.3)]': selectedItem && selectedItem.db_id === 'PP-01', 'border-l-orange-500 bg-black/30 hover:bg-white/5': !selectedItem || selectedItem.db_id !== 'PP-01'}"
@@ -59,6 +63,8 @@
                                     <div class="bg-white/10 text-gray-400 text-xs px-2 py-1 rounded">1U</div>
                                 </div>
                                 <div draggable="true" 
+                                     x-show="!isPlaced('UPS-01')"
+                                     x-transition
                                      @dragstart="startDrag($event, 'UPS-01', 'UPS-MDF-01', 'APC Smart-UPS 3000VA', 2)"
                                      @click="selectEquipment('UPS-01', 'UPS-MDF-01', 'APC Smart-UPS 3000VA', 2)"
                                      :class="{'border-l-tecsisa-yellow bg-tecsisa-yellow/10 scale-[1.02] shadow-[0_0_15px_rgba(255,209,0,0.3)]': selectedItem && selectedItem.db_id === 'UPS-01', 'border-l-red-500 bg-black/30 hover:bg-white/5': !selectedItem || selectedItem.db_id !== 'UPS-01'}"
@@ -249,6 +255,11 @@
                             }
                         });
                     }
+                },
+
+                isPlaced(dbId) {
+                    // Returns true if the equipment with dbId is currently placed inside the rack
+                    return this.rackUnits.some(u => u.occupied && u.db_id == dbId);
                 },
 
                 selectEquipment(dbId, displayId, name, size) {
