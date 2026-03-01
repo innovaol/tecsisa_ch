@@ -213,21 +213,25 @@
             </div>
 
             <!-- Modal Body: Puertos Simulados y Asistente de Enlace -->
-            <div class="px-8 py-6 min-h-[300px] flex flex-col justify-center">
+            <!-- Modal Body: Puertos Simulados y Asistente de Enlace -->
+            <div class="px-8 py-10 min-h-[500px] flex flex-col justify-start overflow-y-auto custom-scrollbar">
                 
                 <div x-show="!loadingPorts && !portError" class="flex flex-col md:flex-row gap-8 w-full transition-all">
                     
                     <!-- Panel Izquierdo: Matriz de Puertos -->
                     <div class="transition-all flex-1 space-y-4">
-                        <div class="text-sm font-bold text-gray-400 border-b border-gray-700/50 pb-2 mb-4">Mapeo Frontal</div>
-                        <div class="grid grid-cols-12 gap-3 max-h-[400px] overflow-y-auto custom-scrollbar pr-2" x-transition>
+                        <div class="text-sm font-bold text-gray-400 border-b border-gray-700/50 pb-2 mb-4 flex justify-between items-center">
+                            <span>Mapeo Frontal</span>
+                            <button x-show="wizardOpen" @click="wizardOpen = false; selectedPort = null" class="text-[10px] text-tecsisa-yellow hover:underline uppercase tracking-widest font-black">Expandir Vista</button>
+                        </div>
+                        <div @click.self="wizardOpen = false; selectedPort = null" class="grid grid-cols-12 gap-3 max-h-[450px] overflow-y-auto custom-scrollbar pr-2" x-transition>
                             <template x-for="port in equipmentPorts" :key="port.id">
                                 <div @click="selectPort(port)" class="col-span-1 aspect-square bg-gradient-to-b from-[#1a1f26] to-[#0f1217] border border-gray-700 rounded shadow-[inset_0_2px_4px_rgba(0,0,0,0.5)] relative group/port cursor-pointer transition transform hover:scale-105 flex flex-col items-center justify-center overflow-hidden"
                                      :class="{
                                         'ring-2 ring-tecsisa-yellow ring-offset-2 ring-offset-[#05080f] scale-110 z-10 block': selectedPort && selectedPort.id === port.id,
                                         'border-green-500/50 shadow-[0_0_10px_rgba(34,197,94,0.3)]': port.status === 'connected',
                                         'border-red-500/50 shadow-[0_0_10px_rgba(239,68,68,0.3)]': port.status === 'broken',
-                                        'opacity-50 grayscale': wizardOpen && selectedPort && selectedPort.id !== port.id
+                                        'opacity-50 grayscale hover:opacity-100 hover:grayscale-0': wizardOpen && selectedPort && selectedPort.id !== port.id && port.status !== 'connected'
                                      }">
                                     <div class="text-[10px] font-mono text-gray-400 font-bold mb-1.5" x-text="port.label"></div>
                                     
@@ -260,7 +264,7 @@
 
                     <!-- Panel Derecho: Asistente de Enlace -->
                     <div x-show="wizardOpen" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="opacity-0 translate-x-8" x-transition:enter-end="opacity-100 translate-x-0" class="w-full md:w-1/3 shrink-0 flex flex-col">
-                        <div class="bg-gradient-to-br from-white/5 to-transparent border border-white/10 rounded-xl p-5 shadow-2xl h-full relative overflow-hidden">
+                        <div class="bg-gradient-to-br from-white/5 to-transparent border border-white/10 rounded-xl p-5 shadow-2xl min-h-full relative">
                             <!-- Wizard Header -->
                             <div class="flex items-center gap-3 mb-6">
                                 <span class="bg-tecsisa-yellow text-black font-black w-8 h-8 rounded-full flex items-center justify-center text-sm shadow-[0_0_15px_rgba(255,209,0,0.5)]">
@@ -326,32 +330,37 @@
                             <!-- Panel de Desconexión / Info -->
                             <div x-show="selectedPort?.status === 'connected'" class="space-y-5 h-full flex flex-col justify-between">
                                 <div class="space-y-4">
-                                    <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-4 flex flex-col gap-2 relative overflow-hidden">
+                                    <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-5 flex flex-col gap-3 relative overflow-hidden">
                                         <div class="absolute right-[-10px] top-[-10px] opacity-10 blur-sm pointer-events-none text-green-500">
                                             <svg class="w-24 h-24" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
                                         </div>
                                         <div class="flex items-center gap-2">
-                                            <div class="w-2 h-2 bg-green-500 rounded-full shadow-[0_0_8px_rgba(34,197,94,1)]"></div>
-                                            <span class="text-green-400 font-bold uppercase text-xs tracking-wider">Enlace Activo</span>
+                                            <div class="w-2.5 h-2.5 bg-green-500 rounded-full shadow-[0_0_10px_rgba(34,197,94,1)]"></div>
+                                            <span class="text-green-400 font-black uppercase text-[10px] tracking-widest">Enlace Establecido</span>
                                         </div>
                                         
-                                        <div class="mt-2 text-sm text-gray-300">
-                                            Puerto <strong class="text-white font-mono" x-text="selectedPort?.label"></strong>
-                                            está conectado a <strong class="text-white font-mono" x-text="selectedPort?.connected_to?.equipment_name"></strong>
-                                            (Pto. <strong class="text-white font-mono" x-text="selectedPort?.connected_to?.port_label"></strong>)
+                                        <div class="mt-1 text-sm text-gray-200 leading-relaxed">
+                                            Puerto <strong class="text-tecsisa-yellow font-mono" x-text="selectedPort?.label"></strong>
+                                            conecta con <strong class="text-white font-bold" x-text="selectedPort?.connected_to?.equipment_name"></strong>
+                                            en su puerto <strong class="text-tecsisa-yellow font-mono" x-text="selectedPort?.connected_to?.port_label"></strong>
                                         </div>
 
-                                        <div class="flex items-center gap-2 mt-2 pt-2 border-t border-green-500/20 text-xs text-gray-400">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                                            <span class="capitalize" x-text="selectedPort?.cable?.type + ' - ' + selectedPort?.cable?.color"></span>
+                                        <div class="flex items-center gap-3 mt-1 pt-3 border-t border-green-500/20 text-xs text-gray-400">
+                                            <div class="flex items-center gap-1.5 bg-black/40 px-2 py-0.5 rounded border border-white/5">
+                                                <div class="w-2 h-2 rounded-full shadow-sm" :class="'bg-' + (selectedPort?.cable?.color === 'aqua' ? 'cyan-400' : selectedPort?.cable?.color + '-500')"></div>
+                                                <span class="capitalize font-medium" x-text="selectedPort?.cable?.type"></span>
+                                            </div>
+                                            <span class="text-[10px] uppercase tracking-tighter opacity-60" x-text="'Color: ' + selectedPort?.cable?.color"></span>
                                         </div>
                                     </div>
                                 </div>
-                                <button @click="disconnectConnection()" :disabled="savingConnection" class="w-full bg-red-500/10 hover:bg-red-500/20 border border-red-500/50 text-red-500 hover:text-red-400 font-bold py-2.5 rounded-lg transition flex items-center justify-center gap-2">
-                                    <svg x-show="!savingConnection" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                                    <svg x-show="savingConnection" class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                                    <span x-text="savingConnection ? 'Cortando...' : 'Cortar Enlace'"></span>
-                                </button>
+                                <div class="pt-4 pb-2">
+                                    <button @click="disconnectConnection()" :disabled="savingConnection" class="w-full bg-red-500/10 hover:bg-red-600 text-red-500 hover:text-white border border-red-500/50 font-black py-3 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg group">
+                                        <svg x-show="!savingConnection" class="w-5 h-5 group-hover:animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                        <svg x-show="savingConnection" class="animate-spin w-5 h-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                        <span x-text="savingConnection ? 'Cortando...' : 'Desvincular Puerto'"></span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
