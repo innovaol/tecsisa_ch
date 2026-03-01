@@ -13,8 +13,50 @@ class CatalogController extends Controller
     {
         $locations = Location::with('parent')->get();
         $systems = System::all();
-        $equipments = Equipment::with(['location', 'system'])->get();
+        $equipments = Equipment::with(['location', 'system'])->orderBy('created_at', 'desc')->get();
 
         return view('catalog.index', compact('locations', 'systems', 'equipments'));
+    }
+
+    public function storeEquipment(Request $request)
+    {
+        $validated = $request->validate([
+            'internal_id' => 'required|unique:equipment,internal_id',
+            'name' => 'required|string|max:255',
+            'form_factor' => 'required|in:rackmount,peripheral,network_point',
+            'system_id' => 'required|exists:systems,id',
+            'location_id' => 'nullable|exists:locations,id',
+            'status' => 'required|in:operative,under_maintenance,out_of_service',
+            'notes' => 'nullable|string',
+        ]);
+
+        Equipment::create($validated);
+
+        return redirect()->back()->with('success', 'Equipo registrado correctamente.');
+    }
+
+    public function updateEquipment(Request $request, Equipment $equipment)
+    {
+        $validated = $request->validate([
+            'internal_id' => 'required|unique:equipment,internal_id,' . $equipment->id,
+            'name' => 'required|string|max:255',
+            'form_factor' => 'required|in:rackmount,peripheral,network_point',
+            'system_id' => 'required|exists:systems,id',
+            'location_id' => 'nullable|exists:locations,id',
+            'status' => 'required|in:operative,under_maintenance,out_of_service',
+            'notes' => 'nullable|string',
+        ]);
+
+        $equipment->update($validated);
+
+        return redirect()->back()->with('success', 'Equipo actualizado correctamente.');
+    }
+
+    public function destroyEquipment(Equipment $equipment)
+    {
+        // Si el equipo está en un rack, la migración maneja el set null
+        $equipment->delete();
+
+        return redirect()->back()->with('success', 'Equipo eliminado del inventario.');
     }
 }

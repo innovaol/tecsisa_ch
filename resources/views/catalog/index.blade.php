@@ -116,7 +116,7 @@
                             <input type="text" placeholder="Buscar por ID Interno..." class="bg-black/30 border border-white/10 text-sm text-gray-300 rounded-lg pl-10 pr-4 py-2 focus:ring-tecsisa-yellow focus:border-tecsisa-yellow">
                             <svg class="w-4 h-4 text-gray-500 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </div>
-                        <button class="bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-bold px-4 py-2 rounded-lg text-sm transition shadow-[0_0_10px_rgba(255,209,0,0.2)]">
+                        <button @click="$dispatch('open-modal', 'create-equipment')" class="bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-bold px-4 py-2 rounded-lg text-sm transition shadow-[0_0_10px_rgba(255,209,0,0.2)]">
                             + Alta de Equipo
                         </button>
                     </div>
@@ -127,6 +127,7 @@
                                 <tr class="bg-black/20 text-xs font-semibold tracking-wide text-gray-400 uppercase border-b border-white/10">
                                     <th class="py-4 pl-6 pr-4">ID de Placa</th>
                                     <th class="py-4 pr-4">Nombre / Modelo</th>
+                                    <th class="py-4 pr-4">Tipo (Form Factor)</th>
                                     <th class="py-4 pr-4">Sistema</th>
                                     <th class="py-4 pr-4">Ubicación Actual</th>
                                     <th class="py-4 pr-4">Estatus</th>
@@ -138,6 +139,14 @@
                                 <tr class="hover:bg-white/5 transition-colors group cursor-pointer">
                                     <td class="py-4 pl-6 pr-4 font-mono text-sm tracking-tight text-tecsisa-yellow font-bold">{{ $eq->internal_id }}</td>
                                     <td class="py-4 pr-4 text-sm font-medium text-gray-200 group-hover:text-white">{{ $eq->name }}</td>
+                                    <td class="py-4 pr-4 text-sm text-gray-400">
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase border 
+                                            @if($eq->form_factor === 'rackmount') border-blue-500/30 text-blue-400 bg-blue-500/5
+                                            @elseif($eq->form_factor === 'peripheral') border-purple-500/30 text-purple-400 bg-purple-500/5
+                                            @else border-amber-500/30 text-amber-400 bg-amber-500/5 @endif">
+                                            {{ $eq->form_factor }}
+                                        </span>
+                                    </td>
                                     <td class="py-4 pr-4 text-sm text-gray-400">
                                         <div class="flex items-center gap-1.5">
                                             <div class="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
@@ -156,8 +165,12 @@
                                             <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-500/10 text-red-400 border border-red-500/20">De Baja</span>
                                         @endif
                                     </td>
-                                    <td class="py-4 pr-6 text-right">
-                                        <button class="text-blue-400 hover:text-blue-300 font-medium text-xs border border-blue-500/30 px-3 py-1.5 rounded bg-blue-500/10 transition">Ver Ficha</button>
+                                    <td class="py-4 pr-6 text-right flex justify-end gap-2">
+                                        <button class="text-gray-400 hover:text-white transition p-1"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg></button>
+                                        <form action="{{ route('catalog.equipment.destroy', $eq) }}" method="POST" onsubmit="return confirm('¿Eliminar este equipo del inventario?')">
+                                            @csrf @method('DELETE')
+                                            <button class="text-gray-500 hover:text-red-400 transition p-1"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                                        </form>
                                     </td>
                                 </tr>
                                 @empty
@@ -170,4 +183,87 @@
 
         </div>
     </div>
+    </div>
+
+    <!-- Modal: Alta de Equipo -->
+    <x-modal name="create-equipment" :show="false" focusable>
+        <form method="post" action="{{ route('catalog.equipment.store') }}" class="p-6 bg-tecsisa-dark border border-white/10 rounded-2xl">
+            @csrf
+            <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                <svg class="w-6 h-6 text-tecsisa-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Registrar Nuevo Activo (Asset)
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- ID Interno -->
+                <div>
+                    <x-input-label for="internal_id" value="ID de Placa / Tag" class="text-gray-400 text-xs font-bold uppercase" />
+                    <x-text-input id="internal_id" name="internal_id" type="text" class="mt-1 block w-full bg-black/40 border-white/10 focus:border-tecsisa-yellow text-white" required placeholder="Ej: SW-MDF-001" />
+                </div>
+
+                <!-- Nombre -->
+                <div>
+                    <x-input-label for="name" value="Nombre del Equipo / Modelo" class="text-gray-400 text-xs font-bold uppercase" />
+                    <x-text-input id="name" name="name" type="text" class="mt-1 block w-full bg-black/40 border-white/10 focus:border-tecsisa-yellow text-white" required placeholder="Ej: Cisco Catalyst 9300" />
+                </div>
+
+                <!-- Form Factor -->
+                <div>
+                    <x-input-label for="form_factor" value="Tipo de Activo (Form Factor)" class="text-gray-400 text-xs font-bold uppercase" />
+                    <select id="form_factor" name="form_factor" class="mt-1 block w-full bg-black/40 border-white/10 rounded-md shadow-sm focus:border-tecsisa-yellow focus:ring-tecsisa-yellow text-white">
+                        <option value="rackmount">Rackmount (Switch/Servidor)</option>
+                        <option value="peripheral">Periférico (Cámara/PC/AP)</option>
+                        <option value="network_point">Punto de Red (Roseta/Pared)</option>
+                    </select>
+                </div>
+
+                <!-- Sistema -->
+                <div>
+                    <x-input-label for="system_id" value="Sistema Perteneciente" class="text-gray-400 text-xs font-bold uppercase" />
+                    <select id="system_id" name="system_id" class="mt-1 block w-full bg-black/40 border-white/10 rounded-md shadow-sm focus:border-tecsisa-yellow focus:ring-tecsisa-yellow text-white">
+                        @foreach($systems as $sys)
+                            <option value="{{ $sys->id }}">{{ $sys->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Ubicación -->
+                <div>
+                    <x-input-label for="location_id" value="Ubicación Física" class="text-gray-400 text-xs font-bold uppercase" />
+                    <select id="location_id" name="location_id" class="mt-1 block w-full bg-black/40 border-white/10 rounded-md shadow-sm focus:border-tecsisa-yellow focus:ring-tecsisa-yellow text-white">
+                        <option value="">Seleccione ubicación...</option>
+                        @foreach($locations as $loc)
+                            <option value="{{ $loc->id }}">{{ $loc->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Estatus -->
+                <div>
+                    <x-input-label for="status" value="Estado Operativo Inicial" class="text-gray-400 text-xs font-bold uppercase" />
+                    <select id="status" name="status" class="mt-1 block w-full bg-black/40 border-white/10 rounded-md shadow-sm focus:border-tecsisa-yellow focus:ring-tecsisa-yellow text-white">
+                        <option value="operative">Operativo</option>
+                        <option value="under_maintenance">En Mantenimiento</option>
+                        <option value="out_of_service">Fuera de Servicio</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Notas -->
+            <div class="mt-6">
+                <x-input-label for="notes" value="Notas Técnicas" class="text-gray-400 text-xs font-bold uppercase" />
+                <textarea id="notes" name="notes" rows="3" class="mt-1 block w-full bg-black/40 border-white/10 rounded-md shadow-sm focus:border-tecsisa-yellow focus:ring-tecsisa-yellow text-white text-sm" placeholder="Detalles adicionales, número de serie, versión firmware..."></textarea>
+            </div>
+
+            <div class="mt-8 flex justify-end gap-3 text-white">
+                <x-secondary-button x-on:click="$dispatch('close')" class="border-white/10 hover:bg-white/5">
+                    Cancelar
+                </x-secondary-button>
+
+                <button type="submit" class="bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-black px-6 py-2 rounded-xl transition shadow-xl">
+                    Guardar en Catálogo
+                </button>
+            </div>
+        </form>
+    </x-modal>
 </x-app-layout>
