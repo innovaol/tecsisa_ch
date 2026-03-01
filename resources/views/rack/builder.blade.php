@@ -47,34 +47,6 @@
                                     <div class="bg-white/10 text-gray-400 text-xs px-2 py-1 rounded">1U</div>
                                 </div>
                             @endforeach
-                            
-                             <!-- Ejemplos extras para llenar -->
-                             <div draggable="true" 
-                                     x-show="!isPlaced('PP-01')"
-                                     x-transition
-                                     @dragstart="startDrag($event, 'PP-01', 'PTC-FO-01', 'Bandeja ODF 24 Hilos', 1)"
-                                     @click="selectEquipment('PP-01', 'PTC-FO-01', 'Bandeja ODF 24 Hilos', 1)"
-                                     :class="{'border-l-tecsisa-yellow bg-tecsisa-yellow/10 scale-[1.02] shadow-[0_0_15px_rgba(255,209,0,0.3)]': selectedItem && selectedItem.db_id === 'PP-01', 'border-l-orange-500 bg-black/30 hover:bg-white/5': !selectedItem || selectedItem.db_id !== 'PP-01'}"
-                                     class="p-3 border border-white/5 rounded-lg border-l-4 cursor-pointer transition-all flex justify-between items-center group">
-                                    <div>
-                                        <div class="text-xs font-mono font-bold" :class="{'text-tecsisa-yellow': selectedItem && selectedItem.db_id === 'PP-01', 'text-orange-400': !selectedItem || selectedItem.db_id !== 'PP-01'}">PTC-FO-01</div>
-                                        <div class="text-sm font-medium whitespace-nowrap overflow-hidden text-ellipsis max-w-[180px]" :class="{'text-white': selectedItem && selectedItem.db_id === 'PP-01', 'text-gray-300': !selectedItem || selectedItem.db_id !== 'PP-01'}">Bandeja ODF 24 Hilos</div>
-                                    </div>
-                                    <div class="bg-white/10 text-gray-400 text-xs px-2 py-1 rounded">1U</div>
-                                </div>
-                                <div draggable="true" 
-                                     x-show="!isPlaced('UPS-01')"
-                                     x-transition
-                                     @dragstart="startDrag($event, 'UPS-01', 'UPS-MDF-01', 'APC Smart-UPS 3000VA', 2)"
-                                     @click="selectEquipment('UPS-01', 'UPS-MDF-01', 'APC Smart-UPS 3000VA', 2)"
-                                     :class="{'border-l-tecsisa-yellow bg-tecsisa-yellow/10 scale-[1.02] shadow-[0_0_15px_rgba(255,209,0,0.3)]': selectedItem && selectedItem.db_id === 'UPS-01', 'border-l-red-500 bg-black/30 hover:bg-white/5': !selectedItem || selectedItem.db_id !== 'UPS-01'}"
-                                     class="p-3 border border-white/5 rounded-lg border-l-4 cursor-pointer transition-all flex justify-between items-center group">
-                                    <div>
-                                        <div class="text-xs font-mono font-bold" :class="{'text-tecsisa-yellow': selectedItem && selectedItem.db_id === 'UPS-01', 'text-red-400': !selectedItem || selectedItem.db_id !== 'UPS-01'}">UPS-MDF-01</div>
-                                        <div class="text-sm font-medium whitespace-nowrap overflow-hidden text-ellipsis max-w-[180px]" :class="{'text-white': selectedItem && selectedItem.db_id === 'UPS-01', 'text-gray-300': !selectedItem || selectedItem.db_id !== 'UPS-01'}">APC Smart-UPS 3000VA</div>
-                                    </div>
-                                    <div class="bg-tecsisa-yellow/20 text-tecsisa-yellow text-xs px-2 py-1 rounded border border-tecsisa-yellow/30">2U</div>
-                                </div>
                         </div>
                     </div>
                 </div>
