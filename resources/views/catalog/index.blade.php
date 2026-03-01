@@ -296,8 +296,8 @@
 
 <script>
     window.inventoryData = {
-        locations: Object.values(@json($locations)),
-        systems: Object.values(@json($systems))
+        locations: @json($locations->values()),
+        systems: @json($systems->values())
     };
 
     function inventoryManager() {
@@ -322,19 +322,13 @@
             },
 
             get activeSchema() {
-                if (!this.formData.system_id) return [];
+                if (!this.formData || !this.formData.system_id) return [];
                 const sysId = String(this.formData.system_id);
+                console.log("Buscando esquema para sistema ID:", sysId);
                 const found = this.allSystems.find(s => String(s.id) === sysId);
                 
-                let schema = found ? (found.form_schema || []) : [];
-                
-                // Aseguramos que formData.specs tenga las llaves necesarias para la reactividad
-                schema.forEach(field => {
-                    if (this.formData.specs[field.label] === undefined) {
-                        this.formData.specs[field.label] = '';
-                    }
-                });
-                
+                const schema = found ? (found.form_schema || []) : [];
+                console.log("Esquema encontrado:", schema);
                 return schema;
             },
 
@@ -356,20 +350,24 @@
             },
 
             openEditModal(eq) {
-                console.log("Editando equipo:", eq);
+                console.log("Abriendo edición para:", eq);
                 this.editMode = true;
                 this.formAction = `/catalogos/equipment/${eq.id}`;
+                
+                // Deep copy de los datos para asegurar reactividad
                 this.formData = {
                     id: eq.id,
-                    internal_id: eq.internal_id,
-                    name: eq.name,
-                    form_factor: eq.form_factor,
-                    system_id: eq.system_id,
-                    location_id: eq.location_id,
-                    status: eq.status,
-                    specs: eq.specs || {},
+                    internal_id: eq.internal_id || '',
+                    name: eq.name || '',
+                    form_factor: eq.form_factor || 'rackmount',
+                    system_id: eq.system_id || '',
+                    location_id: eq.location_id || '',
+                    status: eq.status || 'operative',
+                    specs: eq.specs ? JSON.parse(JSON.stringify(eq.specs)) : {},
                     notes: eq.notes || ''
                 };
+                
+                console.log("FormData hidratado:", this.formData);
                 this.$dispatch('open-modal', 'equipment-modal');
             }
         };
