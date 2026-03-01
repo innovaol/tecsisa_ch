@@ -22,6 +22,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/catalogos', [\App\Http\Controllers\CatalogController::class , 'index'])->name('catalog.index');
 
         Route::get('/racks', [\App\Http\Controllers\RackBuilderController::class , 'index'])->name('rack.builder');
+        Route::post('/racks/{rack}/save', [\App\Http\Controllers\RackBuilderController::class , 'save'])->name('rack.save');
 
         // Módulo Técnico Móvil (Buscador Activos y Tareas)
         Route::resource('tasks', \App\Http\Controllers\TaskController::class);

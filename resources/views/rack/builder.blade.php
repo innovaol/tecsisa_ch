@@ -15,7 +15,7 @@
                 <!-- Selector de Gabinete -->
                 <div class="bg-tecsisa-card backdrop-blur-md rounded-2xl shadow-[0_4px_30px_rgba(0,0,0,0.2)] border border-white/10 p-5">
                     <label class="block text-sm font-medium text-gray-400 uppercase tracking-widest mb-2">Gabinete Activo</label>
-                    <select class="w-full bg-black/40 border-white/10 text-white rounded-lg focus:ring-tecsisa-yellow focus:border-tecsisa-yellow text-sm font-bold">
+                    <select onchange="window.location.search = '?rack_id=' + this.value" class="w-full bg-black/40 border-white/10 text-white rounded-lg focus:ring-tecsisa-yellow focus:border-tecsisa-yellow text-sm font-bold">
                         @foreach($racks as $r)
                             <option value="{{ $r->id }}" {{ $r->id == $rack->id ? 'selected' : '' }}>{{ $r->name }} ({{ $r->total_units }}U)</option>
                         @endforeach
@@ -188,9 +188,10 @@
 
                 <!-- Footer Button Panel -->
                 <div class="p-4 bg-black/60 border-t border-white/10 flex justify-end shrink-0" style="box-shadow: 0 -4px 10px rgba(0,0,0,0.5);">
-                    <button class="w-full md:w-auto bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-black px-8 py-3 rounded-xl shadow-[0_5px_15px_rgba(255,209,0,0.3)] transition transform hover:-translate-y-0.5 flex justify-center items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
-                        Guardar Topología
+                    <button @click="saveTopology()" :disabled="saving" class="w-full md:w-auto bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-black px-8 py-3 rounded-xl shadow-[0_5px_15px_rgba(255,209,0,0.3)] transition transform flex justify-center items-center gap-2" :class="saving ? 'opacity-70 cursor-not-allowed' : 'hover:-translate-y-0.5'">
+                        <svg x-show="!saving" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+                        <svg x-show="saving" class="animate-spin -ml-1 mr-2 h-5 w-5 text-gray-900" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        <span x-text="saving ? 'Guardando Topología...' : 'Guardar Topología'"></span>
                     </button>
                 </div>
             </div>
@@ -202,16 +203,18 @@
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('rackBuilder', () => ({
-                totalU: 45, // Total units from PHP ($rack->total_units)
+                rackId: {{ $rack->id }},
+                totalU: {{ $rack->total_units }}, // Total units from PHP ($rack->total_units)
                 rackUnits: [],
-                
+                existingUnits: @json($rack->units),
+                saving: false,
                 
                 // Variable para el equipo seleccionado mediante CLICK (Modo Móvil/Tablet)
                 selectedItem: null,
+                draggedItem: null, // compatibility for desktop
 
                 init() {
-                    // Inicializar rack vacio de arriba hacia abajo (U superior a U1 inferor a veces se pide, pero el estandar Medinfra suele ser bottom-up. Hagamos Top-down visualmente: U45 .. U1)
-                    
+                    // Inicializar rack vacio de arriba hacia abajo
                     for (let i = this.totalU; i >= 1; i--) {
                         this.rackUnits.push({
                             number: i,
@@ -222,6 +225,28 @@
                             eq_name: null,
                             db_id: null,
                             dragHover: false
+                        });
+                    }
+
+                    // Cargar estado inicial de la Base de Datos
+                    if(this.existingUnits && this.existingUnits.length > 0) {
+                        this.existingUnits.forEach(exU => {
+                            let unitIndex = this.rackUnits.findIndex(u => u.number === exU.unit_number);
+                            if(unitIndex !== -1 && exU.equipment) {
+                                this.rackUnits[unitIndex].occupied = true;
+                                this.rackUnits[unitIndex].size = exU.position_size || 1;
+                                this.rackUnits[unitIndex].db_id = exU.equipment.id;
+                                this.rackUnits[unitIndex].eq_id = exU.equipment.internal_id;
+                                this.rackUnits[unitIndex].eq_name = exU.equipment.name;
+
+                                // Hide slots below the top slot based on size (simulating rack constraints)
+                                for(let s = 1; s < exU.position_size; s++) {
+                                    if(this.rackUnits[unitIndex + s]) {
+                                        this.rackUnits[unitIndex + s].hidden = true;
+                                        this.rackUnits[unitIndex + s].occupied = true;
+                                    }
+                                }
+                            }
                         });
                     }
                 },
@@ -339,8 +364,10 @@
                     
                     // Restaurar unidades ocultadas
                     for(let i = 1; i < unit.size; i++) {
-                        this.rackUnits[unitIndex + i].hidden = false;
-                        this.rackUnits[unitIndex + i].occupied = false;
+                        if(this.rackUnits[unitIndex + i]) {
+                            this.rackUnits[unitIndex + i].hidden = false;
+                            this.rackUnits[unitIndex + i].occupied = false;
+                        }
                     }
 
                     // Limpiar la principal
@@ -349,6 +376,40 @@
                     unit.eq_id = null;
                     unit.eq_name = null;
                     unit.db_id = null;
+                },
+
+                async saveTopology() {
+                    if (this.saving) return;
+                    this.saving = true;
+                    // Gather all actively placed top-level units in the rack
+                    let activeUnits = this.rackUnits.filter(u => u.occupied && !u.hidden && u.db_id);
+                    
+                    try {
+                        let csrfToken = document.head.querySelector('meta[name="csrf-token"]') ? document.head.querySelector('meta[name="csrf-token"]').content : '';
+                        
+                        let res = await fetch(`/racks/${this.rackId}/save`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': csrfToken,
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({ units: activeUnits })
+                        });
+                        
+                        if(res.ok) {
+                            let data = await res.json();
+                            // Optional: show a pretty notification/toast here if desired
+                            console.log("Success", data);
+                            window.location.reload();
+                        } else {
+                            throw new Error('Network error');
+                        }
+                    } catch(e) {
+                        console.error(e);
+                        alert('Hubo un error al guardar o perdiste tu sesioón.');
+                    }
+                    setTimeout(() => { this.saving = false; }, 500);
                 }
             }));
         });
