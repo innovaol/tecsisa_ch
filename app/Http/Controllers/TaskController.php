@@ -98,29 +98,38 @@ class TaskController extends Controller
             'description' => 'nullable|string',
             'form_data' => 'nullable|array',
             'action' => 'required|in:save_draft,submit',
+            'photos.*' => 'nullable|image|max:5120', // Max 5MB per photo
         ]);
 
-        // Update basic task info
-        if ($request->has('description')) {
-            $task->description = $validated['description'];
+        // Merge existing form data with new
+        $mergedData = array_merge($task->form_data ?? [], $validated['form_data'] ?? []);
+
+        // HANDLE PHOTO UPLOADS
+        if ($request->hasFile('photos')) {
+            $photos = $request->file('photos');
+            $photoPaths = $mergedData['photos'] ?? [];
+
+            foreach ($photos as $key => $file) {
+                // Key can be 'before', 'after', etc.
+                $path = $file->store('tasks/' . $task->id, 'public');
+                $photoPaths[$key] = $path;
+            }
+            $mergedData['photos'] = $photoPaths;
         }
 
-        // Merge existing form data with new
-        $currentData = $task->form_data ?? [];
-        $newData = $validated['form_data'] ?? [];
-        $mergedData = array_merge($currentData, $newData);
-
+        // Update task model
+        $task->description = $validated['description'] ?? $task->description;
         $task->form_data = $mergedData;
 
         if ($validated['action'] === 'submit') {
-            $task->status = 'pending'; // Moves from draft to pending verification
+            $task->status = 'pending';
+            $task->completed_at = now();
             $task->save();
-            return redirect()->route('technician.scanner.result', $task->equipment_id)->with('success', 'Tarea enviada para revisión final.');
+            return redirect()->route('technician.scanner.result', $task->equipment_id)->with('success', 'Tarea completada profesionalmente.');
         }
         else {
-            // Just saving draft
             $task->save();
-            return redirect()->route('technician.scanner.result', $task->equipment_id)->with('success', 'Borrador guardado correctamente. Puedes continuar luego.');
+            return redirect()->route('technician.scanner.result', $task->equipment_id)->with('success', 'Avance guardado.');
         }
     }
 }
