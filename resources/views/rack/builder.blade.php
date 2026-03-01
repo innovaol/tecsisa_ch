@@ -7,7 +7,6 @@
     </x-slot>
 
     <!-- Implementación Drag and Drop con HTML5 API usando Alpine -->
-    <script src="https://polyfill.dragdrop-polyfill.com/dragdrop-polyfill.min.js"></script>
     <div class="py-6 min-h-[calc(100vh-140px)] md:h-[calc(100vh-140px)]" x-data="rackBuilder()">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col md:flex-row gap-6">
             
@@ -180,9 +179,9 @@
                     </div>
                 </div>
 
-                <!-- Botón Flotante Inferior de Guardar Estado -->
-                <div class="absolute bottom-6 right-6 z-50">
-                    <button class="bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-black px-6 py-3 rounded-xl shadow-[0_10px_25px_rgba(255,209,0,0.4)] transition transform hover:-translate-y-1 flex items-center gap-2">
+                <!-- Footer Button Panel -->
+                <div class="p-4 bg-black/60 border-t border-white/10 flex justify-end shrink-0" style="box-shadow: 0 -4px 10px rgba(0,0,0,0.5);">
+                    <button class="w-full md:w-auto bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-black px-8 py-3 rounded-xl shadow-[0_5px_15px_rgba(255,209,0,0.3)] transition transform hover:-translate-y-0.5 flex justify-center items-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
                         Guardar Topología
                     </button>
@@ -195,13 +194,6 @@
     <!-- Alpine.js Logic para el Constructor de Rack -->
     <script>
         document.addEventListener('alpine:init', () => {
-            // Polyfill para Drag and Drop en móviles
-            MobileDragDrop.polyfill({
-                dragImageTranslateOverride: MobileDragDrop.scrollBehaviourDragImageTranslateOverride
-            });
-
-            window.addEventListener('touchmove', function() {}, {passive: false});
-
             Alpine.data('rackBuilder', () => ({
                 totalU: 45, // Total units from PHP ($rack->total_units)
                 rackUnits: [],
