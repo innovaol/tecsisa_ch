@@ -214,17 +214,23 @@
 
             <!-- Modal Body: Puertos Simulados y Asistente de Enlace -->
             <!-- Modal Body: Puertos Simulados y Asistente de Enlace -->
-            <div class="px-8 py-10 min-h-[500px] flex flex-col justify-start overflow-y-auto custom-scrollbar">
+            <div class="px-8 py-6 max-h-[80vh] flex flex-col justify-start overflow-y-auto custom-scrollbar" @click.self="wizardOpen = false; selectedPort = null">
                 
                 <div x-show="!loadingPorts && !portError" class="flex flex-col md:flex-row gap-8 w-full transition-all">
                     
                     <!-- Panel Izquierdo: Matriz de Puertos -->
-                    <div class="transition-all flex-1 space-y-4">
-                        <div class="text-sm font-bold text-gray-400 border-b border-gray-700/50 pb-2 mb-4 flex justify-between items-center">
-                            <span>Mapeo Frontal</span>
-                            <button x-show="wizardOpen" @click="wizardOpen = false; selectedPort = null" class="text-[10px] text-tecsisa-yellow hover:underline uppercase tracking-widest font-black">Expandir Vista</button>
+                    <div class="transition-all flex-1 space-y-4 relative">
+                        <div class="text-sm font-bold text-gray-400 border-b border-white/5 pb-2 mb-4 flex justify-between items-center">
+                            <span class="flex items-center gap-2">
+                                <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+                                Mapeo Frontal
+                            </span>
+                            <button x-show="wizardOpen" @click="wizardOpen = false; selectedPort = null" class="text-[10px] text-tecsisa-yellow hover:text-white transition-colors bg-white/5 px-2 py-1 rounded uppercase tracking-widest font-black">Expandir Vista</button>
                         </div>
-                        <div @click.self="wizardOpen = false; selectedPort = null" class="grid grid-cols-12 gap-3 max-h-[450px] overflow-y-auto custom-scrollbar pr-2" x-transition>
+                        
+                        <!-- Area de Matriz -->
+                        <div class="bg-black/20 p-5 rounded-2xl border border-white/5 shadow-inner">
+                            <div class="grid grid-cols-8 md:grid-cols-12 gap-3" x-transition>
                             <template x-for="port in equipmentPorts" :key="port.id">
                                 <div @click="selectPort(port)" class="col-span-1 aspect-square bg-gradient-to-b from-[#1a1f26] to-[#0f1217] border border-gray-700 rounded shadow-[inset_0_2px_4px_rgba(0,0,0,0.5)] relative group/port cursor-pointer transition transform hover:scale-105 flex flex-col items-center justify-center overflow-hidden"
                                      :class="{
@@ -260,11 +266,11 @@
                                 </div>
                             </template>
                         </div>
-                    </div>
+                    </div> <!-- Closes Left Panel -->
 
                     <!-- Panel Derecho: Asistente de Enlace -->
                     <div x-show="wizardOpen" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="opacity-0 translate-x-8" x-transition:enter-end="opacity-100 translate-x-0" class="w-full md:w-1/3 shrink-0 flex flex-col">
-                        <div class="bg-gradient-to-br from-white/5 to-transparent border border-white/10 rounded-xl p-5 shadow-2xl min-h-full relative">
+                        <div class="bg-gradient-to-br from-white/5 to-transparent border border-white/10 rounded-xl p-5 shadow-2xl relative">
                             <!-- Wizard Header -->
                             <div class="flex items-center gap-3 mb-6">
                                 <span class="bg-tecsisa-yellow text-black font-black w-8 h-8 rounded-full flex items-center justify-center text-sm shadow-[0_0_15px_rgba(255,209,0,0.5)]">
@@ -354,7 +360,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="pt-4 pb-2">
+                                <div class="pt-4 mt-auto">
                                     <button @click="disconnectConnection()" :disabled="savingConnection" class="w-full bg-red-500/10 hover:bg-red-600 text-red-500 hover:text-white border border-red-500/50 font-black py-3 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg group">
                                         <svg x-show="!savingConnection" class="w-5 h-5 group-hover:animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                         <svg x-show="savingConnection" class="animate-spin w-5 h-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
@@ -673,10 +679,31 @@
                 },
 
                 get activeTargets() {
-                    if(!this.inspectingEquipment) return [];
-                    let units = this.rackUnits.filter(u => u.occupied && !u.hidden && u.db_id && u.db_id !== this.inspectingEquipment.id);
-                    // unique by equipment id to avoid showing 2U racks multiple times
-                    return Array.from(new Map(units.map(u => [u.db_id, u])).values());
+                    if(!this.inspectingEquipment || !this.inspectingEquipment.id) return [];
+                    
+                    const myId = String(this.inspectingEquipment.id);
+                    
+                    // Filter rack units to find other occupied equipment
+                    let units = this.rackUnits.filter(u => {
+                        return u.occupied && 
+                               !u.hidden && 
+                               u.db_id && 
+                               String(u.db_id) !== myId;
+                    });
+                    
+                    // Use a Map to ensure unique equipment in the dropdown
+                    const uniqueEquipment = new Map();
+                    units.forEach(u => {
+                        if (!uniqueEquipment.has(u.db_id)) {
+                            uniqueEquipment.set(u.db_id, {
+                                db_id: u.db_id,
+                                eq_id: u.eq_id || 'S/N',
+                                eq_name: u.eq_name || 'Equipo'
+                            });
+                        }
+                    });
+
+                    return Array.from(uniqueEquipment.values());
                 },
 
                 async fetchTargetPorts() {
