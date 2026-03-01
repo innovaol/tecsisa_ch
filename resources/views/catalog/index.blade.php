@@ -24,7 +24,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             
             <!-- Tabs Navigation -->
-            <div class="flex gap-4 mb-8 border-b border-white/10 pb-4">
+            <div class="flex overflow-x-auto no-scrollbar gap-4 mb-8 border-b border-white/10 pb-4">
                 <button @click="activeTab = 'locations'" 
                         :class="activeTab === 'locations' ? 'text-tecsisa-yellow border-b-2 border-tecsisa-yellow' : 'text-gray-500 hover:text-gray-300'"
                         class="px-4 py-2 font-bold transition-all uppercase text-sm tracking-widest">
@@ -51,13 +51,13 @@
             <!-- Tab: Locations -->
             <div x-show="activeTab === 'locations'" x-transition>
                 <div class="max-w-4xl mx-auto">
-                    <div class="flex justify-between items-center mb-8">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                         <div>
                             <h3 class="text-white text-2xl font-black uppercase tracking-wider">Infraestructura Física</h3>
                             <p class="text-gray-500 text-sm">Explora la jerarquía de edificios, pisos, cuartos técnicos y racks.</p>
                         </div>
-                        <div class="flex gap-3">
-                            <button @click="openCreateLocationModal()" class="bg-white/5 hover:bg-white/10 text-white border border-white/10 px-4 py-2 rounded-xl text-xs font-bold transition">
+                        <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                            <button @click="openCreateLocationModal()" class="w-full sm:w-auto bg-white/5 hover:bg-white/10 text-white border border-white/10 px-4 py-2 rounded-xl text-xs font-bold transition">
                                 + Nueva Ubicación
                             </button>
                             <button @click="openCreateRackModal()" class="bg-tecsisa-yellow text-tecsisa-dark px-4 py-2 rounded-xl text-xs font-black transition shadow-[0_0_20px_rgba(255,209,0,0.2)]">
@@ -83,12 +83,12 @@
 
             <!-- Tab: Systems -->
             <div x-show="activeTab === 'systems'" x-transition>
-                <div class="flex justify-between items-center mb-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                     <div>
                         <h3 class="text-white text-xl font-bold">Sistemas de Baja Tensión</h3>
                         <p class="text-gray-500 text-sm">Define los sistemas y sus parámetros técnicos personalizados.</p>
                     </div>
-                    <button @click="openCreateSystemModal()" class="bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-bold px-4 py-2 rounded-lg text-sm transition shadow-[0_0_10px_rgba(255,209,0,0.2)]">
+                    <button @click="openCreateSystemModal()" class="w-full md:w-auto bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-bold px-4 py-2 rounded-lg text-sm transition shadow-[0_0_10px_rgba(255,209,0,0.2)]">
                         + Nuevo Sistema
                     </button>
                 </div>
@@ -157,7 +157,7 @@
 
             <!-- Tab: Maintenance Planning -->
             <div x-show="activeTab === 'maintenance'" x-transition class="space-y-8">
-                <div class="flex justify-between items-end">
+                <div class="flex flex-col justify-between items-start gap-4">
                     <div>
                         <h3 class="text-white text-2xl font-black uppercase tracking-wider">Plan de Mantenimiento Preventivo</h3>
                         <p class="text-gray-500 text-sm italic">Sincronización basada en ciclos programados por cada sistema técnico.</p>
@@ -192,7 +192,7 @@
 
                     <!-- Right: Timeline / List -->
                     <div class="lg:col-span-8">
-                        <div class="bg-black/40 border border-white/5 rounded-3xl overflow-hidden">
+                        <div class="bg-black/40 border border-white/5 rounded-3xl overflow-x-auto">
                             <table class="w-full text-left border-collapse">
                                 <thead>
                                     <tr class="bg-white/5 text-[10px] font-black uppercase text-gray-400 tracking-widest border-b border-white/10">
@@ -254,23 +254,23 @@
 
             <!-- Tab: Equipment (Main Catalog) -->
             <div x-show="activeTab === 'equipment'" x-transition>
-                <div class="flex justify-between items-center mb-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                     <div>
                         <h3 class="text-white text-xl font-bold">Catálogo Maestro de Activos</h3>
                         <p class="text-gray-500 text-sm">Gestiona todo el hardware, periféricos y puntos de red.</p>
                     </div>
-                    <div class="flex gap-4">
-                        <div class="relative">
-                            <input type="text" placeholder="Buscar por ID Interno..." class="bg-black/30 border border-white/10 text-sm text-gray-300 rounded-lg pl-10 pr-4 py-2 focus:ring-tecsisa-yellow focus:border-tecsisa-yellow">
+                    <div class="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+                        <div class="relative w-full sm:w-auto">
+                            <input type="text" placeholder="Buscar por ID Interno..." class="w-full bg-black/30 border border-white/10 text-sm text-gray-300 rounded-lg pl-10 pr-4 py-2 focus:ring-tecsisa-yellow focus:border-tecsisa-yellow">
                             <svg class="w-4 h-4 text-gray-500 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </div>
-                        <button @click="openCreateModal()" class="bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-bold px-4 py-2 rounded-lg text-sm transition shadow-[0_0_10px_rgba(255,209,0,0.2)]">
+                        <button @click="openCreateModal()" class="w-full sm:w-auto bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-bold px-4 py-2 rounded-lg text-sm transition shadow-[0_0_10px_rgba(255,209,0,0.2)]">
                             + Alta de Equipo
                         </button>
                     </div>
                 </div>
 
-                <div class="bg-tecsisa-dark/60 border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
+                <div class="bg-tecsisa-dark/60 border border-white/10 rounded-2xl overflow-x-auto shadow-2xl custom-scrollbar">
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-white/5 text-[10px] font-black uppercase text-gray-500 tracking-widest border-b border-white/10">

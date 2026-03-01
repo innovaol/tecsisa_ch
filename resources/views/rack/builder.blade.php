@@ -2,7 +2,7 @@
     <!-- Se personaliza el header incrustado dentro del contexto de Alpine para tener acceso al estado "saving" -->
 
     <!-- Implementación Drag and Drop con HTML5 API usando Alpine -->
-    <div x-data="rackBuilder(@js($unassignedEquipment))" class="flex flex-col overflow-hidden" style="height: calc(100vh - 74px);">
+    <div x-data="rackBuilder(@js($unassignedEquipment))" class="flex flex-col min-h-screen lg:h-[calc(100vh-74px)] lg:overflow-hidden">
         
         <!-- Header con el Botón Guardar Topología Movido al lado del Título -->
         <header class="bg-tecsisa-dark/40 backdrop-blur-md border-b border-white/5 shrink-0">
@@ -19,11 +19,11 @@
             </div>
         </header>
 
-        <div class="flex-1 py-6 overflow-hidden">
+        <div class="flex-1 py-4 md:py-6 flex flex-col lg:overflow-hidden">
             <div class="max-w-[95rem] mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col md:flex-row gap-6">
                 
                 <!-- CONTROLES Y CATÁLOGO DE EQUIPACIÓN (LEFT PANEL) -->
-                <div class="w-full md:w-80 lg:w-96 flex flex-col gap-6 h-[400px] md:h-full shrink-0">
+                <div class="w-full lg:w-96 flex flex-col gap-6 lg:h-full shrink-0">
                 <!-- Selector de Gabinete -->
                 <div class="bg-tecsisa-card backdrop-blur-md rounded-2xl shadow-[0_4px_30px_rgba(0,0,0,0.2)] border border-white/10 p-5">
                     <label class="block text-sm font-medium text-gray-400 uppercase tracking-widest mb-2">Gabinete Activo</label>
@@ -94,7 +94,7 @@
             </div>
 
             <!-- VISUALIZADOR PIXEL-PERFECT DEL RACK (RIGHT PANEL) -->
-            <div class="flex-1 h-[600px] md:h-full flex flex-col bg-tecsisa-card backdrop-blur-md rounded-2xl shadow-[0_4px_40px_rgba(0,0,0,0.4)] border border-white/10 overflow-hidden relative">
+            <div class="w-full flex-1 min-h-[600px] lg:min-h-0 lg:h-full flex flex-col bg-tecsisa-card backdrop-blur-md rounded-2xl shadow-[0_4px_40px_rgba(0,0,0,0.4)] border border-white/10 overflow-hidden relative">
                 
                 <div class="p-4 border-b border-white/10 bg-black/40 flex flex-col md:flex-row justify-between items-center gap-4 z-20" style="box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);">
                     <div class="flex items-center gap-3">

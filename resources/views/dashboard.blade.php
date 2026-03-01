@@ -61,31 +61,33 @@
 
             <!-- Main Panel -->
             <div class="bg-tecsisa-card backdrop-blur-xl rounded-2xl shadow-lg border border-white/10 overflow-hidden">
-                <div class="p-6 border-b border-white/10 flex justify-between items-center bg-white/5">
+                <div class="p-4 md:p-6 border-b border-white/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white/5">
                     <h3 class="text-lg font-bold text-white">Últimas Intervenciones Registradas</h3>
-                    <button class="text-sm text-tecsisa-yellow hover:text-yellow-300 font-medium transition">Ver Historial Completo &rarr;</button>
+                    <button class="text-sm text-tecsisa-yellow hover:text-yellow-300 font-medium transition whitespace-nowrap">Ver Historial Completo &rarr;</button>
                 </div>
                 <div class="p-8 text-center flex flex-col items-center justify-center">
                     @if($equipos_operativos > 0 || $trabajos_pendientes > 0)
-                        <div class="overflow-x-auto w-full max-w-2xl mx-auto rounded-lg border border-white/5 bg-black/20">
-                            <!-- Simulated Recent Activity Table -->
-                            <div class="grid grid-cols-4 px-4 py-3 text-sm font-medium text-gray-400 border-b border-white/5 uppercase tracking-wider text-left">
-                                <div>Equipo</div>
-                                <div>Ubicación</div>
-                                <div>Tipo Evento</div>
-                                <div class="text-right">Fecha</div>
-                            </div>
-                            <div class="grid grid-cols-4 px-4 py-3 text-sm text-gray-300 items-center text-left hover:bg-white/5 transition">
-                                <div class="font-bold text-tecsisa-yellow">SW-MDF-001</div>
-                                <div>Cuarto Principal MDF</div>
-                                <div>Alta en Catálogo</div>
-                                <div class="text-right text-gray-500 text-xs">Ayer 14:00</div>
-                            </div>
-                            <div class="grid grid-cols-4 px-4 py-3 text-sm text-gray-300 items-center text-left hover:bg-white/5 transition border-t border-white/5">
-                                <div class="font-bold text-red-400">CAM-QRO-001</div>
-                                <div>Piso 2 - Quirófanos</div>
-                                <div>Reporte de Daño</div>
-                                <div class="text-right text-gray-500 text-xs">Hoy 09:15</div>
+                        <div class="overflow-x-auto w-full max-w-2xl mx-auto rounded-lg border border-white/5 bg-black/20 custom-scrollbar">
+                            <div class="min-w-[500px]">
+                                <!-- Simulated Recent Activity Table -->
+                                <div class="grid grid-cols-4 px-4 py-3 text-xs md:text-sm font-medium text-gray-400 border-b border-white/5 uppercase tracking-wider text-left">
+                                    <div>Equipo</div>
+                                    <div>Ubicación</div>
+                                    <div>Tipo Evento</div>
+                                    <div class="text-right">Fecha</div>
+                                </div>
+                                <div class="grid grid-cols-4 px-4 py-3 text-xs md:text-sm text-gray-300 items-center text-left hover:bg-white/5 transition">
+                                    <div class="font-bold text-tecsisa-yellow truncate pr-2">SW-MDF-001</div>
+                                    <div class="truncate pr-2">Cuarto Principal MDF</div>
+                                    <div class="truncate pr-2">Alta en Catálogo</div>
+                                    <div class="text-right text-gray-500 text-[10px] md:text-xs">Ayer 14:00</div>
+                                </div>
+                                <div class="grid grid-cols-4 px-4 py-3 text-xs md:text-sm text-gray-300 items-center text-left hover:bg-white/5 transition border-t border-white/5">
+                                    <div class="font-bold text-red-400 truncate pr-2">CAM-QRO-001</div>
+                                    <div class="truncate pr-2">Piso 2 - Quirófanos</div>
+                                    <div class="truncate pr-2">Reporte de Daño</div>
+                                    <div class="text-right text-gray-500 text-[10px] md:text-xs">Hoy 09:15</div>
+                                </div>
                             </div>
                         </div>
                         <div class="mt-6">
