@@ -20,7 +20,7 @@
         </style>
     </x-slot>
 
-    <div class="py-12" x-data="inventoryManager(@js($locations), @js($systems), @js($racks))">
+    <div class="py-12" x-data="inventoryManager(@js($locationsFlat), @js($systems), @js($racks))">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             
             <!-- Tabs Navigation -->
@@ -44,83 +44,33 @@
 
             <!-- Tab: Locations -->
             <div x-show="activeTab === 'locations'" x-transition>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <!-- Column: Locations -->
-                    <div>
-                        <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-white text-xl font-bold">Ubicaciones / Sites</h3>
-                            <button @click="openCreateLocationModal()" class="text-xs bg-white/5 hover:bg-white/10 text-white border border-white/10 px-3 py-1.5 rounded-lg transition">
+                <div class="max-w-4xl mx-auto">
+                    <div class="flex justify-between items-center mb-8">
+                        <div>
+                            <h3 class="text-white text-2xl font-black uppercase tracking-wider">Infraestructura Física</h3>
+                            <p class="text-gray-500 text-sm">Explora la jerarquía de edificios, pisos, cuartos técnicos y racks.</p>
+                        </div>
+                        <div class="flex gap-3">
+                            <button @click="openCreateLocationModal()" class="bg-white/5 hover:bg-white/10 text-white border border-white/10 px-4 py-2 rounded-xl text-xs font-bold transition">
                                 + Nueva Ubicación
                             </button>
-                        </div>
-                        <div class="space-y-3">
-                            @foreach($locations as $loc)
-                            <div class="bg-tecsisa-dark/40 border border-white/5 p-4 rounded-xl flex justify-between items-center group">
-                                <div>
-                                    <h4 class="text-white font-bold">{{ $loc->name }}</h4>
-                                    @if($loc->parent)
-                                        <p class="text-[10px] text-gray-500 uppercase">Padre: {{ $loc->parent->name }}</p>
-                                    @else
-                                        <p class="text-[10px] text-tecsisa-yellow uppercase">Ubicación Raíz</p>
-                                    @endif
-                                </div>
-                                <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button @click="openEditLocationModal(@js($loc))" class="text-gray-500 hover:text-white transition">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                    </button>
-                                    <form action="{{ route('catalog.locations.destroy', $loc) }}" method="POST" onsubmit="return confirm('¿Eliminar esta ubicación?')">
-                                        @csrf @method('DELETE')
-                                        <button class="text-gray-500 hover:text-red-400 transition">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                            @endforeach
-                        </div>
-                    </div>
-
-                    <!-- Column: Racks -->
-                    <div>
-                        <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-white text-xl font-bold">Racks / Gabinetes</h3>
-                            <button @click="openCreateRackModal()" class="text-xs bg-tecsisa-yellow/10 hover:bg-tecsisa-yellow/20 text-tecsisa-yellow border border-tecsisa-yellow/20 px-3 py-1.5 rounded-lg transition">
+                            <button @click="openCreateRackModal()" class="bg-tecsisa-yellow text-tecsisa-dark px-4 py-2 rounded-xl text-xs font-black transition shadow-[0_0_20px_rgba(255,209,0,0.2)]">
                                 + Registrar Rack
                             </button>
                         </div>
-                        <div class="grid grid-cols-1 gap-4">
-                            @foreach($racks as $rack)
-                            <div class="bg-black/40 border border-white/10 p-5 rounded-2xl group hover:border-tecsisa-yellow/40 transition-all">
-                                <div class="flex justify-between items-start mb-3">
-                                    <div>
-                                        <h4 class="text-white font-black text-lg">{{ $rack->name }}</h4>
-                                        <p class="text-xs text-gray-500">{{ $rack->location->name ?? 'Sin ubicación' }} • {{ $rack->total_units }}U</p>
-                                    </div>
-                                    <div class="flex gap-2">
-                                        <button @click="openEditRackModal(@js($rack))" class="text-gray-500 hover:text-white transition">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                        </button>
-                                        <form action="{{ route('catalog.racks.destroy', $rack) }}" method="POST" onsubmit="return confirm('¿Eliminar este rack?')">
-                                            @csrf @method('DELETE')
-                                            <button class="text-gray-500 hover:text-red-400 transition">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-                                <div class="flex items-center gap-4">
-                                    <div class="flex-1 h-2 bg-white/5 rounded-full overflow-hidden">
-                                        @php 
-                                            $occupied = $rack->units()->whereNotNull('equipment_id')->count();
-                                            $percent = ($occupied / max(1, $rack->total_units)) * 100;
-                                        @endphp
-                                        <div class="h-full bg-tecsisa-yellow shadow-[0_0_10px_rgba(255,209,0,0.5)]" style="width: {{ $percent }}%"></div>
-                                    </div>
-                                    <span class="text-[10px] text-gray-400 font-bold uppercase">{{ $occupied }}/{{ $rack->total_units }}U</span>
-                                </div>
+                    </div>
+
+                    <!-- Hierarchical Tree -->
+                    <div class="space-y-4">
+                        @foreach($locationsTree as $loc)
+                            <x-location-item :location="$loc" :allRacks="$racks" />
+                        @endforeach
+
+                        @if($locationsTree->isEmpty())
+                            <div class="text-center py-20 bg-white/5 rounded-3xl border border-dashed border-white/10">
+                                <p class="text-gray-500">No hay ubicaciones registradas. Comienza creando una ubicación raíz.</p>
                             </div>
-                            @endforeach
-                        </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -271,7 +221,7 @@
                                 <label class="block text-gray-400 text-xs font-bold uppercase mb-1">Ubicación Padre (Jerarquía)</label>
                                 <select name="parent_id" x-model="locationFormData.parent_id" class="w-full bg-black/40 border-white/10 rounded-lg text-white h-10 px-3">
                                     <option value="">-- Sin Padre (Raíz) --</option>
-                                    @foreach($locations as $l)
+                                    @foreach($locationsFlat as $l)
                                         <option value="{{ $l->id }}">{{ $l->name }}</option>
                                     @endforeach
                                 </select>
@@ -308,7 +258,7 @@
                                 <label class="block text-gray-400 text-xs font-bold uppercase mb-1">Ubicación</label>
                                 <select name="location_id" x-model="rackFormData.location_id" required class="w-full bg-black/40 border-white/10 rounded-lg text-white h-10 px-3">
                                     <option value="">Seleccione site...</option>
-                                    @foreach($locations as $l)
+                                    @foreach($locationsFlat as $l)
                                         <option value="{{ $l->id }}">{{ $l->name }}</option>
                                     @endforeach
                                 </select>
@@ -517,7 +467,7 @@
                                 <select name="location_id" x-model="formData.location_id" 
                                         class="w-full bg-black/40 border-white/10 rounded-lg text-white focus:border-tecsisa-yellow focus:ring-tecsisa-yellow transition h-10 px-3">
                                     <option value="">Seleccione ubicación...</option>
-                                    @foreach($locations as $loc)
+                                    @foreach($locationsFlat as $loc)
                                         <option value="{{ $loc->id }}">{{ $loc->name }}</option>
                                     @endforeach
                                 </select>

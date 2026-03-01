@@ -12,12 +12,13 @@ class CatalogController extends Controller
 {
     public function index()
     {
-        $locations = Location::with('parent')->get();
+        $locationsTree = Location::with(['children', 'equipments'])->whereNull('parent_id')->get();
+        $locationsFlat = Location::all();
         $systems = System::all();
         $equipments = Equipment::with(['location', 'system'])->orderBy('created_at', 'desc')->get();
         $racks = Rack::with('location')->get();
 
-        return view('catalog.index', compact('locations', 'systems', 'equipments', 'racks'));
+        return view('catalog.index', compact('locationsTree', 'locationsFlat', 'systems', 'equipments', 'racks'));
     }
 
     public function storeEquipment(Request $request)
