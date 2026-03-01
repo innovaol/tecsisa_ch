@@ -24,7 +24,7 @@ class ScannerController extends Controller
             'query' => 'required|string|min:3',
         ]);
 
-        $query = $validated['query'];
+        $query = trim($validated['query']);
 
         // Find equipment exactly matching internal_id or serial_number (Simulation of barcode/QR reading)
         $equipment = Equipment::with('system', 'location')
