@@ -106,11 +106,11 @@
                         </div>
 
                         <!-- Espacio de Montaje (Las unidades) -->
-                        <div class="mx-8 flex flex-col bg-black/80 flex-1 relative z-10">
+                        <div class="mx-8 flex flex-col bg-black/80 flex-1 relative z-10" id="rack-container">
                             <!-- Generamos las 42 (o X) unidades desde arriba hacia abajo -->
                             <template x-for="unit in rackUnits" :key="unit.number">
-                                <div class="relative group border-b border-[#222] min-h-[35px] flex" 
-                                     :style="unit.occupied ? 'height: ' + (35 * unit.size) + 'px;' : 'height: 35px;'"
+                                <div class="relative group border-b border-[#222] min-h-[28px] flex" 
+                                     :style="unit.occupied ? 'height: ' + (28 * unit.size) + 'px;' : 'height: 28px;'"
                                      x-show="!unit.hidden"
                                      @dragover.prevent="allowDrop($event, unit)"
                                      @dragleave="leaveDrop($event, unit)"
@@ -232,8 +232,20 @@
 
                 allowDrop(event, unit) {
                     if(!this.draggedItem) return;
+
+                    // Auto-scroll logic when dragging near top or bottom edges of the scrollable container
+                    const container = event.currentTarget.closest('.custom-scrollbar');
+                    if (container) {
+                        const rect = container.getBoundingClientRect();
+                        const offset = 50; // pixels near edge to trigger scroll
+                        if (event.clientY - rect.top < offset) {
+                            container.scrollTop -= 15;
+                        } else if (rect.bottom - event.clientY < offset) {
+                            container.scrollTop += 15;
+                        }
+                    }
                     
-                    // Simple check if it fits (Ej UPS de 2U no cabe en U1 si solo hay U1. Y ademas no debe colapsar con otras ocupadas debajo)
+                    // Simple check if it fits
                     let fits = true;
                     if(unit.occupied) fits = false;
                     
