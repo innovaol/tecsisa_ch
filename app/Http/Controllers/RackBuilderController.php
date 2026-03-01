@@ -20,6 +20,10 @@ class RackBuilderController extends Controller
             $rack = Rack::with(['units.equipment.system'])->first();
         }
 
+        if (!$rack) {
+            return redirect()->route('catalog.index')->with('error', 'No hay Racks creados. Por favor define uno primero en el catálogo.');
+        }
+
         $racks = Rack::all();
 
         // 1. Equipos en inventario que sí son de rack y no han sido instalados
