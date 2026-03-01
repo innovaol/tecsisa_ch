@@ -7,11 +7,12 @@
     </x-slot>
 
     <!-- Implementación Drag and Drop con HTML5 API usando Alpine -->
-    <div class="py-6 h-[calc(100vh-140px)]" x-data="rackBuilder()">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 h-full flex flex-col md:flex-row gap-6">
+    <script src="https://polyfill.dragdrop-polyfill.com/dragdrop-polyfill.min.js"></script>
+    <div class="py-6 min-h-[calc(100vh-140px)] md:h-[calc(100vh-140px)]" x-data="rackBuilder()">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col md:flex-row gap-6">
             
             <!-- CONTROLES Y CATÁLOGO DE EQUIPACIÓN (LEFT PANEL) -->
-            <div class="w-full md:w-1/3 flex flex-col gap-6 h-full">
+            <div class="w-full md:w-1/3 flex flex-col gap-6 h-[400px] md:h-full shrink-0">
                 <!-- Selector de Gabinete -->
                 <div class="bg-tecsisa-card backdrop-blur-md rounded-2xl shadow-[0_4px_30px_rgba(0,0,0,0.2)] border border-white/10 p-5">
                     <label class="block text-sm font-medium text-gray-400 uppercase tracking-widest mb-2">Gabinete Activo</label>
@@ -69,7 +70,7 @@
             </div>
 
             <!-- VISUALIZADOR PIXEL-PERFECT DEL RACK (RIGHT PANEL) -->
-            <div class="w-full md:w-2/3 h-full flex flex-col bg-tecsisa-card backdrop-blur-md rounded-2xl shadow-[0_4px_40px_rgba(0,0,0,0.4)] border border-white/10 overflow-hidden relative">
+            <div class="w-full md:w-2/3 h-[600px] md:h-full flex flex-col bg-tecsisa-card backdrop-blur-md rounded-2xl shadow-[0_4px_40px_rgba(0,0,0,0.4)] border border-white/10 overflow-hidden relative">
                 
                 <div class="p-4 border-b border-white/10 bg-black/40 flex justify-between items-center" style="box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);">
                     <div class="flex items-center gap-3">
@@ -180,7 +181,7 @@
                 </div>
 
                 <!-- Botón Flotante Inferior de Guardar Estado -->
-                <div class="absolute bottom-6 right-6">
+                <div class="absolute bottom-6 right-6 z-50">
                     <button class="bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-black px-6 py-3 rounded-xl shadow-[0_10px_25px_rgba(255,209,0,0.4)] transition transform hover:-translate-y-1 flex items-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
                         Guardar Topología
@@ -194,6 +195,13 @@
     <!-- Alpine.js Logic para el Constructor de Rack -->
     <script>
         document.addEventListener('alpine:init', () => {
+            // Polyfill para Drag and Drop en móviles
+            MobileDragDrop.polyfill({
+                dragImageTranslateOverride: MobileDragDrop.scrollBehaviourDragImageTranslateOverride
+            });
+
+            window.addEventListener('touchmove', function() {}, {passive: false});
+
             Alpine.data('rackBuilder', () => ({
                 totalU: 45, // Total units from PHP ($rack->total_units)
                 rackUnits: [],
