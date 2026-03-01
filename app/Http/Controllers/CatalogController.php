@@ -89,14 +89,10 @@ class CatalogController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'has_ports' => 'boolean',
             'form_schema' => 'nullable|array',
-            'port_config' => 'nullable|array',
             'maintenance_interval_days' => 'required|integer|min:1',
             'maintenance_guide' => 'nullable|string',
         ]);
-
-        $validated['has_ports'] = $request->boolean('has_ports');
 
         System::create($validated);
 
@@ -107,14 +103,10 @@ class CatalogController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'has_ports' => 'boolean',
             'form_schema' => 'nullable|array',
-            'port_config' => 'nullable|array',
             'maintenance_interval_days' => 'required|integer|min:1',
             'maintenance_guide' => 'nullable|string',
         ]);
-
-        $validated['has_ports'] = $request->boolean('has_ports');
 
         $system->update($validated);
 

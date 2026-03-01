@@ -118,23 +118,6 @@
                                         <span class="text-[9px] text-gray-600 bg-white/5 px-1.5 py-0.5 rounded border border-white/5">Auto-programable</span>
                                     </div>
                                 </div>
-                                <div class="flex-1">
-                                    <p class="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-1">Plantilla Puertos:</p>
-                                    @if($sys->has_ports)
-                                        <div class="flex flex-wrap gap-1">
-                                            @forelse($sys->port_config ?? [] as $p)
-                                                <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-500/20 font-mono">{{ $p['count'] }}{{ strtoupper($p['type']) }}</span>
-                                            @empty
-                                                <span class="text-[10px] text-gray-500 italic">No configurada</span>
-                                            @endforelse
-                                        </div>
-                                    @else
-                                        <div class="flex items-center gap-1.5 mt-1">
-                                            <svg class="w-3.5 h-3.5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
-                                            <span class="text-[10px] text-gray-600 italic font-bold uppercase tracking-wider">Sin gestión física</span>
-                                        </div>
-                                    @endif
-                                </div>
                             </div>
 
                             <div class="space-y-2">
@@ -454,91 +437,6 @@
                                        placeholder="Ej: CCTV, Control de Acceso, Redes...">
                             </div>
 
-                            <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10 group hover:border-tecsisa-yellow/30 transition-all">
-                                <div class="flex items-center gap-3">
-                                    <div class="p-2 bg-emerald-500/10 rounded-lg text-emerald-400">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
-                                    </div>
-                                    <div>
-                                        <h4 class="text-sm font-bold text-white mb-0.5">Gestión de Puertos Físicos</h4>
-                                        <p class="text-[10px] text-gray-500 uppercase font-black">Activar para Switches, Patch Panels o Cámaras IP</p>
-                                    </div>
-                                </div>
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                    <input type="checkbox" name="has_ports" x-model="systemFormData.has_ports" class="sr-only peer">
-                                    <div class="w-11 h-6 bg-black border border-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gray-400 after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600 after:shadow-md"></div>
-                                </label>
-                            </div>
-
-                            <!-- Mantenimiento -->
-                            <div class="bg-blue-500/5 rounded-xl p-6 border border-blue-500/10">
-                                <h3 class="text-xs font-black text-blue-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                    Ciclo de Mantenimiento Planificado
-                                </h3>
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                                    <div class="md:col-span-1">
-                                        <label class="text-[10px] text-gray-500 block mb-1">Frecuencia (Días)</label>
-                                        <input type="number" name="maintenance_interval_days" x-model="systemFormData.maintenance_interval_days" required
-                                               class="w-full bg-black/40 border-white/10 rounded-lg text-sm text-white h-10 px-3">
-                                    </div>
-                                    <div class="md:col-span-2">
-                                        <p class="text-[10px] text-gray-600 mt-6 italic">Se generarán alertas automáticamente cada vez que el equipo cumpla este periodo sin revisión.</p>
-                                    </div>
-                                </div>
-                                <div>
-                                    <label class="text-[10px] text-gray-500 block mb-1">Guía Rápida de Mantenimiento</label>
-                                    <textarea name="maintenance_guide" x-model="systemFormData.maintenance_guide" 
-                                              placeholder="Puntos clave a revisar (Limpieza, Firmware, Cableado...)"
-                                              class="w-full bg-black/40 border-white/10 rounded-lg text-sm text-white p-3 h-20"></textarea>
-                                </div>
-                            </div>
-
-                            <!-- Port Layout -->
-                            <div x-show="systemFormData.has_ports" x-transition.opacity class="bg-emerald-500/5 rounded-xl p-6 border border-emerald-500/10 shadow-[0_10px_40px_rgba(16,185,129,0.05)]">
-                                <div class="flex justify-between items-center mb-4">
-                                    <h3 class="text-xs font-black text-emerald-400 uppercase tracking-widest flex items-center gap-2">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
-                                        Plantilla de Puertos (Default)
-                                    </h3>
-                                    <button type="button" @click="addPortToConfig()" class="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full font-bold hover:bg-emerald-500/20 transition">
-                                        + Agregar Puertos
-                                    </button>
-                                </div>
-                                <div class="space-y-3">
-                                    <template x-for="(pconfig, pindex) in systemFormData.port_config" :key="pindex">
-                                        <div class="flex gap-2 items-center bg-black/20 p-2 rounded-lg border border-white/5 relative group/port">
-                                            <div class="w-16">
-                                                <label class="text-[9px] text-gray-600 block">Prefijo</label>
-                                                <input type="text" :name="'port_config[' + pindex + '][label_prefix]'" x-model="pconfig.label_prefix" required
-                                                       class="w-full bg-black/40 border-white/10 rounded text-xs text-white h-7 px-1 text-center">
-                                            </div>
-                                            <div class="flex-1">
-                                                <label class="text-[9px] text-gray-600 block">Tipo</label>
-                                                <select :name="'port_config[' + pindex + '][type]'" x-model="pconfig.type" required
-                                                        class="w-full bg-black/40 border-white/10 rounded text-xs text-white h-7 px-1">
-                                                    <option value="rj45">RJ45 (Ethernet)</option>
-                                                    <option value="sfp">SFP (1G)</option>
-                                                    <option value="sfp_plus">SFP+ (10G)</option>
-                                                    <option value="sc">SC (Fiber)</option>
-                                                    <option value="lc">LC (Fiber)</option>
-                                                </select>
-                                            </div>
-                                            <div class="w-20">
-                                                <label class="text-[9px] text-gray-600 block">Cantidad</label>
-                                                <input type="number" :name="'port_config[' + pindex + '][count]'" x-model="pconfig.count" required
-                                                       class="w-full bg-black/40 border-white/10 rounded text-xs text-white h-7 px-1 text-center">
-                                            </div>
-                                            <button type="button" @click="removePortFromConfig(pindex)" class="text-gray-600 hover:text-red-400 mt-2">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                                            </button>
-                                        </div>
-                                    </template>
-                                    <template x-if="systemFormData.port_config.length === 0">
-                                        <p class="text-center text-[10px] text-gray-600 italic">No hay puertos configurados. Se usará el default del sistema (24+2).</p>
-                                    </template>
-                                </div>
-                            </div>
 
                             <div class="bg-white/5 rounded-xl p-6 border border-white/5">
                                 <div class="flex justify-between items-center mb-4">
@@ -862,9 +760,7 @@
             systemFormData: {
                 id: '',
                 name: '',
-                has_ports: false,
                 form_schema: [],
-                port_config: [],
                 maintenance_interval_days: 90,
                 maintenance_guide: ''
             },
@@ -940,9 +836,7 @@
                 this.systemFormData = {
                     id: '', 
                     name: '', 
-                    has_ports: false,
                     form_schema: [],
-                    port_config: [],
                     maintenance_interval_days: 90,
                     maintenance_guide: ''
                 };
@@ -955,9 +849,7 @@
                 this.systemFormData = {
                     id: sys.id,
                     name: sys.name,
-                    has_ports: !!sys.has_ports,
                     form_schema: sys.form_schema ? JSON.parse(JSON.stringify(sys.form_schema)) : [],
-                    port_config: sys.port_config ? JSON.parse(JSON.stringify(sys.port_config)) : [],
                     maintenance_interval_days: sys.maintenance_interval_days || 90,
                     maintenance_guide: sys.maintenance_guide || ''
                 };
@@ -970,14 +862,6 @@
 
             removeFieldFromSchema(index) {
                 this.systemFormData.form_schema.splice(index, 1);
-            },
-
-            addPortToConfig() {
-                this.systemFormData.port_config.push({ label_prefix: 'P', type: 'rj45', count: 24 });
-            },
-
-            removePortFromConfig(index) {
-                this.systemFormData.port_config.splice(index, 1);
             },
 
             // --- Locations Logic ---

@@ -12,8 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('systems', function (Blueprint $table) {
-            $table->json('port_config')->nullable()->after('form_schema');
-            $table->integer('maintenance_interval_days')->default(90)->after('port_config');
+            $table->integer('maintenance_interval_days')->default(90)->after('form_schema');
             $table->text('maintenance_guide')->nullable()->after('maintenance_interval_days');
         });
     }
@@ -24,7 +23,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('systems', function (Blueprint $table) {
-            $table->dropColumn(['port_config', 'maintenance_interval_days', 'maintenance_guide']);
+            $table->dropColumn(['maintenance_interval_days', 'maintenance_guide']);
         });
     }
 };

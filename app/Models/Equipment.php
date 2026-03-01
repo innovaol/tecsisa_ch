@@ -40,9 +40,4 @@ class Equipment extends Model
     {
         return $this->belongsTo(Location::class);
     }
-
-    public function ports()
-    {
-        return $this->hasMany(Port::class);
-    }
 }
