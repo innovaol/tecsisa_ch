@@ -37,12 +37,16 @@ class RackBuilderController extends Controller
             'units' => 'array',
         ]);
 
-        // We delete all existing placements for this rack to resync the state efficiently
-        // In a complex app, we might want to check for diffs, but for Rack units, state sync is solid.
+        // 1. Identificar equipos que estaban antes en el rack para detectar remociones
+        $oldEquipmentIds = $rack->units()->whereNotNull('equipment_id')->pluck('equipment_id')->unique()->toArray();
+
+        // 2. Limpiar estado actual para resincronizar
         $rack->units()->delete();
 
         $unitsData = $request->input('units', []);
+        $newEquipmentIds = [];
 
+        // 3. Re-instalar equipos según el nuevo mapa
         foreach ($unitsData as $unit) {
             if (!empty($unit['occupied']) && !empty($unit['db_id'])) {
                 RackUnit::create([
@@ -53,10 +57,34 @@ class RackBuilderController extends Controller
                     'position_size' => $unit['size'],
                     'content_type' => 'equipment',
                 ]);
+                $newEquipmentIds[] = $unit['db_id'];
             }
         }
 
-        return response()->json(['status' => 'success', 'message' => 'Topología de rack guardada con éxito']);
+        // 4. Mecanismo de Limpieza Automática de Enlaces (Data Integrity)
+        // Buscamos equipos que fueron retirados del rack (estaban antes, no están ahora)
+        $removedIds = array_diff($oldEquipmentIds, $newEquipmentIds);
+
+        if (!empty($removedIds)) {
+            // Buscamos todos los puertos de los equipos retirados
+            $portIds = Port::whereIn('equipment_id', $removedIds)->pluck('id');
+
+            if ($portIds->count() > 0) {
+                // Identificamos las conexiones físicas que pasan por estos puertos
+                $connections = Connection::whereIn('port_a_id', $portIds)
+                    ->orWhereIn('port_b_id', $portIds)
+                    ->get();
+
+                foreach ($connections as $conn) {
+                    // Liberamos ambos extremos (el que se va y el que se queda en el rack)
+                    Port::whereIn('id', [$conn->port_a_id, $conn->port_b_id])->update(['status' => 'free']);
+                    // Eliminamos el enlace físico (el cable fue desconectado)
+                    $conn->delete();
+                }
+            }
+        }
+
+        return response()->json(['status' => 'success', 'message' => 'Topología guardada. Se han desconectado los enlaces de los equipos retirados.']);
     }
 
     public function getEquipmentPorts(Equipment $equipment)

@@ -572,7 +572,7 @@
                     if(fits) {
                         // Lo quitamos primero de donde estaba (si estaba)
                         if (existingUnit) {
-                            this.removeEquipment(existingUnit);
+                            this.removeEquipment(existingUnit, false); // No confirmar en movimientos
                         }
 
                         // ¡Instalar en nueva locación!
@@ -607,8 +607,15 @@
                     this.drop(null, unit);
                 },
 
-                removeEquipment(unit) {
-                    if(!unit.occupied || unit.hidden) return; // Only top unit is interactive
+                removeEquipment(unit, confirmRemoval = true) {
+                    if(!unit.occupied || unit.hidden) return; 
+
+                    // Advertencia de integridad si el equipo ya existe en el sistema
+                    if (confirmRemoval && unit.db_id) {
+                        if (!confirm("⚠️ ATENCIÓN: Al retirar este equipo del rack, se eliminarán permanentemente todos sus enlaces físicos y cables asociados. \n\n¿Estás seguro de que deseas quitar '" + unit.eq_name + "'?")) {
+                            return;
+                        }
+                    }
                     
                     const unitIndex = this.rackUnits.findIndex(u => u.number === unit.number);
                     
