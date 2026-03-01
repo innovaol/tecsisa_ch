@@ -243,13 +243,11 @@
                 </div>
                 <button @click="closePortViewer()" class="text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 p-2 rounded-full transition relative group">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                    <!-- Loading Spinner Override if loading API -->
-                    <svg x-show="loadingPorts" class="animate-spin absolute inset-0 m-auto h-5 w-5 text-tecsisa-yellow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                 </button>
             </div>
 
             <!-- Modal Body: Puertos Simulados -->
-            <div class="p-8">
+            <div class="p-8 min-h-[200px] flex flex-col justify-center">
                 <div x-show="!loadingPorts" class="grid grid-cols-12 gap-3" x-transition>
                     <template x-for="port in equipmentPorts" :key="port.id">
                         <div class="col-span-1 aspect-square bg-gradient-to-b from-[#1a1f26] to-[#0f1217] border border-gray-700 rounded shadow-[inset_0_2px_4px_rgba(0,0,0,0.5)] relative group/port cursor-pointer transition transform hover:scale-110 flex flex-col items-center justify-center"
@@ -285,8 +283,16 @@
                     </template>
                 </div>
 
-                <div x-show="loadingPorts" class="h-32 flex items-center justify-center text-gray-400">
-                    Cargando configuración de puertos...
+                <!-- Loading / Error States -->
+                <div x-show="loadingPorts" class="w-full h-32 flex flex-col items-center justify-center text-gray-400 gap-4">
+                    <svg class="animate-spin h-8 w-8 text-tecsisa-yellow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    <span>Conectando e inspeccionando interfaz remota...</span>
+                </div>
+
+                <div x-show="portError" class="w-full h-32 flex flex-col items-center justify-center text-red-400 gap-2">
+                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    <span class="font-bold">Error de Conexión</span>
+                    <span class="text-sm">El equipo no respondió a la consulta física de puertos. Es posible que sea un equipo simulado (no guardado) o un error de red.</span>
                 </div>
             </div>
             
@@ -315,6 +321,7 @@
                 // Port Viewer variables
                 showPortModal: false,
                 loadingPorts: false,
+                portError: false,
                 inspectingEquipment: null,
                 equipmentPorts: [],
 
@@ -512,26 +519,34 @@
 
                 // ---- PORT VIEWER ACTIONS ----
                 async openPortViewer(unit) {
-                    if (!unit.occupied || !unit.db_id) return;
+                    if (!unit.occupied || !unit.db_id) {
+                        alert("Este equipo aún no existe en el registro central o es un marcador temporal. Por favor, guarda el rack primero.");
+                        return;
+                    }
                     
                     this.showPortModal = true;
                     this.loadingPorts = true;
+                    this.portError = false;
                     this.inspectingEquipment = null;
                     this.equipmentPorts = [];
 
                     try {
-                        let res = await fetch(`/api/equipment/${unit.db_id}/ports`);
+                        let res = await fetch(`/api/equipment/${unit.db_id}/ports`, {
+                            headers: {
+                                'Accept': 'application/json'
+                            }
+                        });
+                        
                         if (res.ok) {
                             let data = await res.json();
                             this.inspectingEquipment = data.equipment;
                             this.equipmentPorts = data.ports;
                         } else {
-                            throw new Error('Could not fetch ports');
+                            throw new Error('API Error: ' + res.status);
                         }
                     } catch (e) {
-                        console.error(e);
-                        alert("Error al cargar los puertos de este equipo.");
-                        this.showPortModal = false;
+                        console.error("No se pudieron cargar puertos:", e);
+                        this.portError = true;
                     }
 
                     this.loadingPorts = false;
