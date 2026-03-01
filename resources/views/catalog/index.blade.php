@@ -6,7 +6,7 @@
         </h2>
     </x-slot>
 
-    <div class="py-12" x-data="inventoryManager(@js($locations), @js($systems))">
+    <div class="py-12" x-data="inventoryManager()">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             
             <!-- Tabs Navigation -->
@@ -227,9 +227,9 @@
                         <x-input-label for="system_id" value="Sistema Perteneciente" class="text-gray-400 text-xs font-bold uppercase" />
                         <select id="system_id" name="system_id" x-model="formData.system_id" class="mt-1 block w-full bg-black/40 border-white/10 rounded-md shadow-sm focus:border-tecsisa-yellow focus:ring-tecsisa-yellow text-white">
                             <option value="">-- Seleccione Sistema --</option>
-                            <template x-for="sys in allSystems" :key="sys.id">
-                                <option :value="sys.id" x-text="sys.name"></option>
-                            </template>
+                            @foreach($systems as $sys)
+                                <option value="{{ $sys->id }}">{{ $sys->name }}</option>
+                            @endforeach
                         </select>
                     </div>
 
@@ -238,9 +238,9 @@
                         <x-input-label for="location_id" value="Ubicación Física" class="text-gray-400 text-xs font-bold uppercase" />
                         <select id="location_id" name="location_id" x-model="formData.location_id" class="mt-1 block w-full bg-black/40 border-white/10 rounded-md shadow-sm focus:border-tecsisa-yellow focus:ring-tecsisa-yellow text-white">
                             <option value="">Seleccione ubicación...</option>
-                            <template x-for="loc in allLocations" :key="loc.id">
-                                <option :value="loc.id" x-text="loc.name"></option>
-                            </template>
+                            @foreach($locations as $loc)
+                                <option value="{{ $loc->id }}">{{ $loc->name }}</option>
+                            @endforeach
                         </select>
                     </div>
 
@@ -295,11 +295,16 @@
     </x-modal>
 
 <script>
-    function inventoryManager(locations, systems) {
+    window.inventoryData = {
+        locations: @json($locations),
+        systems: @json($systems)
+    };
+
+    function inventoryManager() {
         return {
             activeTab: 'equipment',
-            allLocations: locations,
-            allSystems: systems,
+            allLocations: window.inventoryData.locations,
+            allSystems: window.inventoryData.systems,
             
             // Modal state
             editMode: false,
@@ -330,7 +335,7 @@
                     internal_id: '',
                     name: '',
                     form_factor: 'rackmount',
-                    system_id: systems.length > 0 ? systems[0].id : '',
+                    system_id: this.allSystems.length > 0 ? this.allSystems[0].id : '',
                     location_id: '',
                     status: 'operative',
                     specs: {},
