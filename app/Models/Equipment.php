@@ -12,6 +12,7 @@ class Equipment extends Model
     protected $fillable = [
         'internal_id',
         'name',
+        'form_factor',
         'system_id',
         'location_id',
         'status',

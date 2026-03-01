@@ -297,7 +297,7 @@
                                     <select x-model="wizardTargetEqDbId" @change="fetchTargetPorts()" class="w-full bg-black/40 border-gray-700/50 text-white rounded-lg text-sm focus:border-tecsisa-yellow focus:ring-tecsisa-yellow shadow-inner">
                                         <option value="">-- Seleccionar Equipo Destino --</option>
                                         <template x-for="target in activeTargets" :key="target.db_id">
-                                            <option :value="target.db_id" x-text="target.eq_id + ' (' + target.eq_name + ')'"></option>
+                                            <option :value="target.db_id" x-text="'[' + target.category + '] ' + target.eq_id + ' - ' + target.eq_name"></option>
                                         </template>
                                     </select>
                                 </div>
@@ -414,6 +414,7 @@
                 totalU: {{ $rack->total_units }}, // Total units from PHP ($rack->total_units)
                 rackUnits: [],
                 existingUnits: @json($rack->units),
+                externalTargets: @json($externalTargets ?? []),
                 saving: false,
                 
                 // Variable para el equipo seleccionado mediante CLICK (Modo Móvil/Tablet)
@@ -701,29 +702,35 @@
                     if(!this.inspectingEquipment || !this.inspectingEquipment.id) return [];
                     
                     const myId = String(this.inspectingEquipment.id);
-                    
-                    // Filter rack units to find other occupied equipment
-                    let units = this.rackUnits.filter(u => {
-                        // Check if it's occupied, not hidden (for multi-U), has a valid ID and is NOT me
-                        return u.occupied && 
-                               u.db_id && 
-                               String(u.db_id) !== myId;
-                    });
-                    
-                    // Use a Map to ensure unique equipment in the dropdown (unique by DB ID)
                     const uniqueMap = new Map();
-                    units.forEach(u => {
-                        if (!uniqueMap.has(String(u.db_id))) {
+
+                    // 1. Equipos en el Rack (Excepto yo)
+                    this.rackUnits.forEach(u => {
+                        if (u.occupied && u.db_id && String(u.db_id) !== myId && !uniqueMap.has(String(u.db_id))) {
                             uniqueMap.set(String(u.db_id), {
                                 db_id: u.db_id,
                                 eq_id: u.eq_id || 'S/N',
-                                eq_name: u.eq_name || 'Equipo'
+                                eq_name: u.eq_name || 'Equipo',
+                                category: 'Rack'
+                            });
+                        }
+                    });
+
+                    // 2. Perifericos y Puntos de Red (Siempre disponibles)
+                    this.externalTargets.forEach(target => {
+                        const tid = String(target.id);
+                        if (tid !== myId && !uniqueMap.has(tid)) {
+                            uniqueMap.set(tid, {
+                                db_id: target.id,
+                                eq_id: target.internal_id || 'S/N',
+                                eq_name: target.name || 'Periférico',
+                                category: target.form_factor === 'network_point' ? 'Punto de Red' : 'Dispositivo'
                             });
                         }
                     });
 
                     let result = Array.from(uniqueMap.values());
-                    console.log("Targets encontrados:", result.length, result);
+                    console.log("Targets totales:", result.length, result);
                     return result;
                 },
 
