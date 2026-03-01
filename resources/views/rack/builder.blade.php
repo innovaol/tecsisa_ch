@@ -7,8 +7,8 @@
     </x-slot>
 
     <!-- Implementación Drag and Drop con HTML5 API usando Alpine -->
-    <div class="py-6 min-h-[calc(100vh-140px)] md:h-[calc(100vh-140px)]" x-data="rackBuilder()">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col md:flex-row gap-6">
+    <div class="py-6 min-h-[calc(100vh-140px)] md:h-[calc(100vh-140px)]">
+        <div x-data="rackBuilder()" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col md:flex-row gap-6">
             
             <!-- CONTROLES Y CATÁLOGO DE EQUIPACIÓN (LEFT PANEL) -->
             <div class="w-full md:w-1/3 flex flex-col gap-6 h-[400px] md:h-full shrink-0">
@@ -302,7 +302,8 @@
         </div>
     </div>
 
-    </div> <!-- Close of x-data div -->
+        </div> <!-- End of Max-w-7xl wrapper where x-data resides! -->
+    </div> <!-- Close of main py-6 background -->
     
     <!-- Alpine.js Logic para el Constructor de Rack -->
     <script>
