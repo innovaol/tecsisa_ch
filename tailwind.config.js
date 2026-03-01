@@ -14,6 +14,13 @@ export default {
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },
+            colors: {
+                tecsisa: {
+                    yellow: '#FFD100', // Yellow from logo
+                    dark: '#111827',   // Slate 900 for texts
+                    light: '#F8FAFC',  // Slate 50 for backgrounds
+                },
+            },
         },
     },
 
