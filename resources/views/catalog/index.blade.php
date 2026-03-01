@@ -20,7 +20,7 @@
         </style>
     </x-slot>
 
-    <div class="py-12" x-data="inventoryManager(@js($locations), @js($systems))">
+    <div class="py-12" x-data="inventoryManager(@js($locations), @js($systems), @js($racks))">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             
             <!-- Tabs Navigation -->
@@ -44,9 +44,84 @@
 
             <!-- Tab: Locations -->
             <div x-show="activeTab === 'locations'" x-transition>
-                <div class="bg-tecsisa-dark/40 backdrop-blur-md border border-white/10 rounded-2xl p-8">
-                    <h3 class="text-white text-lg font-bold mb-4">Ubicaciones y Site Rooms</h3>
-                    <p class="text-gray-400 text-sm">Próximamente: CRUD de Ubicaciones</p>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Column: Locations -->
+                    <div>
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-white text-xl font-bold">Ubicaciones / Sites</h3>
+                            <button @click="openCreateLocationModal()" class="text-xs bg-white/5 hover:bg-white/10 text-white border border-white/10 px-3 py-1.5 rounded-lg transition">
+                                + Nueva Ubicación
+                            </button>
+                        </div>
+                        <div class="space-y-3">
+                            @foreach($locations as $loc)
+                            <div class="bg-tecsisa-dark/40 border border-white/5 p-4 rounded-xl flex justify-between items-center group">
+                                <div>
+                                    <h4 class="text-white font-bold">{{ $loc->name }}</h4>
+                                    @if($loc->parent)
+                                        <p class="text-[10px] text-gray-500 uppercase">Padre: {{ $loc->parent->name }}</p>
+                                    @else
+                                        <p class="text-[10px] text-tecsisa-yellow uppercase">Ubicación Raíz</p>
+                                    @endif
+                                </div>
+                                <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button @click="openEditLocationModal(@js($loc))" class="text-gray-500 hover:text-white transition">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                    </button>
+                                    <form action="{{ route('catalog.locations.destroy', $loc) }}" method="POST" onsubmit="return confirm('¿Eliminar esta ubicación?')">
+                                        @csrf @method('DELETE')
+                                        <button class="text-gray-500 hover:text-red-400 transition">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <!-- Column: Racks -->
+                    <div>
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-white text-xl font-bold">Racks / Gabinetes</h3>
+                            <button @click="openCreateRackModal()" class="text-xs bg-tecsisa-yellow/10 hover:bg-tecsisa-yellow/20 text-tecsisa-yellow border border-tecsisa-yellow/20 px-3 py-1.5 rounded-lg transition">
+                                + Registrar Rack
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-1 gap-4">
+                            @foreach($racks as $rack)
+                            <div class="bg-black/40 border border-white/10 p-5 rounded-2xl group hover:border-tecsisa-yellow/40 transition-all">
+                                <div class="flex justify-between items-start mb-3">
+                                    <div>
+                                        <h4 class="text-white font-black text-lg">{{ $rack->name }}</h4>
+                                        <p class="text-xs text-gray-500">{{ $rack->location->name ?? 'Sin ubicación' }} • {{ $rack->total_units }}U</p>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button @click="openEditRackModal(@js($rack))" class="text-gray-500 hover:text-white transition">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                        </button>
+                                        <form action="{{ route('catalog.racks.destroy', $rack) }}" method="POST" onsubmit="return confirm('¿Eliminar este rack?')">
+                                            @csrf @method('DELETE')
+                                            <button class="text-gray-500 hover:text-red-400 transition">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <div class="flex-1 h-2 bg-white/5 rounded-full overflow-hidden">
+                                        @php 
+                                            $occupied = $rack->units()->whereNotNull('equipment_id')->count();
+                                            $percent = ($occupied / max(1, $rack->total_units)) * 100;
+                                        @endphp
+                                        <div class="h-full bg-tecsisa-yellow shadow-[0_0_10px_rgba(255,209,0,0.5)]" style="width: {{ $percent }}%"></div>
+                                    </div>
+                                    <span class="text-[10px] text-gray-400 font-bold uppercase">{{ $occupied }}/{{ $rack->total_units }}U</span>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -176,6 +251,88 @@
                 </div>
             </div>
 
+        </div>
+
+        <!-- Location Modal -->
+        <div x-show="showLocationModal" style="display: none;" class="fixed inset-0 z-50 overflow-y-auto">
+            <div class="fixed inset-0 bg-black/80 backdrop-blur-sm" @click="showLocationModal = false"></div>
+            <div class="flex min-h-full items-center justify-center p-4">
+                <div class="relative w-full max-w-md bg-tecsisa-dark border border-white/10 rounded-2xl p-8 shadow-2xl">
+                    <form method="post" :action="locationFormAction">
+                        @csrf
+                        <template x-if="locationEditMode"><input type="hidden" name="_method" value="PUT"></template>
+                        <h2 class="text-xl font-bold text-white mb-6" x-text="locationEditMode ? 'Editar Ubicación' : 'Nueva Ubicación'"></h2>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-gray-400 text-xs font-bold uppercase mb-1">Nombre</label>
+                                <input type="text" name="name" x-model="locationFormData.name" required class="w-full bg-black/40 border-white/10 rounded-lg text-white h-10 px-3">
+                            </div>
+                            <div>
+                                <label class="block text-gray-400 text-xs font-bold uppercase mb-1">Ubicación Padre (Jerarquía)</label>
+                                <select name="parent_id" x-model="locationFormData.parent_id" class="w-full bg-black/40 border-white/10 rounded-lg text-white h-10 px-3">
+                                    <option value="">-- Sin Padre (Raíz) --</option>
+                                    @foreach($locations as $l)
+                                        <option value="{{ $l->id }}">{{ $l->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mt-8 flex justify-end gap-3">
+                            <button type="button" @click="showLocationModal = false" class="text-gray-400 font-bold uppercase text-xs">Cancelar</button>
+                            <button type="submit" class="bg-tecsisa-yellow text-tecsisa-dark font-black px-6 py-2 rounded-xl" x-text="locationEditMode ? 'Actualizar' : 'Crear'"></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rack Modal -->
+        <div x-show="showRackModal" style="display: none;" class="fixed inset-0 z-50 overflow-y-auto">
+            <div class="fixed inset-0 bg-black/80 backdrop-blur-sm" @click="showRackModal = false"></div>
+            <div class="flex min-h-full items-center justify-center p-4">
+                <div class="relative w-full max-w-lg bg-tecsisa-dark border border-white/10 rounded-2xl p-8 shadow-2xl">
+                    <form method="post" :action="rackFormAction">
+                        @csrf
+                        <template x-if="rackEditMode"><input type="hidden" name="_method" value="PUT"></template>
+                        <h2 class="text-xl font-bold text-white mb-6" x-text="rackEditMode ? 'Editar Rack' : 'Registrar Rack'"></h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="md:col-span-2">
+                                <label class="block text-gray-400 text-xs font-bold uppercase mb-1">Nombre / Identificador</label>
+                                <input type="text" name="name" x-model="rackFormData.name" required class="w-full bg-black/40 border-white/10 rounded-lg text-white h-10 px-3" placeholder="Ej: RACK-MDF-01">
+                            </div>
+                            <div>
+                                <label class="block text-gray-400 text-xs font-bold uppercase mb-1">Unidades Totales (U)</label>
+                                <input type="number" name="total_units" x-model="rackFormData.total_units" min="1" max="52" required class="w-full bg-black/40 border-white/10 rounded-lg text-white h-10 px-3">
+                            </div>
+                            <div>
+                                <label class="block text-gray-400 text-xs font-bold uppercase mb-1">Ubicación</label>
+                                <select name="location_id" x-model="rackFormData.location_id" required class="w-full bg-black/40 border-white/10 rounded-lg text-white h-10 px-3">
+                                    <option value="">Seleccione site...</option>
+                                    @foreach($locations as $l)
+                                        <option value="{{ $l->id }}">{{ $l->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-400 text-xs font-bold uppercase mb-1">Estado</label>
+                                <select name="status" x-model="rackFormData.status" class="w-full bg-black/40 border-white/10 rounded-lg text-white h-10 px-3">
+                                    <option value="active">Activo / Disponible</option>
+                                    <option value="full">Lleno</option>
+                                    <option value="maintenance">Mantenimiento</option>
+                                </select>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-gray-400 text-xs font-bold uppercase mb-1">Notas</label>
+                                <textarea name="notes" x-model="rackFormData.notes" class="w-full bg-black/40 border-white/10 rounded-lg text-white p-3 h-20 text-sm"></textarea>
+                            </div>
+                        </div>
+                        <div class="mt-8 flex justify-end gap-3">
+                            <button type="button" @click="showRackModal = false" class="text-gray-400 font-bold uppercase text-xs">Cancelar</button>
+                            <button type="submit" class="bg-tecsisa-yellow text-tecsisa-dark font-black px-6 py-2 rounded-xl" x-text="rackEditMode ? 'Guardar' : 'Registrar'"></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
 
         <!-- System Modal (Managing Schemas) -->
@@ -466,13 +623,14 @@
     </div>
 
 <script>
-    function inventoryManager(locations, systems) {
+    function inventoryManager(locations, systems, racks) {
         return {
             activeTab: 'equipment',
             allLocations: locations,
             allSystems: systems,
+            allRacks: racks,
             
-            // Modal state
+            // Equipment Modal state
             showEquipmentModal: false,
             editMode: false,
             formAction: '/catalogos/equipment',
@@ -489,7 +647,7 @@
                 notes: ''
             },
 
-            // Systems (Schema) Modal state
+            // Systems Modal state
             showSystemModal: false,
             systemEditMode: false,
             systemFormAction: '/catalogos/systems',
@@ -499,6 +657,30 @@
                 form_schema: []
             },
 
+            // Locations Modal state
+            showLocationModal: false,
+            locationEditMode: false,
+            locationFormAction: '/catalogos/locations',
+            locationFormData: {
+                id: '',
+                name: '',
+                parent_id: '',
+                level: 1
+            },
+
+            // Racks Modal state
+            showRackModal: false,
+            rackEditMode: false,
+            rackFormAction: '/catalogos/racks',
+            rackFormData: {
+                id: '',
+                name: '',
+                total_units: 42,
+                location_id: '',
+                status: 'active',
+                notes: ''
+            },
+
             get activeSchema() {
                 if (!this.formData.system_id) return [];
                 const sysId = String(this.formData.system_id);
@@ -506,30 +688,21 @@
                 return found ? (found.form_schema || []) : [];
             },
 
+            // --- Equipment Logic ---
             openCreateModal() {
                 this.editMode = false;
                 this.formAction = '/catalogos/equipment';
                 this.formData = {
-                    id: '',
-                    internal_id: '',
-                    name: '',
-                    form_factor: '',
-                    u_height: 1,
-                    system_id: '',
-                    location_id: '',
-                    status: '',
-                    specs: {},
-                    notes: ''
+                    id: '', internal_id: '', name: '', form_factor: '',
+                    u_height: 1, system_id: '', location_id: '',
+                    status: '', specs: {}, notes: ''
                 };
                 this.showEquipmentModal = true;
             },
 
             openEditModal(eq) {
-                console.log("Editando:", eq);
                 this.editMode = true;
                 this.formAction = `/catalogos/equipment/${eq.id}`;
-                
-                // Forzamos strings para los selects
                 this.formData = {
                     id: eq.id,
                     internal_id: String(eq.internal_id || ''),
@@ -542,7 +715,6 @@
                     specs: eq.specs ? JSON.parse(JSON.stringify(eq.specs)) : {},
                     notes: String(eq.notes || '')
                 };
-                
                 this.showEquipmentModal = true;
             },
 
@@ -551,9 +723,7 @@
                 this.systemEditMode = false;
                 this.systemFormAction = '/catalogos/systems';
                 this.systemFormData = {
-                    id: '',
-                    name: '',
-                    form_schema: []
+                    id: '', name: '', form_schema: []
                 };
                 this.showSystemModal = true;
             },
@@ -575,6 +745,52 @@
 
             removeFieldFromSchema(index) {
                 this.systemFormData.form_schema.splice(index, 1);
+            },
+
+            // --- Locations Logic ---
+            openCreateLocationModal() {
+                this.locationEditMode = false;
+                this.locationFormAction = '/catalogos/locations';
+                this.locationFormData = {
+                    id: '', name: '', parent_id: '', level: 1
+                };
+                this.showLocationModal = true;
+            },
+
+            openEditLocationModal(loc) {
+                this.locationEditMode = true;
+                this.locationFormAction = `/catalogos/locations/${loc.id}`;
+                this.locationFormData = {
+                    id: loc.id,
+                    name: loc.name,
+                    parent_id: loc.parent_id ? String(loc.parent_id) : '',
+                    level: loc.level || 1
+                };
+                this.showLocationModal = true;
+            },
+
+            // --- Racks Logic ---
+            openCreateRackModal() {
+                this.rackEditMode = false;
+                this.rackFormAction = '/catalogos/racks';
+                this.rackFormData = {
+                    id: '', name: '', total_units: 42, location_id: '', status: 'active', notes: ''
+                };
+                this.showRackModal = true;
+            },
+
+            openEditRackModal(rack) {
+                this.rackEditMode = true;
+                this.rackFormAction = `/catalogos/racks/${rack.id}`;
+                this.rackFormData = {
+                    id: rack.id,
+                    name: rack.name,
+                    total_units: rack.total_units,
+                    location_id: String(rack.location_id),
+                    status: rack.status,
+                    notes: rack.notes || ''
+                };
+                this.showRackModal = true;
             }
         };
     }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Equipment;
 use App\Models\Location;
 use App\Models\System;
+use App\Models\Rack;
 use Illuminate\Http\Request;
 
 class CatalogController extends Controller
@@ -14,8 +15,9 @@ class CatalogController extends Controller
         $locations = Location::with('parent')->get();
         $systems = System::all();
         $equipments = Equipment::with(['location', 'system'])->orderBy('created_at', 'desc')->get();
+        $racks = Rack::with('location')->get();
 
-        return view('catalog.index', compact('locations', 'systems', 'equipments'));
+        return view('catalog.index', compact('locations', 'systems', 'equipments', 'racks'));
     }
 
     public function storeEquipment(Request $request)
@@ -99,5 +101,87 @@ class CatalogController extends Controller
         $system->delete();
 
         return redirect()->back()->with('success', 'Sistema técnico eliminado.');
+    }
+
+    // --- Locations Management ---
+
+    public function storeLocation(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'parent_id' => 'nullable|exists:locations,id',
+            'level' => 'nullable|integer',
+        ]);
+
+        Location::create($validated);
+
+        return redirect()->back()->with('success', 'Ubicación creada correctamente.');
+    }
+
+    public function updateLocation(Request $request, Location $location)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'parent_id' => 'nullable|exists:locations,id',
+            'level' => 'nullable|integer',
+        ]);
+
+        $location->update($validated);
+
+        return redirect()->back()->with('success', 'Ubicación actualizada correctamente.');
+    }
+
+    public function destroyLocation(Location $location)
+    {
+        if ($location->children()->count() > 0 || $location->equipments()->count() > 0) {
+            return redirect()->back()->with('error', 'No se puede eliminar una ubicación con sub-ubicaciones o equipos asociados.');
+        }
+
+        $location->delete();
+
+        return redirect()->back()->with('success', 'Ubicación eliminada.');
+    }
+
+    // --- Racks Management ---
+
+    public function storeRack(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'total_units' => 'required|integer|min:1|max:52',
+            'location_id' => 'required|exists:locations,id',
+            'status' => 'required|in:active,full,maintenance',
+            'notes' => 'nullable|string',
+        ]);
+
+        Rack::create($validated);
+
+        return redirect()->back()->with('success', 'Rack registrado correctamente.');
+    }
+
+    public function updateRack(Request $request, Rack $rack)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'total_units' => 'required|integer|min:1|max:52',
+            'location_id' => 'required|exists:locations,id',
+            'status' => 'required|in:active,full,maintenance',
+            'notes' => 'nullable|string',
+        ]);
+
+        $rack->update($validated);
+
+        return redirect()->back()->with('success', 'Rack actualizado correctamente.');
+    }
+
+    public function destroyRack(Rack $rack)
+    {
+        if ($rack->units()->whereNotNull('equipment_id')->count() > 0) {
+            return redirect()->back()->with('error', 'No se puede eliminar un rack que contiene equipos instalados.');
+        }
+
+        $rack->delete();
+
+        return redirect()->back()->with('success', 'Rack eliminado del catálogo.');
     }
 }

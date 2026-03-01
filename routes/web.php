@@ -28,6 +28,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/catalogos/systems/{system}', [\App\Http\Controllers\CatalogController::class , 'updateSystem'])->name('catalog.systems.update');
         Route::delete('/catalogos/systems/{system}', [\App\Http\Controllers\CatalogController::class , 'destroySystem'])->name('catalog.systems.destroy');
 
+        Route::post('/catalogos/locations', [\App\Http\Controllers\CatalogController::class , 'storeLocation'])->name('catalog.locations.store');
+        Route::put('/catalogos/locations/{location}', [\App\Http\Controllers\CatalogController::class , 'updateLocation'])->name('catalog.locations.update');
+        Route::delete('/catalogos/locations/{location}', [\App\Http\Controllers\CatalogController::class , 'destroyLocation'])->name('catalog.locations.destroy');
+
+        Route::post('/catalogos/racks', [\App\Http\Controllers\CatalogController::class , 'storeRack'])->name('catalog.racks.store');
+        Route::put('/catalogos/racks/{rack}', [\App\Http\Controllers\CatalogController::class , 'updateRack'])->name('catalog.racks.update');
+        Route::delete('/catalogos/racks/{rack}', [\App\Http\Controllers\CatalogController::class , 'destroyRack'])->name('catalog.racks.destroy');
+
         Route::get('/racks', [\App\Http\Controllers\RackBuilderController::class , 'index'])->name('rack.builder');
         Route::post('/racks/{rack}/save', [\App\Http\Controllers\RackBuilderController::class , 'save'])->name('rack.save');
         Route::get('/api/equipment/{equipment}/ports', [\App\Http\Controllers\RackBuilderController::class , 'getEquipmentPorts'])->name('api.equipment.ports');
