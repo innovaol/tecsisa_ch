@@ -23,6 +23,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::get('/racks', [\App\Http\Controllers\RackBuilderController::class , 'index'])->name('rack.builder');
         Route::post('/racks/{rack}/save', [\App\Http\Controllers\RackBuilderController::class , 'save'])->name('rack.save');
+        Route::get('/api/equipment/{equipment}/ports', [\App\Http\Controllers\RackBuilderController::class , 'getEquipmentPorts'])->name('api.equipment.ports');
 
         // Módulo Técnico Móvil (Buscador Activos y Tareas)
         Route::resource('tasks', \App\Http\Controllers\TaskController::class);

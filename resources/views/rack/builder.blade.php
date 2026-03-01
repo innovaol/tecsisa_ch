@@ -183,6 +183,16 @@
 
                                         </div>
 
+                                        <!-- Acciones Rápidas del Equipo -->
+                                        <div class="absolute inset-y-0 right-0 flex items-center pr-2 gap-2 opacity-0 group-hover/equip:opacity-100 transition">
+                                            <button @click.stop="openPortViewer(unit)" class="p-1.5 bg-blue-500/20 hover:bg-blue-500 text-blue-400 hover:text-white rounded transition shadow-lg backdrop-blur-sm" title="Inspeccionar Puertos">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                            </button>
+                                            <button @click.stop="removeEquipment(unit)" class="p-1.5 bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white rounded transition shadow-lg backdrop-blur-sm" title="Remover del Rack">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                            </button>
+                                        </div>
+
                                         <!-- Tooltip de Equipo -->
                                         <div class="absolute z-50 left-1/2 -translate-x-1/2 -top-12 bg-black text-white px-3 py-1.5 rounded text-xs opacity-0 group-hover/equip:opacity-100 transition pointer-events-none whitespace-nowrap shadow-xl border border-gray-700">
                                             <span class="text-tecsisa-yellow font-bold" x-text="unit.eq_id"></span> - <span x-text="unit.eq_name"></span>
@@ -209,6 +219,82 @@
         </div>
     </div>
     
+    <!-- Modal: Visor de Puertos (Glassmorphism) -->
+    <div x-show="showPortModal" 
+         x-transition.opacity
+         style="display: none;"
+         class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+        
+        <div class="bg-tecsisa-dark border border-white/10 rounded-2xl w-full max-w-5xl mx-4 overflow-hidden shadow-[0_0_50px_rgba(0,0,0,1)] relative"
+             @click.away="closePortViewer()">
+            
+            <!-- Modal Header -->
+            <div class="px-6 py-4 border-b border-white/5 flex justify-between items-center bg-gradient-to-r from-blue-900/20 to-transparent">
+                <div>
+                    <h3 class="text-xl font-black text-white flex items-center gap-2">
+                        <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
+                        Panel de Puertos
+                    </h3>
+                    <div class="text-sm text-gray-400 mt-1" x-show="inspectingEquipment">
+                        Equipo: <span class="text-tecsisa-yellow font-mono font-bold" x-text="inspectingEquipment?.internal_id"></span> 
+                        - <span x-text="inspectingEquipment?.name"></span>
+                    </div>
+                </div>
+                <button @click="closePortViewer()" class="text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 p-2 rounded-full transition relative group">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    <!-- Loading Spinner Override if loading API -->
+                    <svg x-show="loadingPorts" class="animate-spin absolute inset-0 m-auto h-5 w-5 text-tecsisa-yellow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                </button>
+            </div>
+
+            <!-- Modal Body: Puertos Simulados -->
+            <div class="p-8">
+                <div x-show="!loadingPorts" class="grid grid-cols-12 gap-3" x-transition>
+                    <template x-for="port in equipmentPorts" :key="port.id">
+                        <div class="col-span-1 aspect-square bg-gradient-to-b from-[#1a1f26] to-[#0f1217] border border-gray-700 rounded shadow-[inset_0_2px_4px_rgba(0,0,0,0.5)] relative group/port cursor-pointer transition transform hover:scale-110 flex flex-col items-center justify-center"
+                             :class="{
+                                'border-green-500/50 shadow-[0_0_10px_rgba(34,197,94,0.3)]': port.status === 'connected',
+                                'border-red-500/50 shadow-[0_0_10px_rgba(239,68,68,0.3)]': port.status === 'broken'
+                             }">
+                            <div class="text-[9px] font-mono text-gray-500 absolute top-0.5" x-text="port.label"></div>
+                            
+                            <!-- RJ45 Graphic (simplified) -->
+                            <div class="w-4 h-4 bg-black border border-gray-800 rounded-sm mt-2 relative overflow-hidden" x-show="port.type == 'rj45'">
+                                <div class="absolute top-0 right-1 w-0.5 h-full" :class="port.status === 'connected' ? 'bg-green-500/80 animate-pulse' : 'bg-gray-800'"></div>
+                            </div>
+
+                            <!-- SFP Graphic -->
+                            <div class="w-5 h-3 bg-black border border-gray-800 rounded-sm mt-2 flex items-center justify-center" x-show="port.type == 'sfp' || port.type == 'sfp_plus'">
+                                <div class="w-2 h-1 bg-gray-600 rounded-sm"></div>
+                            </div>
+                            
+                            <!-- Status Indicator -->
+                            <div class="absolute bottom-1 right-1 w-2 h-2 rounded-full border border-black" 
+                                 :class="{
+                                    'bg-green-500 shadow-[0_0_5px_rgba(34,197,94,1)]': port.status === 'connected',
+                                    'bg-red-500 shadow-[0_0_5px_rgba(239,68,68,1)]': port.status === 'broken',
+                                    'bg-gray-600': port.status === 'free'
+                                 }"></div>
+
+                            <!-- Hover Tooltip Port -->
+                            <div class="absolute z-50 left-1/2 -translate-x-1/2 -top-10 bg-black text-white px-2 py-1 rounded text-xs opacity-0 group-hover/port:opacity-100 transition pointer-events-none whitespace-nowrap shadow-xl border border-gray-700">
+                                Puerto <span class="text-white font-bold" x-text="port.label"></span> (<span x-text="port.type"></span>)
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                <div x-show="loadingPorts" class="h-32 flex items-center justify-center text-gray-400">
+                    Cargando configuración de puertos...
+                </div>
+            </div>
+            
+            <div class="px-6 py-4 bg-black/40 border-t border-white/5 flex justify-end">
+                <button @click="closePortViewer()" class="px-5 py-2 text-sm font-bold text-gray-300 hover:text-white transition">Cerrar</button>
+            </div>
+        </div>
+    </div>
+    
     <!-- Alpine.js Logic para el Constructor de Rack -->
     <script>
         document.addEventListener('alpine:init', () => {
@@ -222,6 +308,12 @@
                 // Variable para el equipo seleccionado mediante CLICK (Modo Móvil/Tablet)
                 selectedItem: null,
                 draggedItem: null, // compatibility for desktop
+
+                // Port Viewer variables
+                showPortModal: false,
+                loadingPorts: false,
+                inspectingEquipment: null,
+                equipmentPorts: [],
 
                 init() {
                     // Inicializar rack vacio de arriba hacia abajo
@@ -413,6 +505,41 @@
                     unit.eq_id = null;
                     unit.eq_name = null;
                     unit.db_id = null;
+                },
+
+                // ---- PORT VIEWER ACTIONS ----
+                async openPortViewer(unit) {
+                    if (!unit.occupied || !unit.db_id) return;
+                    
+                    this.showPortModal = true;
+                    this.loadingPorts = true;
+                    this.inspectingEquipment = null;
+                    this.equipmentPorts = [];
+
+                    try {
+                        let res = await fetch(`/api/equipment/${unit.db_id}/ports`);
+                        if (res.ok) {
+                            let data = await res.json();
+                            this.inspectingEquipment = data.equipment;
+                            this.equipmentPorts = data.ports;
+                        } else {
+                            throw new Error('Could not fetch ports');
+                        }
+                    } catch (e) {
+                        console.error(e);
+                        alert("Error al cargar los puertos de este equipo.");
+                        this.showPortModal = false;
+                    }
+
+                    this.loadingPorts = false;
+                },
+
+                closePortViewer() {
+                    this.showPortModal = false;
+                    setTimeout(() => {
+                        this.equipmentPorts = [];
+                        this.inspectingEquipment = null;
+                    }, 300);
                 },
 
                 async saveTopology() {

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Rack;
 use App\Models\RackUnit;
 use App\Models\Equipment;
+use App\Models\Port;
 use Illuminate\Http\Request;
 
 class RackBuilderController extends Controller
@@ -55,5 +56,49 @@ class RackBuilderController extends Controller
         }
 
         return response()->json(['status' => 'success', 'message' => 'Topología de rack guardada con éxito']);
+    }
+
+    public function getEquipmentPorts(Equipment $equipment)
+    {
+        // Simple demonstration logic: if the equipment has no ports generated yet, 
+        // we generate a standard 24-port switch layout for it.
+        if ($equipment->ports()->count() === 0) {
+            $portsToCreate = [];
+            for ($i = 1; $i <= 24; $i++) {
+                $portsToCreate[] = [
+                    'number_label' => str_pad($i, 2, '0', STR_PAD_LEFT),
+                    'port_type' => 'rj45',
+                    'status' => 'free',
+                ];
+            }
+            // Add 2 SFP ports
+            $portsToCreate[] = ['number_label' => 'SFP 1', 'port_type' => 'sfp', 'status' => 'free'];
+            $portsToCreate[] = ['number_label' => 'SFP 2', 'port_type' => 'sfp', 'status' => 'free'];
+
+            $equipment->ports()->createMany($portsToCreate);
+        }
+
+        $ports = $equipment->ports()->orderBy('id')->get();
+        // Since connections are not fully generated yet, we map them as standard
+        $mappedPorts = $ports->map(function ($port) {
+            return [
+            'id' => $port->id,
+            'label' => $port->number_label,
+            'type' => $port->port_type,
+            'status' => $port->status,
+            // Add connection details if existed later
+            'connected_to' => null
+            ];
+        });
+
+        return response()->json([
+            'equipment' => [
+                'id' => $equipment->id,
+                'internal_id' => $equipment->internal_id,
+                'name' => $equipment->name,
+                'specs' => $equipment->specs
+            ],
+            'ports' => $mappedPorts
+        ]);
     }
 }
