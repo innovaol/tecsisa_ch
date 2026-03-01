@@ -220,9 +220,16 @@
                                                 <label class="text-[10px] text-gray-600 block mb-1">Tipo de Dato</label>
                                                 <select :name="'form_schema[' + index + '][type]'" x-model="field.type"
                                                         class="w-full bg-black/40 border-white/10 rounded-lg text-xs text-white h-8 px-2">
-                                                    <option value="text">Texto</option>
+                                                    <option value="text">Texto Corto</option>
                                                     <option value="number">Número</option>
+                                                    <option value="date">Fecha</option>
+                                                    <option value="select">Lista (Dropdown)</option>
                                                 </select>
+                                            </div>
+                                            <div class="flex-1" x-show="field.type === 'select'">
+                                                <label class="text-[10px] text-gray-600 block mb-1">Opciones (separadas por coma)</label>
+                                                <input type="text" :name="'form_schema[' + index + '][options]'" x-model="field.options" 
+                                                       class="w-full bg-black/40 border-white/10 rounded-lg text-xs text-white h-8 px-2" placeholder="Op 1, Op 2, Op 3...">
                                             </div>
                                             <button type="button" @click="removeFieldFromSchema(index)" class="text-gray-600 hover:text-red-400 p-2">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
@@ -366,11 +373,39 @@
                                 <template x-for="(field, index) in activeSchema" :key="index">
                                     <div>
                                         <label class="block text-[10px] font-black text-gray-500 uppercase mb-1" x-text="field.label"></label>
-                                        <input :type="field.type === 'number' ? 'number' : 'text'" 
-                                               :name="'specs[' + field.label + ']'" 
-                                               x-model="formData.specs[field.label]"
-                                               class="w-full bg-black/60 border-white/5 rounded-lg text-sm text-white focus:border-tecsisa-yellow focus:ring-0 transition h-9 px-3"
-                                               :placeholder="'Valor ' + field.label.toLowerCase()">
+                                        
+                                        <!-- Case: Select -->
+                                        <template x-if="field.type === 'select'">
+                                            <select :name="'specs[' + field.label + ']'" x-model="formData.specs[field.label]"
+                                                    class="w-full bg-black/60 border-white/5 rounded-lg text-sm text-white focus:border-tecsisa-yellow focus:ring-0 transition h-9 px-3">
+                                                <option value="">-- Seleccione --</option>
+                                                <template x-for="opt in (field.options || '').split(',').map(s => s.trim())" :key="opt">
+                                                    <option :value="opt" x-text="opt"></option>
+                                                </template>
+                                            </select>
+                                        </template>
+
+                                        <!-- Case: Date -->
+                                        <template x-if="field.type === 'date'">
+                                            <input type="date" :name="'specs[' + field.label + ']'" 
+                                                   x-model="formData.specs[field.label]"
+                                                   class="w-full bg-black/60 border-white/5 rounded-lg text-sm text-white focus:border-tecsisa-yellow focus:ring-0 transition h-9 px-3">
+                                        </template>
+
+                                        <!-- Case: Number -->
+                                        <template x-if="field.type === 'number'">
+                                            <input type="number" :name="'specs[' + field.label + ']'" 
+                                                   x-model="formData.specs[field.label]"
+                                                   class="w-full bg-black/60 border-white/5 rounded-lg text-sm text-white focus:border-tecsisa-yellow focus:ring-0 transition h-9 px-3">
+                                        </template>
+
+                                        <!-- Case: Text (Default) -->
+                                        <template x-if="field.type === 'text' || !field.type">
+                                            <input type="text" :name="'specs[' + field.label + ']'" 
+                                                   x-model="formData.specs[field.label]"
+                                                   class="w-full bg-black/60 border-white/5 rounded-lg text-sm text-white focus:border-tecsisa-yellow focus:ring-0 transition h-9 px-3"
+                                                   :placeholder="'Valor ' + field.label.toLowerCase()">
+                                        </template>
                                     </div>
                                 </template>
                             </div>
@@ -504,7 +539,7 @@
             },
 
             addFieldToSchema() {
-                this.systemFormData.form_schema.push({ label: '', type: 'text' });
+                this.systemFormData.form_schema.push({ label: '', type: 'text', options: '' });
             },
 
             removeFieldFromSchema(index) {
