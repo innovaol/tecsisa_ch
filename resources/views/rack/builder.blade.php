@@ -147,8 +147,12 @@
                                     </div>
 
                                     <!-- Slot Lleno (Equipo) -->
-                                    <div x-show="unit.occupied" class="flex-1 w-full h-full relative cursor-pointer group/equip"
-                                         @dblclick="removeEquipment(unit)">
+                                    <div x-show="unit.occupied" class="flex-1 w-full h-full relative cursor-pointer group/equip transition-all"
+                                         draggable="true"
+                                         @dragstart="startDrag($event, unit.db_id, unit.eq_id, unit.eq_name, unit.size)"
+                                         @click.stop="selectEquipment(unit.db_id, unit.eq_id, unit.eq_name, unit.size)"
+                                         @dblclick="removeEquipment(unit)"
+                                         :class="{'ring-2 ring-tecsisa-yellow ring-offset-2 ring-offset-[#0a0f18] z-20': selectedItem && selectedItem.db_id === unit.db_id}">
                                         
                                         <!-- Diseño estilo Switch Realista -->
                                         <div class="absolute inset-0 bg-[#1e2329] border-y border-gray-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.5)] flex items-center px-4 overflow-hidden">
@@ -327,28 +331,44 @@
                     unit.dragHover = false;
                     if(!this.draggedItem) return;
 
-                    // Evitar duplicados: Si el equipo ya está en el rack, lo movemos (desinstalamos del anterior)
                     let existingUnit = this.rackUnits.find(u => u.occupied && u.db_id === this.draggedItem.db_id);
+                    
+                    // Arrays of units currently occupied by this same equipment, so they don't block their own movement
+                    let selfIndexes = [];
                     if (existingUnit) {
-                        this.removeEquipment(existingUnit);
+                        let exIndex = this.rackUnits.findIndex(u => u.number === existingUnit.number);
+                        for(let i=0; i<existingUnit.size; i++) {
+                            selfIndexes.push(exIndex + i);
+                        }
                     }
 
                     // Revalidamos
                     const unitIndex = this.rackUnits.findIndex(u => u.number === unit.number);
                     let fits = true;
-                    if(unit.occupied) fits = false;
+                    
                     if (unitIndex + this.draggedItem.size > this.totalU) fits = false;
-                    for(let i = 1; i < this.draggedItem.size; i++) {
-                        if (this.rackUnits[unitIndex + i].occupied) fits = false;
+                    
+                    if(fits) {
+                        for(let i = 0; i < this.draggedItem.size; i++) {
+                            if (this.rackUnits[unitIndex + i].occupied && !selfIndexes.includes(unitIndex + i)) {
+                                fits = false;
+                            }
+                        }
                     }
 
                     if(fits) {
-                        // ¡Instalar!
-                        unit.occupied = true;
-                        unit.size = this.draggedItem.size;
-                        unit.eq_id = this.draggedItem.eq_id;
-                        unit.eq_name = this.draggedItem.eq_name;
-                        unit.db_id = this.draggedItem.db_id;
+                        // Lo quitamos primero de donde estaba (si estaba)
+                        if (existingUnit) {
+                            this.removeEquipment(existingUnit);
+                        }
+
+                        // ¡Instalar en nueva locación!
+                        let targetUnit = this.rackUnits[unitIndex];
+                        targetUnit.occupied = true;
+                        targetUnit.size = this.draggedItem.size;
+                        targetUnit.eq_id = this.draggedItem.eq_id;
+                        targetUnit.eq_name = this.draggedItem.eq_name;
+                        targetUnit.db_id = this.draggedItem.db_id;
 
                         // Esconder las unidades inferiores que este equipo "tapa" fisicamente
                         for(let i = 1; i < this.draggedItem.size; i++) {
