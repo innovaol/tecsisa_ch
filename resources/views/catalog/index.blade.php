@@ -187,15 +187,7 @@
 
     <!-- Modal: Alta de Equipo -->
     <x-modal name="create-equipment" :show="false" maxWidth="4xl" focusable>
-        <div x-data="{ 
-                system_id: '{{ $systems->first()->id ?? '' }}', 
-                systems: Object.values(@json($systems)),
-                get activeSchema() {
-                    if (!this.system_id) return [];
-                    let found = this.systems.find(s => String(s.id) === String(this.system_id));
-                    return found ? (found.form_schema || []) : [];
-                }
-             }" 
+        <div x-data="equipmentForm(@js($systems))" 
              class="bg-tecsisa-dark p-0 border border-white/10 overflow-hidden">
             <form method="post" action="{{ route('catalog.equipment.store') }}" class="p-8">
             @csrf
@@ -297,4 +289,18 @@
         </form>
     </div>
 </x-modal>
+
+<script>
+    function equipmentForm(systems) {
+        return {
+            system_id: systems.length > 0 ? systems[0].id : '',
+            allSystems: systems,
+            get activeSchema() {
+                if (!this.system_id) return [];
+                const found = this.allSystems.find(s => String(s.id) === String(this.system_id));
+                return found ? (found.form_schema || []) : [];
+            }
+        };
+    }
+</script>
 </x-app-layout>
