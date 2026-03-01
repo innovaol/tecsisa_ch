@@ -42,7 +42,7 @@ class EquipmentSeeder extends Seeder
         // Cámara en Urgencias
         Equipment::create([
             'internal_id' => 'CAM-URG-001',
-            'serial_number' => 'HIK987654',
+            'serial_number' => '801325136883',
             'name' => 'Cámara PTZ Sala Espera',
             'system_id' => $cctv->id,
             'location_id' => $urgencias->id,
