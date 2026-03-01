@@ -18,7 +18,7 @@
                     <x-nav-link :href="route('catalog.index')" :active="request()->routeIs('catalog.*')">
                         {{ __('Catálogos y BDR') }}
                     </x-nav-link>
-                    <x-nav-link href="#" :active="false">
+                    <x-nav-link :href="route('rack.builder')" :active="request()->routeIs('rack.*')">
                         {{ __('Racks & Topología') }}
                     </x-nav-link>
                     <x-nav-link href="#" :active="false">
@@ -79,11 +79,14 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" class="text-white hover:text-tecsisa-yellow">
                 {{ __('Inicio') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link href="#" class="text-white hover:text-tecsisa-yellow">
-                {{ __('Escáner / Nueva Tarea') }}
+            <x-responsive-nav-link :href="route('catalog.index')" :active="request()->routeIs('catalog.*')" class="text-white hover:text-tecsisa-yellow">
+                {{ __('Catálogos y BDR') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('rack.builder')" :active="request()->routeIs('rack.*')" class="text-white hover:text-tecsisa-yellow">
+                {{ __('Racks & Topología') }}
             </x-responsive-nav-link>
             <x-responsive-nav-link href="#" class="text-white hover:text-tecsisa-yellow">
-                {{ __('Mis Tareas (Borradores)') }}
+                {{ __('Reportes PDF') }}
             </x-responsive-nav-link>
         </div>
 

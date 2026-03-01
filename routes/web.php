@@ -21,11 +21,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::get('/catalogos', [\App\Http\Controllers\CatalogController::class , 'index'])->name('catalog.index');
 
-        // Módulo Técnico Móvil (Buscador Activos y Tareas)
-        Route::get('/scanner', [\App\Http\Controllers\ScannerController::class , 'index'])->name('scanner.index');
-        Route::post('/scanner/buscar', [\App\Http\Controllers\ScannerController::class , 'search'])->name('scanner.search');
+        Route::get('/racks', [\App\Http\Controllers\RackBuilderController::class , 'index'])->name('rack.builder');
 
-        Route::resource('tasks', \App\Http\Controllers\TaskController::class);    });
+        // Módulo Técnico Móvil (Buscador Activos y Tareas)
+        Route::resource('tasks', \App\Http\Controllers\TaskController::class);
+    });
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class , 'edit'])->name('profile.edit');
