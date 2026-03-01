@@ -11,9 +11,24 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-        <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-    </head>
+        <!-- Scripts (Using CDN for local development without Node.js) -->
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        colors: {
+                            tecsisa: {
+                                yellow: '#FFD100',
+                                dark: '#111827',
+                                light: '#F8FAFC',
+                            }
+                        }
+                    }
+                }
+            }
+        </script>
+        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <body class="font-sans antialiased text-tecsisa-dark">
         <div class="min-h-screen bg-tecsisa-light">
             @include('layouts.navigation')
