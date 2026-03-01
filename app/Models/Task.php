@@ -9,16 +9,7 @@ class Task extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'title',
-        'description',
-        'equipment_id',
-        'assigned_to',
-        'status',
-        'priority',
-        'form_data',
-        'completed_at',
-    ];
+    protected $guarded = [];
 
     protected $casts = [
         'form_data' => 'array',
@@ -30,7 +21,7 @@ class Task extends Model
         return $this->belongsTo(Equipment::class);
     }
 
-    public function assignee()
+    public function assignedUser()
     {
         return $this->belongsTo(User::class , 'assigned_to');
     }
