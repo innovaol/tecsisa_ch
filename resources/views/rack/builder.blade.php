@@ -191,11 +191,11 @@
         </div>
     
     <!-- Modal: Visor de Puertos (Glassmorphism) -->
-    <div x-show="showPortModal" 
+    <div x-cloak
+         x-show="showPortModal" 
          x-transition.opacity
-         class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
-         style="display: none;"
-         :style="{ display: showPortModal ? 'flex' : 'none' }">
+         :class="showPortModal ? 'flex' : 'hidden'"
+         class="fixed inset-0 z-[100] items-center justify-center bg-black/80 backdrop-blur-sm">
         
         <div class="bg-tecsisa-dark border border-white/10 rounded-2xl w-full max-w-5xl mx-4 overflow-hidden shadow-[0_0_50px_rgba(0,0,0,1)] relative"
              @click.away="closePortViewer()">
