@@ -213,10 +213,9 @@
             </div>
 
             <!-- Modal Body: Puertos Simulados y Asistente de Enlace -->
-            <!-- Modal Body: Puertos Simulados y Asistente de Enlace -->
-            <div class="px-8 py-6 max-h-[80vh] flex flex-col justify-start overflow-y-auto custom-scrollbar" @click.self="wizardOpen = false; selectedPort = null">
+            <div class="px-8 py-6 max-h-[85vh] overflow-y-auto custom-scrollbar relative" @click.self="wizardOpen = false; selectedPort = null">
                 
-                <div x-show="!loadingPorts && !portError" class="flex flex-col md:flex-row gap-8 w-full transition-all">
+                <div x-show="!loadingPorts && !portError" class="flex flex-col md:flex-row items-start gap-8 w-full transition-all">
                     
                     <!-- Panel Izquierdo: Matriz de Puertos -->
                     <div class="transition-all flex-1 space-y-4 relative">
@@ -266,20 +265,31 @@
                                 </div>
                             </template>
                         </div>
-                    </div> <!-- Closes Grid (Line 234) -->
-                </div> <!-- Closes Matrix Area (Line 233) -->
-            </div> <!-- Closes Left Panel (Line 222) -->
+                    </div> 
+                </div> 
 
-            <!-- Panel Derecho: Asistente de Enlace -->
-                    <div x-show="wizardOpen" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="opacity-0 translate-x-8" x-transition:enter-end="opacity-100 translate-x-0" class="w-full md:w-1/3 shrink-0 flex flex-col">
-                        <div class="bg-gradient-to-br from-white/5 to-transparent border border-white/10 rounded-xl p-5 shadow-2xl relative">
-                            <!-- Wizard Header -->
-                            <div class="flex items-center gap-3 mb-6">
-                                <span class="bg-tecsisa-yellow text-black font-black w-8 h-8 rounded-full flex items-center justify-center text-sm shadow-[0_0_15px_rgba(255,209,0,0.5)]">
+                <!-- Panel Derecho: Asistente de Enlace (Sticky para evitar scroll) -->
+                <div x-show="wizardOpen" 
+                     x-transition:enter="transition ease-out duration-300 transform" 
+                     x-transition:enter-start="opacity-0 translate-x-8" 
+                     x-transition:enter-end="opacity-100 translate-x-0" 
+                     class="w-full md:w-80 lg:w-96 shrink-0 sticky top-0 z-20">
+                    <div class="bg-[#0f1217] border border-white/10 rounded-2xl p-6 shadow-2xl relative overflow-hidden">
+                        <!-- Glow effect -->
+                        <div class="absolute -top-24 -right-24 w-48 h-48 bg-tecsisa-yellow/5 blur-[100px] pointer-events-none"></div>
+                        
+                        <!-- Wizard Header -->
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="flex items-center gap-3">
+                                <span class="bg-tecsisa-yellow text-black font-black w-8 h-8 rounded-full flex items-center justify-center text-sm shadow-[0_0_15px_rgba(255,209,0,0.4)]">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
                                 </span>
-                                <h4 class="text-white font-bold text-lg tracking-wide">Gestor de Enlace</h4>
+                                <h4 class="text-white font-bold text-base tracking-wide">Gestor de Enlace</h4>
                             </div>
+                            <button @click="wizardOpen = false; selectedPort = null" class="text-gray-500 hover:text-white transition-colors bg-white/5 p-1.5 rounded-lg hover:bg-white/10">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                        </div>
 
                             <div x-show="selectedPort?.status === 'free'" class="space-y-5">
                                 <div class="space-y-1">
