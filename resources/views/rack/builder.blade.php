@@ -316,6 +316,12 @@
                     unit.dragHover = false;
                     if(!this.draggedItem) return;
 
+                    // Evitar duplicados: Si el equipo ya está en el rack, lo movemos (desinstalamos del anterior)
+                    let existingUnit = this.rackUnits.find(u => u.occupied && u.db_id === this.draggedItem.db_id);
+                    if (existingUnit) {
+                        this.removeEquipment(existingUnit);
+                    }
+
                     // Revalidamos
                     const unitIndex = this.rackUnits.findIndex(u => u.number === unit.number);
                     let fits = true;
