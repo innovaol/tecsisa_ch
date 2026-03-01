@@ -35,31 +35,37 @@
                             @foreach($unassignedEquipment as $eq)
                                 <div draggable="true" 
                                      @dragstart="startDrag($event, '{{ $eq->id }}', '{{ $eq->internal_id }}', '{{ $eq->name }}', 1)"
-                                     class="p-3 bg-black/30 border border-white/5 rounded-lg border-l-4 border-l-blue-500 cursor-grab active:cursor-grabbing hover:bg-white/5 transition flex justify-between items-center group">
+                                     @click="selectEquipment('{{ $eq->id }}', '{{ $eq->internal_id }}', '{{ $eq->name }}', 1)"
+                                     :class="{'border-l-tecsisa-yellow bg-tecsisa-yellow/10 scale-[1.02] shadow-[0_0_15px_rgba(255,209,0,0.3)]': selectedItem && selectedItem.db_id === '{{ $eq->id }}', 'border-l-blue-500 bg-black/30 hover:bg-white/5': !selectedItem || selectedItem.db_id !== '{{ $eq->id }}'}"
+                                     class="p-3 border border-white/5 rounded-lg border-l-4 cursor-pointer transition-all flex justify-between items-center group">
                                     <div>
-                                        <div class="text-xs text-tecsisa-yellow font-mono font-bold">{{ $eq->internal_id }}</div>
-                                        <div class="text-sm text-gray-300 font-medium whitespace-nowrap overflow-hidden text-ellipsis max-w-[180px]">{{ $eq->name }}</div>
+                                        <div class="text-xs font-mono font-bold" :class="{'text-tecsisa-yellow': selectedItem && selectedItem.db_id === '{{ $eq->id }}', 'text-tecsisa-yellow': !selectedItem || selectedItem.db_id !== '{{ $eq->id }}'}">{{ $eq->internal_id }}</div>
+                                        <div class="text-sm font-medium whitespace-nowrap overflow-hidden text-ellipsis max-w-[180px]" :class="{'text-white': selectedItem && selectedItem.db_id === '{{ $eq->id }}', 'text-gray-300': !selectedItem || selectedItem.db_id !== '{{ $eq->id }}'}">{{ $eq->name }}</div>
                                     </div>
                                     <div class="bg-white/10 text-gray-400 text-xs px-2 py-1 rounded">1U</div>
                                 </div>
                             @endforeach
                             
-                            <!-- Ejemplos extras para llenar -->
+                             <!-- Ejemplos extras para llenar -->
                              <div draggable="true" 
-                                     @dragstart="startDrag($event, 'PP-01', 'Patch Panel F.O', 'Distribuidor Fibra', 1)"
-                                     class="p-3 bg-black/30 border border-white/5 rounded-lg border-l-4 border-l-orange-500 cursor-grab active:cursor-grabbing hover:bg-white/5 transition flex justify-between items-center group">
+                                     @dragstart="startDrag($event, 'PP-01', 'PTC-FO-01', 'Bandeja ODF 24 Hilos', 1)"
+                                     @click="selectEquipment('PP-01', 'PTC-FO-01', 'Bandeja ODF 24 Hilos', 1)"
+                                     :class="{'border-l-tecsisa-yellow bg-tecsisa-yellow/10 scale-[1.02] shadow-[0_0_15px_rgba(255,209,0,0.3)]': selectedItem && selectedItem.db_id === 'PP-01', 'border-l-orange-500 bg-black/30 hover:bg-white/5': !selectedItem || selectedItem.db_id !== 'PP-01'}"
+                                     class="p-3 border border-white/5 rounded-lg border-l-4 cursor-pointer transition-all flex justify-between items-center group">
                                     <div>
-                                        <div class="text-xs text-orange-400 font-mono font-bold">PTC-FO-01</div>
-                                        <div class="text-sm text-gray-300 font-medium whitespace-nowrap overflow-hidden text-ellipsis max-w-[180px]">Bandeja ODF 24 Hilos</div>
+                                        <div class="text-xs font-mono font-bold" :class="{'text-tecsisa-yellow': selectedItem && selectedItem.db_id === 'PP-01', 'text-orange-400': !selectedItem || selectedItem.db_id !== 'PP-01'}">PTC-FO-01</div>
+                                        <div class="text-sm font-medium whitespace-nowrap overflow-hidden text-ellipsis max-w-[180px]" :class="{'text-white': selectedItem && selectedItem.db_id === 'PP-01', 'text-gray-300': !selectedItem || selectedItem.db_id !== 'PP-01'}">Bandeja ODF 24 Hilos</div>
                                     </div>
                                     <div class="bg-white/10 text-gray-400 text-xs px-2 py-1 rounded">1U</div>
                                 </div>
                                 <div draggable="true" 
-                                     @dragstart="startDrag($event, 'UPS-01', 'UPS Principal', 'Sistema Energía', 2)"
-                                     class="p-3 bg-black/30 border border-white/5 rounded-lg border-l-4 border-l-red-500 cursor-grab active:cursor-grabbing hover:bg-white/5 transition flex justify-between items-center group">
+                                     @dragstart="startDrag($event, 'UPS-01', 'UPS-MDF-01', 'APC Smart-UPS 3000VA', 2)"
+                                     @click="selectEquipment('UPS-01', 'UPS-MDF-01', 'APC Smart-UPS 3000VA', 2)"
+                                     :class="{'border-l-tecsisa-yellow bg-tecsisa-yellow/10 scale-[1.02] shadow-[0_0_15px_rgba(255,209,0,0.3)]': selectedItem && selectedItem.db_id === 'UPS-01', 'border-l-red-500 bg-black/30 hover:bg-white/5': !selectedItem || selectedItem.db_id !== 'UPS-01'}"
+                                     class="p-3 border border-white/5 rounded-lg border-l-4 cursor-pointer transition-all flex justify-between items-center group">
                                     <div>
-                                        <div class="text-xs text-red-400 font-mono font-bold">UPS-MDF-01</div>
-                                        <div class="text-sm text-gray-300 font-medium whitespace-nowrap overflow-hidden text-ellipsis max-w-[180px]">APC Smart-UPS 3000VA</div>
+                                        <div class="text-xs font-mono font-bold" :class="{'text-tecsisa-yellow': selectedItem && selectedItem.db_id === 'UPS-01', 'text-red-400': !selectedItem || selectedItem.db_id !== 'UPS-01'}">UPS-MDF-01</div>
+                                        <div class="text-sm font-medium whitespace-nowrap overflow-hidden text-ellipsis max-w-[180px]" :class="{'text-white': selectedItem && selectedItem.db_id === 'UPS-01', 'text-gray-300': !selectedItem || selectedItem.db_id !== 'UPS-01'}">APC Smart-UPS 3000VA</div>
                                     </div>
                                     <div class="bg-tecsisa-yellow/20 text-tecsisa-yellow text-xs px-2 py-1 rounded border border-tecsisa-yellow/30">2U</div>
                                 </div>
@@ -115,7 +121,8 @@
                                      @dragover.prevent="allowDrop($event, unit)"
                                      @dragleave="leaveDrop($event, unit)"
                                      @drop="drop($event, unit)"
-                                     :class="{'bg-tecsisa-yellow/10 border-2 border-tecsisa-yellow border-dashed': unit.dragHover && !unit.occupied, 'bg-red-500/10 border-2 border-red-500 border-dashed': unit.dragHover && unit.occupied}">
+                                     @click="placeEquipment(unit)"
+                                     :class="{'bg-tecsisa-yellow/10 border-2 border-tecsisa-yellow border-dashed': unit.dragHover && !unit.occupied, 'bg-red-500/10 border-2 border-red-500 border-dashed': unit.dragHover && unit.occupied, 'cursor-pointer hover:bg-white/10 transition': selectedItem && !unit.occupied}">
                                     
                                     <!-- Número de U (Regleta izq) -->
                                     <div class="absolute -left-7 top-0 bottom-0 flex items-center justify-center w-6 text-[10px] font-bold text-gray-400 bg-black/50 pointer-events-none">
@@ -129,8 +136,8 @@
                                     <!-- Render del Slot: Vacío o Lleno -->
                                     
                                     <!-- Slot Vacío -->
-                                    <div x-show="!unit.occupied" class="flex-1 w-full h-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-200">
-                                        <span class="text-xs text-white/30 tracking-widest uppercase font-mono">Espacio Libre</span>
+                                    <div x-show="!unit.occupied" class="flex-1 w-full h-full flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition duration-200">
+                                        <span class="text-xs text-white/30 tracking-widest uppercase font-mono" x-text="selectedItem ? 'Click aquí para instalar' : 'Espacio Libre'"></span>
                                     </div>
 
                                     <!-- Slot Lleno (Equipo) -->
@@ -169,7 +176,7 @@
                                         <!-- Tooltip de Equipo -->
                                         <div class="absolute z-50 left-1/2 -translate-x-1/2 -top-12 bg-black text-white px-3 py-1.5 rounded text-xs opacity-0 group-hover/equip:opacity-100 transition pointer-events-none whitespace-nowrap shadow-xl border border-gray-700">
                                             <span class="text-tecsisa-yellow font-bold" x-text="unit.eq_id"></span> - <span x-text="unit.eq_name"></span>
-                                            <div class="text-[9px] text-gray-400 mt-0.5">Doble-Click para desencrackar</div>
+                                            <div class="text-[9px] text-gray-400 mt-0.5" x-text="'Doble-Click para desencrackar (' + unit.size + 'U)'"></div>
                                         </div>
                                     </div>
                                     
@@ -198,8 +205,9 @@
                 totalU: 45, // Total units from PHP ($rack->total_units)
                 rackUnits: [],
                 
-                // Variable global para almacenar el equipo siendo arrastrado (porque event.dataTransfer a veces no sirve cross-element easily)
-                draggedItem: null,
+                
+                // Variable para el equipo seleccionado mediante CLICK (Modo Móvil/Tablet)
+                selectedItem: null,
 
                 init() {
                     // Inicializar rack vacio de arriba hacia abajo (U superior a U1 inferor a veces se pide, pero el estandar Medinfra suele ser bottom-up. Hagamos Top-down visualmente: U45 .. U1)
@@ -218,13 +226,24 @@
                     }
                 },
 
+                selectEquipment(dbId, displayId, name, size) {
+                    // Toggle selection logic
+                    if (this.selectedItem && this.selectedItem.db_id === dbId) {
+                        this.selectedItem = null;
+                        this.draggedItem = null;
+                    } else {
+                        this.selectedItem = {
+                            db_id: dbId,
+                            eq_id: displayId,
+                            eq_name: name,
+                            size: parseInt(size)
+                        };
+                        this.draggedItem = this.selectedItem; // Keep drag compatible with click
+                    }
+                },
+
                 startDrag(event, dbId, displayId, name, size) {
-                    this.draggedItem = {
-                        db_id: dbId,
-                        eq_id: displayId,
-                        eq_name: name,
-                        size: parseInt(size)
-                    };
+                    this.selectEquipment(dbId, displayId, name, size);
                     event.dataTransfer.effectAllowed = 'move';
                     // Pequeña trampita para Alpine
                     setTimeout(() => { event.target.classList.add('opacity-50'); }, 0);
@@ -301,6 +320,16 @@
                     
                     // Restaurar opacidad del dragg (Si tuvieramos ref al DOM del arrastrado)
                     this.draggedItem = null;
+                    this.selectedItem = null; // Clear selection after placing
+                },
+
+                placeEquipment(unit) {
+                    // Logic for clicking to place after selecting
+                    if (!this.selectedItem || unit.occupied) return;
+                    
+                    // Route to drop logic to reuse calculation
+                    this.draggedItem = this.selectedItem;
+                    this.drop(null, unit);
                 },
 
                 removeEquipment(unit) {
