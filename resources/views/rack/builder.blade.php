@@ -151,7 +151,6 @@
                                          draggable="true"
                                          @dragstart="startDrag($event, unit.db_id, unit.eq_id, unit.eq_name, unit.size)"
                                          @click.stop="selectEquipment(unit.db_id, unit.eq_id, unit.eq_name, unit.size)"
-                                         @dblclick="removeEquipment(unit)"
                                          :class="{'ring-2 ring-tecsisa-yellow ring-offset-2 ring-offset-[#0a0f18] z-20': selectedItem && selectedItem.db_id === unit.db_id}">
                                         
                                         <!-- Diseño estilo Switch Realista -->
@@ -183,12 +182,12 @@
 
                                         </div>
 
-                                        <!-- Acciones Rápidas del Equipo -->
-                                        <div class="absolute inset-y-0 right-0 flex items-center pr-2 gap-2 opacity-0 group-hover/equip:opacity-100 transition">
-                                            <button @click.stop="openPortViewer(unit)" class="p-1.5 bg-blue-500/20 hover:bg-blue-500 text-blue-400 hover:text-white rounded transition shadow-lg backdrop-blur-sm" title="Inspeccionar Puertos">
+                                        <!-- Acciones Rápidas del Equipo (z-30 to stay above everything else) -->
+                                        <div class="absolute inset-y-0 right-0 flex items-center pr-2 gap-2 opacity-0 group-hover/equip:opacity-100 transition z-30">
+                                            <button @click.prevent.stop="openPortViewer(unit)" class="p-1.5 bg-blue-500/20 hover:bg-blue-500 text-blue-400 hover:text-white rounded transition shadow-lg backdrop-blur-sm" title="Inspeccionar Puertos">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                                             </button>
-                                            <button @click.stop="removeEquipment(unit)" class="p-1.5 bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white rounded transition shadow-lg backdrop-blur-sm" title="Remover del Rack">
+                                            <button @click.prevent.stop="removeEquipment(unit)" class="p-1.5 bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white rounded transition shadow-lg backdrop-blur-sm" title="Remover del Rack">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                             </button>
                                         </div>
@@ -196,7 +195,6 @@
                                         <!-- Tooltip de Equipo -->
                                         <div class="absolute z-50 left-1/2 -translate-x-1/2 -top-12 bg-black text-white px-3 py-1.5 rounded text-xs opacity-0 group-hover/equip:opacity-100 transition pointer-events-none whitespace-nowrap shadow-xl border border-gray-700">
                                             <span class="text-tecsisa-yellow font-bold" x-text="unit.eq_id"></span> - <span x-text="unit.eq_name"></span>
-                                            <div class="text-[9px] text-gray-400 mt-0.5" x-text="'Doble-Click para desencrackar (' + unit.size + 'U)'"></div>
                                         </div>
                                     </div>
                                     
