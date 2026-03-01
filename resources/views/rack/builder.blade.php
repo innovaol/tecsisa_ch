@@ -212,41 +212,149 @@
                 </button>
             </div>
 
-            <!-- Modal Body: Puertos Simulados -->
-            <div class="p-8 min-h-[200px] flex flex-col justify-center">
-                <div x-show="!loadingPorts" class="grid grid-cols-12 gap-3" x-transition>
-                    <template x-for="port in equipmentPorts" :key="port.id">
-                        <div class="col-span-1 aspect-square bg-gradient-to-b from-[#1a1f26] to-[#0f1217] border border-gray-700 rounded shadow-[inset_0_2px_4px_rgba(0,0,0,0.5)] relative group/port cursor-pointer transition transform hover:scale-110 flex flex-col items-center justify-center"
-                             :class="{
-                                'border-green-500/50 shadow-[0_0_10px_rgba(34,197,94,0.3)]': port.status === 'connected',
-                                'border-red-500/50 shadow-[0_0_10px_rgba(239,68,68,0.3)]': port.status === 'broken'
-                             }">
-                            <div class="text-[10px] font-mono text-gray-400 font-bold mb-1.5" x-text="port.label"></div>
-                            
-                            <!-- RJ45 Graphic (simplified) -->
-                            <div class="w-5 h-5 bg-black border border-gray-800 rounded-sm relative overflow-hidden flex-shrink-0" x-show="port.type == 'rj45'">
-                                <div class="absolute top-0 right-1 w-1 h-full" :class="port.status === 'connected' ? 'bg-green-500/80 animate-pulse' : 'bg-gray-800'"></div>
+            <!-- Modal Body: Puertos Simulados y Asistente de Enlace -->
+            <div class="px-8 py-6 min-h-[300px] flex flex-col justify-center">
+                
+                <div x-show="!loadingPorts && !portError" class="flex flex-col md:flex-row gap-8 w-full transition-all">
+                    
+                    <!-- Panel Izquierdo: Matriz de Puertos -->
+                    <div class="transition-all flex-1 space-y-4">
+                        <div class="text-sm font-bold text-gray-400 border-b border-gray-700/50 pb-2 mb-4">Mapeo Frontal</div>
+                        <div class="grid grid-cols-12 gap-3 max-h-[400px] overflow-y-auto custom-scrollbar pr-2" x-transition>
+                            <template x-for="port in equipmentPorts" :key="port.id">
+                                <div @click="selectPort(port)" class="col-span-1 aspect-square bg-gradient-to-b from-[#1a1f26] to-[#0f1217] border border-gray-700 rounded shadow-[inset_0_2px_4px_rgba(0,0,0,0.5)] relative group/port cursor-pointer transition transform hover:scale-105 flex flex-col items-center justify-center overflow-hidden"
+                                     :class="{
+                                        'ring-2 ring-tecsisa-yellow ring-offset-2 ring-offset-[#05080f] scale-110 z-10 block': selectedPort && selectedPort.id === port.id,
+                                        'border-green-500/50 shadow-[0_0_10px_rgba(34,197,94,0.3)]': port.status === 'connected',
+                                        'border-red-500/50 shadow-[0_0_10px_rgba(239,68,68,0.3)]': port.status === 'broken',
+                                        'opacity-50 grayscale': wizardOpen && selectedPort && selectedPort.id !== port.id
+                                     }">
+                                    <div class="text-[10px] font-mono text-gray-400 font-bold mb-1.5" x-text="port.label"></div>
+                                    
+                                    <!-- RJ45 Graphic (simplified) -->
+                                    <div class="w-5 h-5 bg-black border border-gray-800 rounded-sm relative overflow-hidden flex-shrink-0" x-show="port.type == 'rj45'">
+                                        <div class="absolute top-0 right-1 w-1 h-full" :class="port.status === 'connected' ? 'bg-green-500/80 animate-pulse' : 'bg-gray-800'"></div>
+                                    </div>
+
+                                    <!-- SFP Graphic -->
+                                    <div class="w-6 h-4 bg-black border border-gray-800 rounded-sm flex items-center justify-center flex-shrink-0" x-show="port.type == 'sfp' || port.type == 'sfp_plus'">
+                                        <div class="w-2.5 h-1.5 bg-gray-600 rounded-sm"></div>
+                                    </div>
+                                    
+                                    <!-- Status Indicator -->
+                                    <div class="absolute bottom-1 right-1 w-2 h-2 rounded-full border border-black" 
+                                         :class="{
+                                            'bg-green-500 shadow-[0_0_5px_rgba(34,197,94,1)]': port.status === 'connected',
+                                            'bg-red-500 shadow-[0_0_5px_rgba(239,68,68,1)]': port.status === 'broken',
+                                            'bg-gray-600': port.status === 'free'
+                                         }"></div>
+
+                                    <!-- Hover Tooltip Port -->
+                                    <div class="absolute z-50 left-1/2 -translate-x-1/2 -top-10 bg-black text-white px-2 py-1 rounded text-xs opacity-0 group-hover/port:opacity-100 transition pointer-events-none whitespace-nowrap shadow-xl border border-gray-700">
+                                        Puerto <span class="text-white font-bold" x-text="port.label"></span> (<span x-text="port.type"></span>)
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+
+                    <!-- Panel Derecho: Asistente de Enlace -->
+                    <div x-show="wizardOpen" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="opacity-0 translate-x-8" x-transition:enter-end="opacity-100 translate-x-0" class="w-full md:w-1/3 shrink-0 flex flex-col">
+                        <div class="bg-gradient-to-br from-white/5 to-transparent border border-white/10 rounded-xl p-5 shadow-2xl h-full relative overflow-hidden">
+                            <!-- Wizard Header -->
+                            <div class="flex items-center gap-3 mb-6">
+                                <span class="bg-tecsisa-yellow text-black font-black w-8 h-8 rounded-full flex items-center justify-center text-sm shadow-[0_0_15px_rgba(255,209,0,0.5)]">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                                </span>
+                                <h4 class="text-white font-bold text-lg tracking-wide">Gestor de Enlace</h4>
                             </div>
 
-                            <!-- SFP Graphic -->
-                            <div class="w-6 h-4 bg-black border border-gray-800 rounded-sm flex items-center justify-center flex-shrink-0" x-show="port.type == 'sfp' || port.type == 'sfp_plus'">
-                                <div class="w-2.5 h-1.5 bg-gray-600 rounded-sm"></div>
+                            <div x-show="selectedPort?.status === 'free'" class="space-y-5">
+                                <div class="space-y-1">
+                                    <label class="text-xs text-gray-400 font-bold uppercase tracking-wider">¿Hacia dónde va este cable?</label>
+                                    <select x-model="wizardTargetEqDbId" @change="fetchTargetPorts()" class="w-full bg-black/40 border-gray-700/50 text-white rounded-lg text-sm focus:border-tecsisa-yellow focus:ring-tecsisa-yellow shadow-inner">
+                                        <option value="">-- Seleccionar Equipo Destino --</option>
+                                        <template x-for="target in activeTargets" :key="target.db_id">
+                                            <option :value="target.db_id" x-text="target.eq_id + ' (' + target.eq_name + ')'"></option>
+                                        </template>
+                                    </select>
+                                </div>
+
+                                <div class="space-y-1" x-show="wizardTargetPorts.length > 0">
+                                    <label class="text-xs text-gray-400 font-bold uppercase tracking-wider">¿A qué puerto entra?</label>
+                                    <select x-model="wizardTargetPortId" class="w-full bg-black/40 border-gray-700/50 text-white rounded-lg text-sm focus:border-tecsisa-yellow focus:ring-tecsisa-yellow shadow-inner">
+                                        <option value="">-- Seleccionar Puerto Libre --</option>
+                                        <template x-for="tp in wizardTargetPorts" :key="tp.id">
+                                            <option :value="tp.id" x-text="'Puerto ' + tp.label + ' (' + tp.type + ')'"></option>
+                                        </template>
+                                    </select>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-4" x-show="wizardTargetPortId">
+                                    <div class="space-y-1">
+                                        <label class="text-xs text-gray-400 font-bold uppercase tracking-wider">Medio Físico</label>
+                                        <select x-model="wizardCableType" class="w-full bg-black/40 border-gray-700/50 text-white rounded-lg text-sm mb-1">
+                                            <option value="utp" x-show="selectedPort?.type !== 'sfp' && selectedPort?.type !== 'sfp_plus'">Patch Cord UTP</option>
+                                            <option value="fiber" x-show="selectedPort?.type === 'sfp' || selectedPort?.type === 'sfp_plus'">Fibra Óptica</option>
+                                            <option value="dac" x-show="selectedPort?.type === 'sfp' || selectedPort?.type === 'sfp_plus'">DAC</option>
+                                        </select>
+                                    </div>
+                                    <div class="space-y-1">
+                                        <label class="text-xs text-gray-400 font-bold uppercase tracking-wider">Color Forro</label>
+                                        <select x-model="wizardCableColor" class="w-full bg-black/40 border-gray-700/50 text-white rounded-lg text-sm mb-1">
+                                            <option value="blue">Azul</option>
+                                            <option value="yellow">Amarillo</option>
+                                            <option value="red">Rojo</option>
+                                            <option value="green">Verde</option>
+                                            <option value="gray">Gris</option>
+                                            <option value="orange">Naranja</option>
+                                            <option value="aqua">Aguamarina</option>
+                                            <option value="black">Negro</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="pt-4" x-show="wizardTargetPortId">
+                                    <button @click="createConnection()" :disabled="savingConnection" class="w-full bg-tecsisa-yellow hover:bg-yellow-400 text-black font-black py-2.5 rounded-lg transition transform hover:scale-105 flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(255,209,0,0.3)]">
+                                        <svg x-show="!savingConnection" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                        <svg x-show="savingConnection" class="animate-spin w-5 h-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                        <span x-text="savingConnection ? 'Integrando...' : 'Emparchar'"></span>
+                                    </button>
+                                </div>
                             </div>
                             
-                            <!-- Status Indicator -->
-                            <div class="absolute bottom-1 right-1 w-2 h-2 rounded-full border border-black" 
-                                 :class="{
-                                    'bg-green-500 shadow-[0_0_5px_rgba(34,197,94,1)]': port.status === 'connected',
-                                    'bg-red-500 shadow-[0_0_5px_rgba(239,68,68,1)]': port.status === 'broken',
-                                    'bg-gray-600': port.status === 'free'
-                                 }"></div>
+                            <!-- Panel de Desconexión / Info -->
+                            <div x-show="selectedPort?.status === 'connected'" class="space-y-5 h-full flex flex-col justify-between">
+                                <div class="space-y-4">
+                                    <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-4 flex flex-col gap-2 relative overflow-hidden">
+                                        <div class="absolute right-[-10px] top-[-10px] opacity-10 blur-sm pointer-events-none text-green-500">
+                                            <svg class="w-24 h-24" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-2 h-2 bg-green-500 rounded-full shadow-[0_0_8px_rgba(34,197,94,1)]"></div>
+                                            <span class="text-green-400 font-bold uppercase text-xs tracking-wider">Enlace Activo</span>
+                                        </div>
+                                        
+                                        <div class="mt-2 text-sm text-gray-300">
+                                            Puerto <strong class="text-white font-mono" x-text="selectedPort?.label"></strong>
+                                            está conectado a <strong class="text-white font-mono" x-text="selectedPort?.connected_to?.equipment_name"></strong>
+                                            (Pto. <strong class="text-white font-mono" x-text="selectedPort?.connected_to?.port_label"></strong>)
+                                        </div>
 
-                            <!-- Hover Tooltip Port -->
-                            <div class="absolute z-50 left-1/2 -translate-x-1/2 -top-10 bg-black text-white px-2 py-1 rounded text-xs opacity-0 group-hover/port:opacity-100 transition pointer-events-none whitespace-nowrap shadow-xl border border-gray-700">
-                                Puerto <span class="text-white font-bold" x-text="port.label"></span> (<span x-text="port.type"></span>)
+                                        <div class="flex items-center gap-2 mt-2 pt-2 border-t border-green-500/20 text-xs text-gray-400">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                            <span class="capitalize" x-text="selectedPort?.cable?.type + ' - ' + selectedPort?.cable?.color"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button @click="disconnectConnection()" :disabled="savingConnection" class="w-full bg-red-500/10 hover:bg-red-500/20 border border-red-500/50 text-red-500 hover:text-red-400 font-bold py-2.5 rounded-lg transition flex items-center justify-center gap-2">
+                                    <svg x-show="!savingConnection" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                    <svg x-show="savingConnection" class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                    <span x-text="savingConnection ? 'Cortando...' : 'Cortar Enlace'"></span>
+                                </button>
                             </div>
                         </div>
-                    </template>
+                    </div>
                 </div>
 
                 <!-- Loading / Error States -->
@@ -285,12 +393,21 @@
                 selectedItem: null,
                 draggedItem: null, // compatibility for desktop
 
-                // Port Viewer variables
+                // Port Viewer & Wizard variables
                 showPortModal: false,
                 loadingPorts: false,
                 portError: false,
                 inspectingEquipment: null,
                 equipmentPorts: [],
+                
+                wizardOpen: false,
+                selectedPort: null,
+                wizardTargetEqDbId: '',
+                wizardTargetPorts: [],
+                wizardTargetPortId: '',
+                wizardCableType: 'utp',
+                wizardCableColor: 'blue',
+                savingConnection: false,
 
                 init() {
                     // Inicializar rack vacio de arriba hacia abajo
@@ -524,7 +641,116 @@
                     setTimeout(() => {
                         this.equipmentPorts = [];
                         this.inspectingEquipment = null;
+                        this.wizardOpen = false;
+                        this.selectedPort = null;
+                        this.wizardTargetPorts = [];
                     }, 300);
+                },
+
+                // ---- CONNECTION WIZARD ACTIONS ----
+                selectPort(port) {
+                    if (this.selectedPort && this.selectedPort.id === port.id) {
+                        this.wizardOpen = false;
+                        this.selectedPort = null;
+                        return;
+                    }
+                    this.selectedPort = port;
+                    this.wizardOpen = true;
+                    this.wizardTargetEqDbId = '';
+                    this.wizardTargetPorts = [];
+                    this.wizardTargetPortId = '';
+                    this.wizardCableType = (port.type === 'sfp' || port.type === 'sfp_plus') ? 'fiber' : 'utp';
+                    this.wizardCableColor = 'blue';
+                },
+
+                get activeTargets() {
+                    if(!this.inspectingEquipment) return [];
+                    let units = this.rackUnits.filter(u => u.occupied && !u.hidden && u.db_id && u.db_id !== this.inspectingEquipment.id);
+                    // unique by equipment id to avoid showing 2U racks multiple times
+                    return Array.from(new Map(units.map(u => [u.db_id, u])).values());
+                },
+
+                async fetchTargetPorts() {
+                    if(!this.wizardTargetEqDbId) {
+                        this.wizardTargetPorts = [];
+                        return;
+                    }
+                    try {
+                        let res = await fetch(`/api/equipment/${this.wizardTargetEqDbId}/ports`, {
+                            headers: { 'Accept': 'application/json' }
+                        });
+                        if(res.ok) {
+                            let data = await res.json();
+                            this.wizardTargetPorts = data.ports.filter(p => p.status === 'free');
+                        }
+                    } catch(e) {
+                        console.error("Error fetching target ports:", e);
+                    }
+                },
+
+                async createConnection() {
+                    if(this.savingConnection || !this.wizardTargetPortId) return;
+                    this.savingConnection = true;
+                    
+                    try {
+                        let csrfToken = document.head.querySelector('meta[name="csrf-token"]') ? document.head.querySelector('meta[name="csrf-token"]').content : '';
+                        let res = await fetch('/api/connections', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': csrfToken,
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                port_a_id: this.selectedPort.id,
+                                port_b_id: this.wizardTargetPortId,
+                                cable_type: this.wizardCableType,
+                                cable_color: this.wizardCableColor
+                            })
+                        });
+                        
+                        if(res.ok) {
+                            this.wizardOpen = false;
+                            this.selectedPort = null;
+                            // Recargar ambos lados sería óptimo, pero basta con reabrir modal del equipo actual
+                            await this.openPortViewer({ occupied: true, db_id: this.inspectingEquipment.id });
+                        } else {
+                            alert("Error al guardar enlace físico. Verifica que ambos puertos sigan libres.");
+                        }
+                    } catch(e) {
+                        console.error(e);
+                        alert("Fallo de red al conectar");
+                    }
+                    this.savingConnection = false;
+                },
+
+                async disconnectConnection() {
+                    if(this.savingConnection || !this.selectedPort.cable) return;
+                    
+                    if(!confirm("¿Estás seguro de que quieres de parchear este puerto permanentemente?")) return;
+                    
+                    this.savingConnection = true;
+                    try {
+                        let csrfToken = document.head.querySelector('meta[name="csrf-token"]') ? document.head.querySelector('meta[name="csrf-token"]').content : '';
+                        let res = await fetch(`/api/connections/${this.selectedPort.cable.id}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': csrfToken,
+                                'Accept': 'application/json'
+                            }
+                        });
+                        
+                        if(res.ok) {
+                            this.wizardOpen = false;
+                            this.selectedPort = null;
+                            await this.openPortViewer({ occupied: true, db_id: this.inspectingEquipment.id });
+                        } else {
+                            alert("No se pudo remover el enlace de la red.");
+                        }
+                    } catch(e) {
+                         console.error(e);
+                    }
+                    this.savingConnection = false;
                 },
 
                 async saveTopology() {

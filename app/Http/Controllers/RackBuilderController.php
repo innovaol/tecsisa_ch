@@ -6,6 +6,7 @@ use App\Models\Rack;
 use App\Models\RackUnit;
 use App\Models\Equipment;
 use App\Models\Port;
+use App\Models\Connection;
 use Illuminate\Http\Request;
 
 class RackBuilderController extends Controller
@@ -79,17 +80,47 @@ class RackBuilderController extends Controller
         }
 
         $ports = $equipment->ports()->orderBy('id')->get();
-        // Since connections are not fully generated yet, we map them as standard
-        $mappedPorts = $ports->map(function ($port) {
-            return [
-            'id' => $port->id,
-            'label' => $port->number_label,
-            'type' => $port->port_type,
-            'status' => $port->status,
-            // Add connection details if existed later
-            'connected_to' => null
-            ];
-        });
+
+        $portIds = $ports->pluck('id');
+        $connections = Connection::with(['portA.equipment', 'portB.equipment'])
+            ->whereIn('port_a_id', $portIds)
+            ->orWhereIn('port_b_id', $portIds)
+            ->get();
+
+        $mappedPorts = $ports->map(function ($port) use ($connections) {
+            $conn = $connections->first(function ($c) use ($port) {
+                    return $c->port_a_id == $port->id || $c->port_b_id == $port->id;
+                }
+                );
+
+                $connectedTo = null;
+                $cableInfo = null;
+
+                if ($conn) {
+                    $otherPort = ($conn->port_a_id == $port->id) ? $conn->portB : $conn->portA;
+
+                    $connectedTo = [
+                        'equipment_id' => $otherPort->equipment->internal_id,
+                        'equipment_name' => $otherPort->equipment->name,
+                        'port_label' => $otherPort->number_label
+                    ];
+
+                    $cableInfo = [
+                        'id' => $conn->id,
+                        'type' => $conn->cable_type,
+                        'color' => $conn->cable_color
+                    ];
+                }
+
+                return [
+                'id' => $port->id,
+                'label' => $port->number_label,
+                'type' => $port->port_type,
+                'status' => $port->status,
+                'connected_to' => $connectedTo,
+                'cable' => $cableInfo
+                ];
+            });
 
         return response()->json([
             'equipment' => [
@@ -100,5 +131,49 @@ class RackBuilderController extends Controller
             ],
             'ports' => $mappedPorts
         ]);
+    }
+
+    public function connectPorts(Request $request)
+    {
+        $request->validate([
+            'port_a_id' => 'required|exists:ports,id',
+            'port_b_id' => 'required|exists:ports,id|different:port_a_id',
+            'cable_type' => 'required|string',
+            'cable_color' => 'required|string',
+        ]);
+
+        $portA = Port::findOrFail($request->port_a_id);
+        $portB = Port::findOrFail($request->port_b_id);
+
+        if ($portA->status === 'connected' || $portB->status === 'connected') {
+            return response()->json(['error' => 'Uno o ambos puertos ya están ocupados'], 422);
+        }
+
+        $connection = Connection::create([
+            'port_a_id' => $portA->id,
+            'port_b_id' => $portB->id,
+            'cable_type' => $request->cable_type,
+            'cable_color' => $request->cable_color,
+        ]);
+
+        $portA->update(['status' => 'connected']);
+        $portB->update(['status' => 'connected']);
+
+        return response()->json(['status' => 'success', 'connection' => $connection]);
+    }
+
+    public function disconnectConnection(Connection $connection)
+    {
+        $portA = $connection->portA;
+        $portB = $connection->portB;
+
+        $connection->delete();
+
+        if ($portA)
+            $portA->update(['status' => 'free']);
+        if ($portB)
+            $portB->update(['status' => 'free']);
+
+        return response()->json(['status' => 'success', 'message' => 'Desconexión exitosa']);
     }
 }
