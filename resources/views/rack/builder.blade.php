@@ -36,15 +36,15 @@
                                 <div draggable="true" 
                                      x-show="!isPlaced('{{ $eq->id }}')"
                                      x-transition
-                                     @dragstart="startDrag($event, '{{ $eq->id }}', '{{ $eq->internal_id }}', '{{ $eq->name }}', 1)"
-                                     @click="selectEquipment('{{ $eq->id }}', '{{ $eq->internal_id }}', '{{ $eq->name }}', 1)"
+                                     @dragstart="startDrag($event, '{{ $eq->id }}', '{{ $eq->internal_id }}', '{{ $eq->name }}', {{ $eq->u_height }})"
+                                     @click="selectEquipment('{{ $eq->id }}', '{{ $eq->internal_id }}', '{{ $eq->name }}', {{ $eq->u_height }})"
                                      :class="{'border-l-tecsisa-yellow bg-tecsisa-yellow/10 scale-[1.02] shadow-[0_0_15px_rgba(255,209,0,0.3)]': selectedItem && selectedItem.db_id === '{{ $eq->id }}', 'border-l-blue-500 bg-black/30 hover:bg-white/5': !selectedItem || selectedItem.db_id !== '{{ $eq->id }}'}"
                                      class="p-3 border border-white/5 rounded-lg border-l-4 cursor-pointer transition-all flex justify-between items-center group">
                                     <div>
                                         <div class="text-xs font-mono font-bold" :class="{'text-tecsisa-yellow': selectedItem && selectedItem.db_id === '{{ $eq->id }}', 'text-tecsisa-yellow': !selectedItem || selectedItem.db_id !== '{{ $eq->id }}'}">{{ $eq->internal_id }}</div>
                                         <div class="text-sm font-medium whitespace-nowrap overflow-hidden text-ellipsis max-w-[180px]" :class="{'text-white': selectedItem && selectedItem.db_id === '{{ $eq->id }}', 'text-gray-300': !selectedItem || selectedItem.db_id !== '{{ $eq->id }}'}">{{ $eq->name }}</div>
                                     </div>
-                                    <div class="bg-white/10 text-gray-400 text-xs px-2 py-1 rounded">1U</div>
+                                    <div class="bg-white/10 text-gray-400 text-xs px-2 py-1 rounded">{{ $eq->u_height }}U</div>
                                 </div>
                             @endforeach
                         </div>

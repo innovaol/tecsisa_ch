@@ -101,7 +101,7 @@
                                 </td>
                                 <td class="py-4">
                                     @if($eq->form_factor === 'rackmount')
-                                        <span class="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded border border-blue-500/20 uppercase font-bold">Rackmount</span>
+                                        <span class="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded border border-blue-500/20 uppercase font-bold">Rackmount ({{ $eq->u_height }}U)</span>
                                     @elseif($eq->form_factor === 'peripheral')
                                         <span class="text-[10px] bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded border border-purple-500/20 uppercase font-bold">Periférico</span>
                                     @else
@@ -199,6 +199,14 @@
                                 </select>
                             </div>
 
+                            <!-- Altura en U (Solo Rackmount) -->
+                            <div x-show="formData.form_factor === 'rackmount'" x-transition>
+                                <label class="block text-gray-400 text-xs font-bold uppercase mb-1">Altura (Unidades de Rack - U)</label>
+                                <input type="number" name="u_height" x-model="formData.u_height" min="1" max="42"
+                                       class="w-full bg-black/40 border-white/10 rounded-lg text-white focus:border-tecsisa-yellow focus:ring-tecsisa-yellow transition h-10 px-3" 
+                                       placeholder="Ej: 1, 2, 4...">
+                            </div>
+
                             <!-- Sistema -->
                             <div>
                                 <label class="block text-gray-400 text-xs font-bold uppercase mb-1">Sistema Perteneciente</label>
@@ -294,6 +302,7 @@
                 internal_id: '',
                 name: '',
                 form_factor: 'rackmount',
+                u_height: 1,
                 system_id: '',
                 location_id: '',
                 status: 'operative',
@@ -316,6 +325,7 @@
                     internal_id: '',
                     name: '',
                     form_factor: 'rackmount',
+                    u_height: 1,
                     system_id: '',
                     location_id: '',
                     status: 'operative',
@@ -336,6 +346,7 @@
                     internal_id: String(eq.internal_id || ''),
                     name: String(eq.name || ''),
                     form_factor: String(eq.form_factor || 'rackmount'),
+                    u_height: eq.u_height || 1,
                     system_id: eq.system_id ? String(eq.system_id) : '',
                     location_id: eq.location_id ? String(eq.location_id) : '',
                     status: String(eq.status || 'operative'),

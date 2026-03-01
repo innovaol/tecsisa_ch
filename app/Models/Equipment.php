@@ -13,6 +13,7 @@ class Equipment extends Model
         'internal_id',
         'name',
         'form_factor',
+        'u_height',
         'system_id',
         'location_id',
         'status',
