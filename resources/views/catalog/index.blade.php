@@ -193,6 +193,7 @@
                                 <label class="block text-gray-400 text-xs font-bold uppercase mb-1">Tipo de Activo (Form Factor)</label>
                                 <select name="form_factor" x-model="formData.form_factor" 
                                         class="w-full bg-black/40 border-white/10 rounded-lg text-white focus:border-tecsisa-yellow focus:ring-tecsisa-yellow transition h-10 px-3">
+                                    <option value="">-- Seleccione Tipo --</option>
                                     <option value="rackmount">Rackmount (Switch/Servidor)</option>
                                     <option value="peripheral">Periférico (Cámara/PC/AP)</option>
                                     <option value="network_point">Punto de Red (Roseta/Pared)</option>
@@ -236,6 +237,7 @@
                                 <label class="block text-gray-400 text-xs font-bold uppercase mb-1">Estado Operativo</label>
                                 <select name="status" x-model="formData.status" 
                                         class="w-full bg-black/40 border-white/10 rounded-lg text-white focus:border-tecsisa-yellow focus:ring-tecsisa-yellow transition h-10 px-3">
+                                    <option value="">-- Seleccione Estado --</option>
                                     <option value="operative">Operativo</option>
                                     <option value="under_maintenance">En Mantenimiento</option>
                                     <option value="out_of_service">Fuera de Servicio</option>
@@ -301,11 +303,11 @@
                 id: '',
                 internal_id: '',
                 name: '',
-                form_factor: 'rackmount',
+                form_factor: '',
                 u_height: 1,
                 system_id: '',
                 location_id: '',
-                status: 'operative',
+                status: '',
                 specs: {},
                 notes: ''
             },
@@ -324,11 +326,11 @@
                     id: '',
                     internal_id: '',
                     name: '',
-                    form_factor: 'rackmount',
+                    form_factor: '',
                     u_height: 1,
                     system_id: '',
                     location_id: '',
-                    status: 'operative',
+                    status: '',
                     specs: {},
                     notes: ''
                 };
