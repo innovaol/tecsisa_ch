@@ -1,0 +1,173 @@
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-bold text-2xl text-white tracking-wide leading-tight flex items-center gap-3">
+            <svg class="w-6 h-6 text-tecsisa-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+            {{ __('Gestión de Catálogos (BDR)') }}
+        </h2>
+    </x-slot>
+
+    <div class="py-12" x-data="{ activeTab: 'locations' }">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            
+            <!-- Tabs Navigation -->
+            <div class="flex space-x-2 mb-6 ml-2 overflow-x-auto">
+                <button @click="activeTab = 'locations'" :class="{ 'bg-tecsisa-yellow text-tecsisa-dark font-bold shadow-[0_0_15px_rgba(255,209,0,0.3)]': activeTab === 'locations', 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10': activeTab !== 'locations' }" class="px-5 py-2.5 rounded-xl text-sm transition-all duration-300 border border-white/10">
+                    Edificios y Áreas
+                </button>
+                <button @click="activeTab = 'systems'" :class="{ 'bg-tecsisa-yellow text-tecsisa-dark font-bold shadow-[0_0_15px_rgba(255,209,0,0.3)]': activeTab === 'systems', 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10': activeTab !== 'systems' }" class="px-5 py-2.5 rounded-xl text-sm transition-all duration-300 border border-white/10">
+                    Sistemas Técnicos
+                </button>
+                <button @click="activeTab = 'equipment'" :class="{ 'bg-tecsisa-yellow text-tecsisa-dark font-bold shadow-[0_0_15px_rgba(255,209,0,0.3)]': activeTab === 'equipment', 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10': activeTab !== 'equipment' }" class="px-5 py-2.5 rounded-xl text-sm transition-all duration-300 border border-white/10">
+                    Inventario Base Físico
+                </button>
+            </div>
+
+            <!-- Content Area: Locations -->
+            <div x-show="activeTab === 'locations'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="bg-tecsisa-card backdrop-blur-xl rounded-2xl shadow-lg border border-white/10 overflow-hidden" style="display: none;">
+                <div class="flex justify-between items-center p-6 border-b border-white/5 bg-white/5">
+                    <h3 class="text-xl font-semibold text-white">Estructura Hospitalaria</h3>
+                    <button class="bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 border border-blue-500/30 px-4 py-2 rounded-lg text-sm font-medium transition shadow-sm">
+                        + Nueva Ubicación
+                    </button>
+                </div>
+                <div class="p-6">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="text-xs font-semibold tracking-wide text-gray-400 uppercase border-b border-white/10">
+                                    <th class="pb-3 pr-4">ID</th>
+                                    <th class="pb-3 pr-4">Nombre de la Ubicación</th>
+                                    <th class="pb-3 pr-4">Nivel Jurídico/Físico</th>
+                                    <th class="pb-3 pr-4">Ubicación Padre</th>
+                                    <th class="pb-3 text-right">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/5">
+                                @forelse($locations as $loc)
+                                <tr class="hover:bg-white/5 transition-colors group">
+                                    <td class="py-4 pr-4 font-mono text-xs text-gray-500">LOC-{{ str_pad($loc->id, 3, '0', STR_PAD_LEFT) }}</td>
+                                    <td class="py-4 pr-4 text-sm font-medium text-gray-200 group-hover:text-white">{{ $loc->name }}</td>
+                                    <td class="py-4 pr-4 text-sm text-gray-400">
+                                        <span class="px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                            @if($loc->level === 'edificio') bg-purple-500/10 text-purple-400 border border-purple-500/20
+                                            @elseif($loc->level === 'piso') bg-blue-500/10 text-blue-400 border border-blue-500/20
+                                            @else bg-green-500/10 text-green-400 border border-green-500/20 @endif">
+                                            {{ ucfirst($loc->level) }}
+                                        </span>
+                                    </td>
+                                    <td class="py-4 pr-4 text-sm text-gray-500">{{ $loc->parent ? $loc->parent->name : '-- Raíz --' }}</td>
+                                    <td class="py-4 text-right">
+                                        <button class="text-gray-400 hover:text-tecsisa-yellow transition"><svg class="w-5 h-5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg></button>
+                                        <button class="text-gray-400 hover:text-red-400 transition ml-2"><svg class="w-5 h-5 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr><td colspan="5" class="py-6 text-center text-gray-500">No hay ubicaciones registradas</td></tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Area: Systems -->
+            <div x-show="activeTab === 'systems'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="bg-tecsisa-card backdrop-blur-xl rounded-2xl shadow-lg border border-white/10 overflow-hidden" style="display: none;">
+                <div class="flex justify-between items-center p-6 border-b border-white/5 bg-white/5">
+                    <h3 class="text-xl font-semibold text-white">Sistemas Clínicos y Tecnológicos</h3>
+                    <button class="bg-blue-500/20 text-blue-400 hover:bg-blue-500/30 border border-blue-500/30 px-4 py-2 rounded-lg text-sm font-medium transition shadow-sm">
+                        + Registrar Sistema
+                    </button>
+                </div>
+                <!-- Grids of System Cards instead of Tables for variety -->
+                <div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    @forelse($systems as $sys)
+                    <div class="bg-white/5 border border-white/10 rounded-xl p-5 hover:border-tecsisa-yellow/30 transition group">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="text-lg font-bold text-gray-200 group-hover:text-tecsisa-yellow transition">{{ $sys->name }}</h4>
+                            <span class="bg-white/10 text-gray-400 text-xs px-2 py-1 rounded">{{ count($sys->form_schema ?? []) }} Atributos</span>
+                        </div>
+                        <div class="space-y-2 mt-4">
+                            @foreach(array_slice($sys->form_schema ?? [], 0, 3) as $field)
+                                <div class="text-xs text-gray-400 font-mono bg-black/20 p-1.5 rounded flex justify-between">
+                                    <span>{{ $field['label'] }}</span>
+                                    <span class="text-gray-500">[{{ $field['type'] }}]</span>
+                                </div>
+                            @endforeach
+                            @if(count($sys->form_schema ?? []) > 3)
+                                <div class="text-xs text-center text-gray-500 w-full mt-2 italic">+ {{ count($sys->form_schema) - 3 }} campos más</div>
+                            @endif
+                        </div>
+                        <div class="mt-6 flex justify-end space-x-2">
+                             <button class="text-xs border border-white/10 text-gray-300 hover:bg-white/10 px-3 py-1.5 rounded transition">Editar Esquema</button>
+                        </div>
+                    </div>
+                    @empty
+                    <div class="col-span-full py-6 text-center text-gray-500">No hay sistemas registrados</div>
+                    @endforelse
+                </div>
+            </div>
+
+            <!-- Content Area: Equipment -->
+            <div x-show="activeTab === 'equipment'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="bg-tecsisa-card backdrop-blur-xl rounded-2xl shadow-lg border border-white/10 overflow-hidden" style="display: none;">
+                <div class="flex justify-between items-center p-6 border-b border-white/5 bg-white/5">
+                    <h3 class="text-xl font-semibold text-white">Inventario (Asset DB)</h3>
+                    <div class="flex space-x-3">
+                        <div class="relative">
+                            <input type="text" placeholder="Buscar por ID Interno..." class="bg-black/30 border border-white/10 text-sm text-gray-300 rounded-lg pl-10 pr-4 py-2 focus:ring-tecsisa-yellow focus:border-tecsisa-yellow">
+                            <svg class="w-4 h-4 text-gray-500 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        </div>
+                        <button class="bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-bold px-4 py-2 rounded-lg text-sm transition shadow-[0_0_10px_rgba(255,209,0,0.2)]">
+                            + Alta de Equipo
+                        </button>
+                    </div>
+                </div>
+                <div class="p-0">
+                    <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-black/20 text-xs font-semibold tracking-wide text-gray-400 uppercase border-b border-white/10">
+                                    <th class="py-4 pl-6 pr-4">ID de Placa</th>
+                                    <th class="py-4 pr-4">Nombre / Modelo</th>
+                                    <th class="py-4 pr-4">Sistema</th>
+                                    <th class="py-4 pr-4">Ubicación Actual</th>
+                                    <th class="py-4 pr-4">Estatus</th>
+                                    <th class="py-4 pr-6 text-right">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/5">
+                                @forelse($equipments as $eq)
+                                <tr class="hover:bg-white/5 transition-colors group cursor-pointer">
+                                    <td class="py-4 pl-6 pr-4 font-mono text-sm tracking-tight text-tecsisa-yellow font-bold">{{ $eq->internal_id }}</td>
+                                    <td class="py-4 pr-4 text-sm font-medium text-gray-200 group-hover:text-white">{{ $eq->name }}</td>
+                                    <td class="py-4 pr-4 text-sm text-gray-400">
+                                        <div class="flex items-center gap-1.5">
+                                            <div class="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                                            {{ $eq->system->name }}
+                                        </div>
+                                    </td>
+                                    <td class="py-4 pr-4 text-sm text-gray-400">
+                                        {{ $eq->location ? $eq->location->name : 'N/A' }}
+                                    </td>
+                                    <td class="py-4 pr-4 text-sm text-gray-400">
+                                        @if($eq->status === 'operative')
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-500/10 text-green-400 border border-green-500/20">Operativo</span>
+                                        @elseif($eq->status === 'under_maintenance')
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-500/10 text-yellow-400 border border-yellow-500/20">Mantenimiento</span>
+                                        @else
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-500/10 text-red-400 border border-red-500/20">De Baja</span>
+                                        @endif
+                                    </td>
+                                    <td class="py-4 pr-6 text-right">
+                                        <button class="text-blue-400 hover:text-blue-300 font-medium text-xs border border-blue-500/30 px-3 py-1.5 rounded bg-blue-500/10 transition">Ver Ficha</button>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr><td colspan="6" class="py-8 text-center text-gray-500">El catálogo de equipos está vacío.</td></tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</x-app-layout>

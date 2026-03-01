@@ -15,8 +15,8 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Inicio') }}
                     </x-nav-link>
-                    <x-nav-link href="#" :active="false">
-                        {{ __('Catálogos') }}
+                    <x-nav-link :href="route('catalog.index')" :active="request()->routeIs('catalog.*')">
+                        {{ __('Catálogos y BDR') }}
                     </x-nav-link>
                     <x-nav-link href="#" :active="false">
                         {{ __('Racks & Topología') }}

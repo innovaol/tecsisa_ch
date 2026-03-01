@@ -7,9 +7,20 @@ use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/login');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard', function () {
+            $equipos_operativos = \App\Models\Equipment::where('status', 'operative')->count();
+            // Since we don't have tickets/tasks yet, let's hardcode or calculate maintenance
+            $trabajos_pendientes = \App\Models\Equipment::where('status', 'under_maintenance')->count();
+            // Fiber/Cobre total length (Just a simulated aggregate for now since we don't have links yet)
+            $cable_instalado = "5,420";
+
+            return view('dashboard', compact('equipos_operativos', 'trabajos_pendientes', 'cable_instalado'));
+        }
+        )->name('dashboard');
+
+        Route::get('/catalogos', [\App\Http\Controllers\CatalogController::class , 'index'])->name('catalog.index');
+    });
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class , 'edit'])->name('profile.edit');

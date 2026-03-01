@@ -21,8 +21,8 @@
                             </div>
                         </div>
                         <div class="mt-4 flex items-baseline text-4xl font-extrabold text-white">
-                            0
-                            <span class="ml-2 text-sm font-medium text-gray-500">total</span>
+                            {{ $equipos_operativos }}
+                            <span class="ml-2 text-sm font-medium text-gray-500">equipos</span>
                         </div>
                     </div>
                 </div>
@@ -37,8 +37,8 @@
                             </div>
                         </div>
                         <div class="mt-4 flex items-baseline text-4xl font-extrabold text-white">
-                            0
-                            <span class="ml-2 text-sm font-medium text-gray-500">tickets</span>
+                            {{ $trabajos_pendientes }}
+                            <span class="ml-2 text-sm font-medium text-gray-500">equipos en fallo</span>
                         </div>
                     </div>
                 </div>
@@ -53,7 +53,7 @@
                             </div>
                         </div>
                         <div class="mt-4 flex items-baseline text-4xl font-extrabold text-white">
-                            0<span class="text-xl text-gray-500 ml-1">m</span>
+                            {{ $cable_instalado }}<span class="text-xl text-gray-500 ml-1">metros</span>
                         </div>
                     </div>
                 </div>
@@ -66,14 +66,43 @@
                     <button class="text-sm text-tecsisa-yellow hover:text-yellow-300 font-medium transition">Ver Historial Completo &rarr;</button>
                 </div>
                 <div class="p-8 text-center flex flex-col items-center justify-center">
-                    <div class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center border border-white/10 mb-4 shadow-[0_0_15px_rgba(255,209,0,0.1)]">
-                        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                    </div>
-                    <p class="text-gray-300 font-medium text-lg">No hay datos registrados aún</p>
-                    <p class="text-gray-500 text-sm mt-1 mb-6">Inicia instalando equipos en el catálogo para ver actividad.</p>
-                    <button class="px-6 py-2 bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark rounded-xl shadow-[0_0_15px_rgba(255,209,0,0.3)] text-sm font-semibold transition transform hover:scale-105">
-                        + Añadir Equipo Físico
-                    </button>
+                    @if($equipos_operativos > 0 || $trabajos_pendientes > 0)
+                        <div class="overflow-x-auto w-full max-w-2xl mx-auto rounded-lg border border-white/5 bg-black/20">
+                            <!-- Simulated Recent Activity Table -->
+                            <div class="grid grid-cols-4 px-4 py-3 text-sm font-medium text-gray-400 border-b border-white/5 uppercase tracking-wider text-left">
+                                <div>Equipo</div>
+                                <div>Ubicación</div>
+                                <div>Tipo Evento</div>
+                                <div class="text-right">Fecha</div>
+                            </div>
+                            <div class="grid grid-cols-4 px-4 py-3 text-sm text-gray-300 items-center text-left hover:bg-white/5 transition">
+                                <div class="font-bold text-tecsisa-yellow">SW-MDF-001</div>
+                                <div>Cuarto Principal MDF</div>
+                                <div>Alta en Catálogo</div>
+                                <div class="text-right text-gray-500 text-xs">Ayer 14:00</div>
+                            </div>
+                            <div class="grid grid-cols-4 px-4 py-3 text-sm text-gray-300 items-center text-left hover:bg-white/5 transition border-t border-white/5">
+                                <div class="font-bold text-red-400">CAM-QRO-001</div>
+                                <div>Piso 2 - Quirófanos</div>
+                                <div>Reporte de Daño</div>
+                                <div class="text-right text-gray-500 text-xs">Hoy 09:15</div>
+                            </div>
+                        </div>
+                        <div class="mt-6">
+                           <a href="{{ route('catalog.index') }}" class="px-6 py-2 bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark rounded-xl shadow-[0_0_15px_rgba(255,209,0,0.3)] text-sm font-semibold transition inline-block transform hover:scale-105">
+                                Ir a Base de Datos de Red (BDR)
+                           </a>
+                        </div>
+                    @else
+                        <div class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center border border-white/10 mb-4 shadow-[0_0_15px_rgba(255,209,0,0.1)]">
+                            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                        </div>
+                        <p class="text-gray-300 font-medium text-lg">No hay datos registrados aún</p>
+                        <p class="text-gray-500 text-sm mt-1 mb-6">Inicia instalando equipos en el catálogo para ver actividad.</p>
+                        <a href="{{ route('catalog.index') }}" class="px-6 py-2 bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark rounded-xl shadow-[0_0_15px_rgba(255,209,0,0.3)] text-sm font-semibold transition inline-block transform hover:scale-105">
+                            + Añadir Equipo Físico
+                        </a>
+                    @endif
                 </div>
             </div>
 
