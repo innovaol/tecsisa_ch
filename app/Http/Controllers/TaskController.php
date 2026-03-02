@@ -11,17 +11,28 @@ use Illuminate\Support\Facades\Auth;
 class TaskController extends Controller
 {
     /**
-     * Display a listing of the user's tasks.
+     * Display a listing of the tasks.
      */
     public function index()
     {
-        // Get tasks assigned to the current user
-        $tasks = Task::where('assigned_to', Auth::id())
-            ->with(['equipment.system', 'equipment.location'])
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $query = Task::with(['equipment.system', 'equipment.location', 'assignee']);
+        $users = collect();
+        $equipments = collect();
 
-        return view('tasks.index', compact('tasks'));
+        if (Auth::user()->hasRole('Administrador')) {
+            // Admin sees everything
+            $tasks = $query->orderBy('created_at', 'desc')->get();
+            $users = \App\Models\User::all(['id', 'name']);
+            $equipments = \App\Models\Equipment::all(['id', 'name', 'internal_id']);
+        }
+        else {
+            // Technicians only see their assignments
+            $tasks = $query->where('assigned_to', Auth::id())
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }
+
+        return view('tasks.index', compact('tasks', 'users', 'equipments'));
     }
 
     /**
@@ -50,6 +61,8 @@ class TaskController extends Controller
             'description' => 'nullable|string',
             'priority' => 'required|in:low,medium,high,critical',
             'task_type' => 'required|in:maintenance,replacement,installation',
+            'assigned_to' => 'nullable|exists:users,id',
+            'status' => 'nullable|in:draft,pending,in_progress,completed',
             'form_data' => 'nullable|array',
         ]);
 
@@ -59,12 +72,12 @@ class TaskController extends Controller
             'description' => $validated['description'],
             'priority' => $validated['priority'],
             'task_type' => $validated['task_type'],
-            'assigned_to' => Auth::id(), // Automatically assign to creator for now
-            'status' => 'draft', // Initial state
+            'assigned_to' => $validated['assigned_to'] ?? Auth::id(), // Allow admins to set assignee
+            'status' => $validated['status'] ?? 'pending', // Admins probably want directly pending tasks
             'form_data' => $validated['form_data'] ?? [],
         ]);
 
-        return redirect()->route('tasks.edit', $task)->with('success', 'Borrador de tarea creado. Proceda a llenar el formulario técnico.');
+        return redirect()->route('tasks.index')->with('success', 'Tarea ' . $task->title . ' creada correctamente.');
     }
 
     /**

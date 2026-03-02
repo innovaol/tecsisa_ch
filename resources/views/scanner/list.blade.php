@@ -1,4 +1,4 @@
-<x-technician-layout>
+<x-technician-layout hideHeader="true">
     <div class="fixed top-0 inset-x-0 z-[60] bg-[#0a0d14]/95 backdrop-blur-3xl border-b border-white/5 pt-safe">
         <div class="px-4 py-4 flex items-center justify-between">
             <a href="{{ route('technician.scanner') }}" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white transition shadow-lg">
@@ -9,7 +9,7 @@
         </div>
     </div>
 
-    <div class="pt-24 pb-24 px-5 relative z-10">
+    <div class="pt-20 pb-28 px-5 relative z-10">
         <h2 class="text-xs font-black text-gray-500 uppercase tracking-widest mb-4">Buscando: "{{ $query }}"</h2>
 
         <div class="space-y-3">

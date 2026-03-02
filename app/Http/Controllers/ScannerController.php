@@ -53,4 +53,16 @@ class ScannerController extends Controller
 
         return view('scanner.list', ['results' => $results, 'query' => $query]);
     }
+
+    /**
+     * View all equipment organized by location.
+     */
+    public function equipmentList()
+    {
+        $locations = \App\Models\Location::with(['equipments' => function ($q) {
+            $q->with('system');
+        }])->get();
+
+        return view('scanner.equipment_list', ['locations' => $locations]);
+    }
 }

@@ -1,30 +1,40 @@
-<x-technician-layout>
+<x-technician-layout hideHeader="true">
     <script src="https://unpkg.com/html5-qrcode"></script>
     
     <div class="fixed top-0 inset-x-0 z-40 bg-[#0a0d14]/90 backdrop-blur-xl border-b border-white/5 pt-safe">
         <div class="px-4 py-3 flex items-center justify-between">
             <h1 class="text-xs font-black text-white uppercase tracking-widest flex items-center gap-2">
                 <svg class="w-4 h-4 text-tecsisa-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
-                Asistente de Busqueda
+                Escanear Activo
             </h1>
         </div>
     </div>
     
-    <div class="pt-20 pb-24 px-5" x-data="scannerApp()">
+    <div class="pt-16 px-5" x-data="scannerApp()">
         
         <!-- Toggle Tabs -->
         <div class="flex bg-black/40 border border-white/5 p-1 rounded-full mb-6 relative">
-            <div class="absolute inset-y-1 w-[calc(50%-4px)] bg-[#1a202c] rounded-full shadow transition-all duration-300 ease-out" :class="activeTab === 'scan' ? 'left-1' : 'left-[50%]'"></div>
-            <button @click="activeTab = 'scan'" class="flex-1 py-3 text-xs font-bold uppercase tracking-widest text-center relative z-10 transition-colors" :class="activeTab === 'scan' ? 'text-white' : 'text-gray-500'">
-                Escáner Óptico
+            <!-- Mobile Slider -->
+            <div class="absolute inset-y-1 w-[calc(33.33%-4px)] md:hidden bg-[#1a202c] rounded-full shadow transition-all duration-300 ease-out" 
+                 :style="activeTab === 'scan' ? 'left: 4px; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 4px 15px rgba(0,0,0,0.5);' : (activeTab === 'text' ? 'left: 33.33%; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 4px 15px rgba(0,0,0,0.5);' : 'left: 66.66%; border-color: transparent;')"></div>
+                 
+            <!-- Desktop Slider -->
+            <div class="absolute inset-y-1 w-[calc(50%-4px)] hidden md:block bg-[#1a202c] rounded-full shadow transition-all duration-300 ease-out"
+                 :style="activeTab === 'text' ? 'left: 4px; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 4px 15px rgba(0,0,0,0.5);' : 'left: 50%; border-color: transparent;'"></div>
+            
+            <button @click="activeTab = 'scan'" class="md:hidden flex-1 py-3 text-[10px] font-black uppercase tracking-widest text-center relative z-10 transition-colors" :class="activeTab === 'scan' ? 'text-white' : 'text-gray-500'">
+                Escáner
             </button>
-            <button @click="activeTab = 'text'" class="flex-1 py-3 text-xs font-bold uppercase tracking-widest text-center relative z-10 transition-colors" :class="activeTab === 'text' ? 'text-white' : 'text-gray-500'">
-                Ingreso Manual
+            <button @click="activeTab = 'text'" class="flex-1 py-3 text-[10px] font-black uppercase tracking-widest text-center relative z-10 transition-colors" :class="activeTab === 'text' ? 'text-white' : 'text-gray-500'">
+                Por ID
             </button>
+            <a href="{{ route('technician.equipment.list') }}" class="flex-1 py-3 text-[10px] font-black uppercase tracking-widest text-center relative z-10 transition-colors text-gray-500 hover:text-white">
+                Explorar
+            </a>
         </div>
 
         <!-- CAMERA SCANNER VIEW -->
-        <div x-show="activeTab === 'scan'" class="flex flex-col items-center">
+        <div x-show="activeTab === 'scan'" class="md:hidden flex flex-col items-center">
             
             <div class="w-full max-w-sm aspect-square bg-black rounded-3xl overflow-hidden relative border-2 border-white/10 shadow-[0_10px_40px_rgba(0,0,0,0.5)] mb-6">
                 <!-- Marco/Guía de Escaneo -->
@@ -93,7 +103,7 @@
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('scannerApp', () => ({
-                activeTab: new URLSearchParams(window.location.search).get('mode') || 'scan',
+                activeTab: window.innerWidth >= 768 ? 'text' : (new URLSearchParams(window.location.search).get('mode') || 'scan'),
                 query: '',
                 isScanning: false,
                 html5QrCode: null,

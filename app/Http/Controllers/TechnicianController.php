@@ -13,19 +13,23 @@ class TechnicianController extends Controller
     {
         $user = Auth::user();
 
-        // Get tasks assigned to this technician
-        $tasks = Task::with('equipment.location')
-            ->where('assigned_to', $user->id)
+        // Get tasks: If Admin, show all. If Technician, show only assigned.
+        $query = Task::with(['equipment.location', 'assignee'])
             ->whereIn('status', ['draft', 'pending', 'in_progress'])
             ->orderBy('priority', 'desc')
-            ->orderBy('created_at', 'desc')
-            ->get();
+            ->orderBy('created_at', 'desc');
 
-        $completedTasks = Task::where('assigned_to', $user->id)
-            ->whereIn('status', ['completed', 'verified'])
+        $completedQuery = Task::whereIn('status', ['completed', 'verified'])
             ->orderBy('completed_at', 'desc')
-            ->take(5)
-            ->get();
+            ->take(5);
+
+        if (!$user->hasRole('Administrador')) {
+            $query->where('assigned_to', $user->id);
+            $completedQuery->where('assigned_to', $user->id);
+        }
+
+        $tasks = $query->get();
+        $completedTasks = $completedQuery->get();
 
         return view('technician.dashboard', compact('tasks', 'completedTasks'));
     }
@@ -76,5 +80,31 @@ class TechnicianController extends Controller
         $task->save();
 
         return redirect()->route('technician.dashboard')->with('success', 'Tarea actualizada correctamente.');
+    }
+
+    public function infrastructureHub()
+    {
+        if (!Auth::user()->hasRole('Administrador')) {
+            abort(403);
+        }
+        return view('technician.infrastructure_hub');
+    }
+
+    public function systemsList()
+    {
+        if (!Auth::user()->hasRole('Administrador')) {
+            abort(403);
+        }
+        $systems = \App\Models\System::withCount('equipments')->get();
+        return view('technician.systems_list', compact('systems'));
+    }
+
+    public function locationsList()
+    {
+        if (!Auth::user()->hasRole('Administrador')) {
+            abort(403);
+        }
+        $locations = \App\Models\Location::withCount('equipments')->get();
+        return view('technician.locations_list', compact('locations'));
     }
 }

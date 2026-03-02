@@ -32,6 +32,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/scanner', [\App\Http\Controllers\ScannerController::class , 'index'])->name('scanner');
             Route::get('/scanner/result/{equipment}', [\App\Http\Controllers\ScannerController::class , 'showResult'])->name('scanner.result');
             Route::post('/scanner/search', [\App\Http\Controllers\ScannerController::class , 'search'])->name('scanner.search');
+            Route::get('/equipment', [\App\Http\Controllers\ScannerController::class , 'equipmentList'])->name('equipment.list');
+
+            // Admin Mobile Hub
+            Route::get('/infrastructure', [\App\Http\Controllers\TechnicianController::class , 'infrastructureHub'])->name('infrastructure');
+            Route::get('/infrastructure/systems', [\App\Http\Controllers\TechnicianController::class , 'systemsList'])->name('systems');
+            Route::get('/infrastructure/locations', [\App\Http\Controllers\TechnicianController::class , 'locationsList'])->name('locations');
         }
         );
 
@@ -56,6 +62,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
             Route::get('/racks', [\App\Http\Controllers\RackBuilderController::class , 'index'])->name('rack.builder');
             Route::post('/racks/{rack}/save', [\App\Http\Controllers\RackBuilderController::class , 'save'])->name('rack.save');
+
+            // User and Role Management
+            Route::resource('users', \App\Http\Controllers\UserController::class);
         }
         );
 

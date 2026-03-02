@@ -1,18 +1,23 @@
-<x-technician-layout>
+<x-technician-layout hideHeader="true" :hideNav="true">
     <div class="fixed top-0 inset-x-0 z-[60] bg-[#0a0d14]/95 backdrop-blur-3xl border-b border-white/5 pt-safe">
         <div class="px-4 py-4 flex items-center justify-between">
-            <a href="{{ route('technician.scanner') }}" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white transition shadow-lg">
+            <a href="{{ route('technician.equipment.list') }}" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white transition shadow-lg">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
             </a>
             <h1 class="text-xs font-black text-white uppercase tracking-widest flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span> Equipo Identificado
+                <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span> Detalle del Activo
             </h1>
-            <div class="w-10 h-10"></div>
+            <div class="w-10 h-10 flex items-center justify-center">
+                @if(Auth::user()->hasRole('Administrador'))
+                <a href="{{ route('catalog.index') }}?equipment_id={{ $equipment->id }}" class="w-8 h-8 rounded-full bg-tecsisa-yellow/10 border border-tecsisa-yellow/20 flex items-center justify-center text-tecsisa-yellow hover:bg-tecsisa-yellow hover:text-black transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                </a>
+                @endif
+            </div>
         </div>
     </div>
 
-    <div class="pt-24 pb-20 px-5 relative z-10">
-        
+    <div class="pt-20 pb-36 px-5 relative z-10">
         <!-- Info Principal -->
         <div class="bg-gradient-to-br from-[#12161f] to-[#0a0d14] rounded-3xl border border-white/10 p-6 shadow-2xl relative overflow-hidden mb-6">
             <div class="absolute -right-10 -top-10 w-32 h-32 bg-tecsisa-yellow/10 rounded-full blur-2xl"></div>
@@ -54,80 +59,56 @@
                 @endif
             </div>
         </div>
+    </div>
 
-        <!-- Tipos de Trabajo -->
-        <h3 class="text-xs font-black text-gray-500 uppercase tracking-widest mb-3 px-1">¿Qué tipo de trabajo realizará?</h3>
-        
-        <div class="space-y-3">
-            <!-- Botón Mantenimiento -->
-            <form action="{{ route('tasks.store') }}" method="POST">
-                @csrf
-                <input type="hidden" name="equipment_id" value="{{ $equipment->id }}">
-                <input type="hidden" name="title" value="Mantenimiento de Equipo">
-                <input type="hidden" name="priority" value="medium">
-                <input type="hidden" name="task_type" value="maintenance">
-                <input type="hidden" name="description" value="Procedimiento de mantenimiento preventivo y/o correctivo.">
+    <!-- Barra de Acciones Fija Inferior -->
+    <div class="fixed bottom-0 inset-x-0 bg-[#0a0d14]/98 backdrop-blur-3xl border-t border-white/10 pb-safe z-[70]">
+        <div class="p-5 max-w-lg mx-auto">
+            <h3 class="text-[9px] font-black text-gray-500 uppercase tracking-[0.3em] mb-4 text-center">Abrir Reporte de Intervención</h3>
+            <div class="grid grid-cols-3 gap-3">
+                <!-- Botón Mantenimiento -->
+                <form action="{{ route('tasks.store') }}" method="POST" onsubmit="return confirm('¿Iniciar reporte de MANTENIMIENTO?')">
+                    @csrf
+                    <input type="hidden" name="equipment_id" value="{{ $equipment->id }}">
+                    <input type="hidden" name="title" value="Mantenimiento de Equipo">
+                    <input type="hidden" name="priority" value="medium">
+                    <input type="hidden" name="task_type" value="maintenance">
+                    <input type="hidden" name="description" value="Procedimiento de mantenimiento preventivo y/o correctivo.">
+                    <button type="submit" class="w-full flex flex-col items-center gap-2 bg-[#12161f] hover:bg-white/5 border border-white/10 rounded-2xl p-3 transition text-tecsisa-yellow">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg>
+                        <span class="text-[8px] font-black uppercase tracking-widest text-white">Mantenimiento</span>
+                    </button>
+                </form>
 
-                <button type="submit" class="w-full bg-[#12161f] hover:bg-white/5 border border-transparent hover:border-tecsisa-yellow/30 text-white font-black p-4 rounded-3xl flex items-center justify-between transition group shadow-lg">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 bg-tecsisa-yellow/10 rounded-2xl flex items-center justify-center text-tecsisa-yellow shrink-0 group-hover:bg-tecsisa-yellow group-hover:text-black transition-colors">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                        </div>
-                        <div class="text-left">
-                            <span class="block text-sm uppercase tracking-widest text-white mb-0.5">Mantenimiento</span>
-                            <span class="block text-xs text-gray-500 font-normal">Revisión, limpieza o ajuste técnico</span>
-                        </div>
-                    </div>
-                    <svg class="w-5 h-5 text-gray-600 group-hover:text-tecsisa-yellow transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                </button>
-            </form>
+                <!-- Botón Instalación -->
+                <form action="{{ route('tasks.store') }}" method="POST" onsubmit="return confirm('¿Iniciar reporte de INSTALACIÓN?')">
+                    @csrf
+                    <input type="hidden" name="equipment_id" value="{{ $equipment->id }}">
+                    <input type="hidden" name="title" value="Instalación / Configuración">
+                    <input type="hidden" name="priority" value="medium">
+                    <input type="hidden" name="task_type" value="installation">
+                    <input type="hidden" name="description" value="Procedimiento de instalación y puesta a punto de un nuevo activo.">
+                    <button type="submit" class="w-full flex flex-col items-center gap-2 bg-[#12161f] hover:bg-white/5 border border-white/10 rounded-2xl p-3 transition text-cyan-500">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                        <span class="text-[8px] font-black uppercase tracking-widest text-white">Instalación</span>
+                    </button>
+                </form>
 
-            <!-- Botón Instalación -->
-            <form action="{{ route('tasks.store') }}" method="POST">
-                @csrf
-                <input type="hidden" name="equipment_id" value="{{ $equipment->id }}">
-                <input type="hidden" name="title" value="Instalación / Configuración">
-                <input type="hidden" name="priority" value="medium">
-                <input type="hidden" name="task_type" value="installation">
-                <input type="hidden" name="description" value="Procedimiento de instalación y puesta a punto de un nuevo activo.">
-
-                <button type="submit" class="w-full bg-[#12161f] hover:bg-white/5 border border-transparent hover:border-cyan-500/30 text-white font-black p-4 rounded-3xl flex items-center justify-between transition group shadow-lg">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 bg-cyan-500/10 rounded-2xl flex items-center justify-center text-cyan-500 shrink-0 group-hover:bg-cyan-500 group-hover:text-black transition-colors">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                        </div>
-                        <div class="text-left">
-                            <span class="block text-sm uppercase tracking-widest text-white mb-0.5">Instalación</span>
-                            <span class="block text-xs text-gray-500 font-normal">Montaje y configuración inicial</span>
-                        </div>
-                    </div>
-                    <svg class="w-5 h-5 text-gray-600 group-hover:text-cyan-500 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                </button>
-            </form>
-
-            <!-- Botón Reemplazo -->
-            <form action="{{ route('tasks.store') }}" method="POST">
-                @csrf
-                <input type="hidden" name="equipment_id" value="{{ $equipment->id }}">
-                <input type="hidden" name="title" value="Sustitución / Reemplazo Físico">
-                <input type="hidden" name="priority" value="high">
-                <input type="hidden" name="task_type" value="replacement">
-                <input type="hidden" name="description" value="Procedimiento de extracción y cambio de equipo por otro.">
-
-                <button type="submit" class="w-full bg-[#12161f] hover:bg-white/5 border border-transparent hover:border-red-500/30 text-white font-black p-4 rounded-3xl flex items-center justify-between transition group shadow-lg">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 bg-red-500/10 rounded-2xl flex items-center justify-center text-red-500 shrink-0 group-hover:bg-red-500 group-hover:text-white transition-colors">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
-                        </div>
-                        <div class="text-left">
-                            <span class="block text-sm uppercase tracking-widest text-white mb-0.5">Reemplazo</span>
-                            <span class="block text-xs text-gray-500 font-normal">Cambio físico por daño o mejora</span>
-                        </div>
-                    </div>
-                    <svg class="w-5 h-5 text-gray-600 group-hover:text-red-500 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                </button>
-            </form>
+                <!-- Botón Reemplazo -->
+                <form action="{{ route('tasks.store') }}" method="POST" onsubmit="return confirm('¿Iniciar reporte de REEMPLAZO?')">
+                    @csrf
+                    <input type="hidden" name="equipment_id" value="{{ $equipment->id }}">
+                    <input type="hidden" name="title" value="Sustitución / Reemplazo Físico">
+                    <input type="hidden" name="priority" value="high">
+                    <input type="hidden" name="task_type" value="replacement">
+                    <input type="hidden" name="description" value="Procedimiento de extracción y cambio de equipo por otro.">
+                    <button type="submit" class="w-full flex flex-col items-center gap-2 bg-[#12161f] hover:bg-white/5 border border-white/10 rounded-2xl p-3 transition text-red-500">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                        <span class="text-[8px] font-black uppercase tracking-widest text-white">Reemplazo</span>
+                    </button>
+                </form>
+            </div>
+            <a href="{{ route('technician.equipment.list') }}" class="block mt-4 text-center text-gray-500 text-[10px] font-black uppercase tracking-[0.2em] hover:text-white transition">Cancelar y Volver</a>
         </div>
-
     </div>
 </x-technician-layout>

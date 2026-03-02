@@ -56,63 +56,24 @@
         }
     </style>
 </head>
-<body class="font-sans antialiased bg-[#05080f] text-white overflow-hidden" style="display: flex; flex-direction: column; height: 100dvh;" x-data="{ showScannerMenu: false }">
+<body class="font-sans antialiased bg-[#05080f] text-white md:overflow-auto md:h-auto overflow-hidden h-[100dvh]" style="display: flex; flex-direction: column;">
+    
+    <!-- Background Glowing Orbs (Premium Aesthetic) -->
+    <div class="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-tecsisa-yellow/5 blur-[120px] pointer-events-none z-0"></div>
+    <div class="fixed bottom-[-10%] right-[-10%] w-[30%] h-[30%] rounded-full bg-blue-500/5 blur-[120px] pointer-events-none z-0"></div>
 
-    <!-- Top Header Nativo -->
-    <header class="bg-[#0f1217]/90 backdrop-blur-xl border-b border-white/5 pt-safe shrink-0">
-        <div class="px-5 py-4 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-tecsisa-yellow/10 flex items-center justify-center border border-tecsisa-yellow/20">
-                    <span class="text-tecsisa-yellow font-black text-lg">{{ substr(Auth::user()->name, 0, 1) }}</span>
-                </div>
-                <div>
-                    <h1 class="text-xs text-gray-400 font-bold uppercase tracking-widest">Técnico Nivel 1</h1>
-                    <p class="text-sm font-black text-white leading-tight">{{ explode(' ', Auth::user()->name)[0] }}</p>
-                </div>
-            </div>
-            
-            <button class="relative p-2 bg-white/5 rounded-full border border-white/10 text-gray-400 hover:text-white transition">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
-                <div class="absolute top-1.5 right-1.5 w-2 h-2 bg-tecsisa-yellow rounded-full shadow-[0_0_5px_rgba(255,209,0,1)]"></div>
-            </button>
+    <!-- Unified Master Navigation -->
+    @unless($hideNav ?? false)
+        @include('layouts.navigation', ['hideHeader' => $hideHeader ?? false])
+    @endunless
+
+    <!-- Contenido Principal -->
+    <main class="flex-1 md:overflow-visible overflow-y-auto no-scrollbar relative z-10 {{ ($hideNav ?? false) ? '' : 'pb-28 md:pb-0' }}">
+        <div class="md:max-w-7xl md:mx-auto md:w-full md:px-6 lg:px-8">
+            {{ $slot }}
         </div>
-    </header>
-
-    <!-- Contenido Scrollable -->
-    <main class="flex-1 overflow-y-auto no-scrollbar relative z-0 pb-safe">
-        {{ $slot }}
     </main>
-
-    <!-- Bottom Navigation Bar (App Nativa Flow) -->
-    @if(!$hideNav)
-    <nav class="bg-[#0f1217]/95 backdrop-blur-2xl border-t border-white/10 shrink-0 pb-safe-bottom z-40 relative">
-        <div class="flex justify-around items-center px-2 py-3">
-            <a href="{{ route('technician.dashboard') }}" class="flex flex-col items-center gap-1 {{ request()->routeIs('technician.dashboard') ? 'text-tecsisa-yellow' : 'text-gray-500 hover:text-gray-400' }} transition-colors">
-                <svg class="w-6 h-6 outline-none" fill="{{ request()->routeIs('technician.dashboard') ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                <span class="text-[10px] font-bold uppercase tracking-widest">Tareas</span>
-            </a>
-            
-            <button @click="showScannerMenu = true" class="flex flex-col items-center gap-1 {{ request()->routeIs('technician.scanner') ? 'text-tecsisa-yellow' : 'text-gray-500 hover:text-gray-400' }} transition-colors focus:outline-none">
-                <div class="relative"> <!-- Escáner central flotante -->
-                    <div class="absolute -top-6 left-1/2 transform -translate-x-1/2 w-12 h-12 bg-tecsisa-yellow rounded-full shadow-[0_5px_20px_rgba(255,209,0,0.4)] flex items-center justify-center text-black border-4 border-[#05080f]">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
-                    </div>
-                </div>
-                <span class="text-[10px] font-bold uppercase tracking-widest mt-6 opacity-0">Escanear</span>
-            </button>
-
-            <form method="POST" action="{{ route('logout') }}" class="flex">
-                @csrf
-                <a href="{{ route('logout') }}" 
-                   onclick="event.preventDefault(); this.closest('form').submit();"
-                   class="flex flex-col items-center gap-1 text-gray-500 hover:text-gray-400 transition-colors">
-                    <svg class="w-6 h-6 outline-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                    <span class="text-[10px] font-bold uppercase tracking-widest">Salir</span>
-                </a>
-            </form>
-        </div>
-    </nav>
-    @endif
+</body>
 
     <!-- Modal Fondo Intento (Bottom Sheet) -->
     <div x-show="showScannerMenu" style="display: none;" class="fixed inset-0 z-[100] flex flex-col justify-end">
@@ -127,12 +88,16 @@
             
             <div class="space-y-3">
                 <a href="{{ route('technician.scanner') }}?mode=scan" class="w-full bg-tecsisa-yellow hover:bg-yellow-400 text-black font-black py-4 rounded-xl text-sm uppercase tracking-widest flex items-center justify-center gap-3 transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
                     Escanear Código (Cámara)
                 </a>
                 <a href="{{ route('technician.scanner') }}?mode=text" class="w-full bg-transparent border-2 border-white/10 text-white hover:bg-white/5 font-bold py-4 rounded-xl text-sm uppercase tracking-widest flex items-center justify-center gap-3 transition">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                     Ingreso Manual Predictivo
+                </a>
+                <a href="{{ route('technician.equipment.list') }}" class="w-full bg-[#1a202c] border border-white/5 text-gray-400 hover:text-white hover:bg-[#2d3748] font-bold py-4 rounded-xl text-sm uppercase tracking-widest flex items-center justify-center gap-3 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                    Explorar Catálogo Completo
                 </a>
             </div>
             <button @click="showScannerMenu = false" class="mt-6 w-full text-center text-gray-500 font-bold text-xs uppercase tracking-widest pb-4 hover:text-white transition">Cancelar</button>

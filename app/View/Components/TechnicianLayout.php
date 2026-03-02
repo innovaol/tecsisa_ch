@@ -8,10 +8,12 @@ use Illuminate\View\View;
 class TechnicianLayout extends Component
 {
     public $hideNav;
+    public $hideHeader;
 
-    public function __construct($hideNav = false)
+    public function __construct($hideNav = false, $hideHeader = false)
     {
         $this->hideNav = $hideNav;
+        $this->hideHeader = $hideHeader;
     }
 
     /**

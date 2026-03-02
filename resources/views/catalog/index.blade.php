@@ -40,12 +40,6 @@
                         class="px-4 py-2 font-bold transition-all uppercase text-sm tracking-widest">
                     Inventario de Equipos
                 </button>
-                <button @click="activeTab = 'maintenance'" 
-                        :class="activeTab === 'maintenance' ? 'text-blue-400 border-b-2 border-blue-400' : 'text-gray-500 hover:text-gray-300'"
-                        class="px-4 py-2 font-bold transition-all uppercase text-sm tracking-widest flex items-center gap-2">
-                    <span class="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></span>
-                    Plan de Mantenimiento
-                </button>
             </div>
 
             <!-- Tab: Locations -->
@@ -54,13 +48,13 @@
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                         <div>
                             <h3 class="text-white text-2xl font-black uppercase tracking-wider">Infraestructura Física</h3>
-                            <p class="text-gray-500 text-sm">Explora la jerarquía de edificios, pisos, cuartos técnicos y racks.</p>
+                            <p class="text-gray-500 text-sm font-bold tracking-wide mt-1">Explora la jerarquía de edificios, pisos, cuartos técnicos y racks.</p>
                         </div>
                         <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-                            <button @click="openCreateLocationModal()" class="w-full sm:w-auto bg-white/5 hover:bg-white/10 text-white border border-white/10 px-4 py-2 rounded-xl text-xs font-bold transition">
+                            <button @click="openCreateLocationModal()" class="w-full sm:w-auto flex justify-center items-center bg-transparent border-2 border-white/10 hover:border-white/20 hover:bg-white/5 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95">
                                 + Nueva Ubicación
                             </button>
-                            <button @click="openCreateRackModal()" class="bg-tecsisa-yellow text-tecsisa-dark px-4 py-2 rounded-xl text-xs font-black transition shadow-[0_0_20px_rgba(255,209,0,0.2)]">
+                            <button @click="openCreateRackModal()" class="w-full sm:w-auto flex justify-center items-center bg-tecsisa-yellow hover:bg-yellow-400 text-black px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-[0_10px_20px_rgba(255,209,0,0.3)] transition-all active:scale-95">
                                 + Registrar Rack
                             </button>
                         </div>
@@ -85,10 +79,10 @@
             <div x-show="activeTab === 'systems'" x-transition>
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                     <div>
-                        <h3 class="text-white text-xl font-bold">Sistemas de Baja Tensión</h3>
-                        <p class="text-gray-500 text-sm">Define los sistemas y sus parámetros técnicos personalizados.</p>
+                        <h3 class="text-white text-2xl font-black uppercase tracking-wider">Sistemas de Alta/Baja Tensión</h3>
+                        <p class="text-gray-500 text-sm font-bold tracking-wide mt-1">Define los sistemas y sus parámetros técnicos personalizados.</p>
                     </div>
-                    <button @click="openCreateSystemModal()" class="w-full md:w-auto bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-bold px-4 py-2 rounded-lg text-sm transition shadow-[0_0_10px_rgba(255,209,0,0.2)]">
+                    <button @click="openCreateSystemModal()" class="w-full md:w-auto flex justify-center items-center bg-tecsisa-yellow hover:bg-yellow-400 text-black px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-[0_10px_20px_rgba(255,209,0,0.3)] transition-all active:scale-95">
                         + Nuevo Sistema
                     </button>
                 </div>
@@ -110,15 +104,7 @@
                         </div>
                         
                         <div class="space-y-4">
-                            <div class="flex gap-4 border-b border-white/5 pb-3">
-                                <div class="flex-1">
-                                    <p class="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-1">Ciclo de Servicio:</p>
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-xs text-blue-400 font-bold">{{ $sys->maintenance_interval_days ?? 90 }} Días</span>
-                                        <span class="text-[9px] text-gray-600 bg-white/5 px-1.5 py-0.5 rounded border border-white/5">Auto-programable</span>
-                                    </div>
-                                </div>
-                            </div>
+                            <!-- Ciclo de Servicio Removed -->
 
                             <div class="space-y-2">
                                 <p class="text-[10px] text-gray-500 uppercase font-black tracking-widest">Esquema de Especificaciones:</p>
@@ -138,116 +124,20 @@
                 </div>
             </div>
 
-            <!-- Tab: Maintenance Planning -->
-            <div x-show="activeTab === 'maintenance'" x-transition class="space-y-8">
-                <div class="flex flex-col justify-between items-start gap-4">
-                    <div>
-                        <h3 class="text-white text-2xl font-black uppercase tracking-wider">Plan de Mantenimiento Preventivo</h3>
-                        <p class="text-gray-500 text-sm italic">Sincronización basada en ciclos programados por cada sistema técnico.</p>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                    <!-- Left: Urgency Sidebar -->
-                    <div class="lg:col-span-4 space-y-4">
-                        <div class="bg-red-500/10 border border-red-500/20 rounded-2xl p-6">
-                            <div class="flex justify-between items-center mb-4">
-                                <h4 class="text-red-400 font-black uppercase text-xs tracking-widest flex items-center gap-2">
-                                    <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
-                                    Vencidos / Críticos
-                                </h4>
-                                <span class="text-2xl font-black text-red-500">{{ $equipments->filter(fn($e) => $e->next_maintenance_at && $e->next_maintenance_at->isPast())->count() }}</span>
-                            </div>
-                            <p class="text-[10px] text-red-400/60 leading-relaxed uppercase font-bold">Equipos que han superado su periodo de gracia y requieren inspección técnica inmediata.</p>
-                        </div>
-
-                        <div class="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-6">
-                            <div class="flex justify-between items-center mb-4">
-                                <h4 class="text-blue-400 font-black uppercase text-xs tracking-widest flex items-center gap-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                    Próximos (7 Días)
-                                </h4>
-                                <span class="text-2xl font-black text-blue-400">{{ $equipments->filter(fn($e) => $e->next_maintenance_at && $e->next_maintenance_at->isFuture() && $e->next_maintenance_at->diffInDays(now()) <= 7)->count() }}</span>
-                            </div>
-                            <p class="text-[10px] text-blue-400/60 leading-relaxed uppercase font-bold">Activos entrando en ventana de mantenimiento preventivo.</p>
-                        </div>
-                    </div>
-
-                    <!-- Right: Timeline / List -->
-                    <div class="lg:col-span-8">
-                        <div class="bg-black/40 border border-white/5 rounded-3xl overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
-                                <thead>
-                                    <tr class="bg-white/5 text-[10px] font-black uppercase text-gray-400 tracking-widest border-b border-white/10">
-                                        <th class="py-4 pl-6">Equipo / ID</th>
-                                        <th class="py-4">Último Servicio</th>
-                                        <th class="py-4">Próxima Fecha</th>
-                                        <th class="py-4">Estado Salud</th>
-                                        <th class="py-4 pr-6 text-right">Acción</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="text-xs">
-                                    @php
-                                        $sortedEquip = $equipments->filter(fn($e) => $e->next_maintenance_at)->sortBy('next_maintenance_at');
-                                    @endphp
-                                    @forelse($sortedEquip as $eq)
-                                    @php
-                                        $isOverdue = $eq->next_maintenance_at->isPast();
-                                        $isSoon = !$isOverdue && $eq->next_maintenance_at->diffInDays(now()) <= 7;
-                                    @endphp
-                                    <tr class="border-b border-white/5 hover:bg-white/[0.02] transition-colors group">
-                                        <td class="py-4 pl-6">
-                                            <div class="flex flex-col">
-                                                <span class="font-bold text-gray-200">{{ $eq->internal_id }}</span>
-                                                <span class="text-[10px] text-gray-500 truncate w-32">{{ $eq->name }}</span>
-                                            </div>
-                                        </td>
-                                        <td class="py-4">
-                                            <span class="text-gray-400">{{ $eq->last_maintenance_at ? $eq->last_maintenance_at->format('d/m/Y') : ($eq->installation_date ? $eq->installation_date->format('d/m/Y') . ' (Inst)' : 'N/A') }}</span>
-                                        </td>
-                                        <td class="py-4">
-                                            <span class="{{ $isOverdue ? 'text-red-500 font-black' : ($isSoon ? 'text-blue-400 font-bold' : 'text-gray-300') }}">
-                                                {{ $eq->next_maintenance_at->format('d/m/Y') }}
-                                            </span>
-                                        </td>
-                                        <td class="py-4">
-                                            @if($isOverdue)
-                                                <span class="text-[9px] bg-red-500/10 text-red-500 px-2 py-0.5 rounded border border-red-500/20 uppercase font-black">Crítico</span>
-                                            @elseif($isSoon)
-                                                <span class="text-[9px] bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded border border-blue-500/20 uppercase font-black">Programado</span>
-                                            @else
-                                                <span class="text-[9px] bg-emerald-500/10 text-emerald-500 px-2 py-0.5 rounded border border-emerald-500/20 uppercase font-black">Saludable</span>
-                                            @endif
-                                        </td>
-                                        <td class="py-4 pr-6 text-right">
-                                            <button @click="openEditModal(@js($eq))" class="text-[10px] font-black uppercase text-tecsisa-yellow hover:underline">Ver Guía</button>
-                                        </td>
-                                    </tr>
-                                    @empty
-                                    <tr>
-                                        <td colspan="5" class="py-12 text-center text-gray-600 italic">No hay datos de mantenimiento registrados en el catálogo.</td>
-                                    </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+            <!-- Plan de Mantenimiento Tab Removed -->
             <!-- Tab: Equipment (Main Catalog) -->
             <div x-show="activeTab === 'equipment'" x-transition>
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                     <div>
-                        <h3 class="text-white text-xl font-bold">Catálogo Maestro de Activos</h3>
-                        <p class="text-gray-500 text-sm">Gestiona todo el hardware, periféricos y puntos de red.</p>
+                        <h3 class="text-white text-2xl font-black uppercase tracking-wider">Catálogo Maestro de Activos</h3>
+                        <p class="text-gray-500 text-sm font-bold tracking-wide mt-1">Gestiona todo el hardware, periféricos y puntos de red.</p>
                     </div>
                     <div class="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-                        <div class="relative w-full sm:w-auto">
-                            <input type="text" placeholder="Buscar por ID Interno..." class="w-full bg-black/30 border border-white/10 text-sm text-gray-300 rounded-lg pl-10 pr-4 py-2 focus:ring-tecsisa-yellow focus:border-tecsisa-yellow">
-                            <svg class="w-4 h-4 text-gray-500 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        <div class="relative w-full sm:w-auto flex items-center">
+                            <input type="text" placeholder="Buscar por ID..." class="w-full bg-black/40 border-2 border-white/10 text-xs font-bold text-white uppercase tracking-wider rounded-xl pl-10 pr-4 py-2.5 focus:ring-tecsisa-yellow focus:border-tecsisa-yellow transition-colors placeholder-gray-600 outline-none">
+                            <svg class="w-4 h-4 text-gray-500 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </div>
-                        <button @click="openCreateModal()" class="w-full sm:w-auto bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-bold px-4 py-2 rounded-lg text-sm transition shadow-[0_0_10px_rgba(255,209,0,0.2)]">
+                        <button @click="openCreateModal()" class="w-full sm:w-auto flex justify-center items-center bg-tecsisa-yellow hover:bg-yellow-400 text-black px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-[0_10px_20px_rgba(255,209,0,0.3)] transition-all active:scale-95">
                             + Alta de Equipo
                         </button>
                     </div>
@@ -613,40 +503,6 @@
                             </div>
                         </div>
 
-                        <!-- Ciclo de Vida / Mantenimiento -->
-                        <div class="mt-8 p-6 bg-white/5 border border-white/5 rounded-xl">
-                            <h3 class="text-sm font-bold text-blue-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                Ciclo de Vida / Mantenimiento
-                            </h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label class="block text-gray-400 text-xs font-bold uppercase mb-1">Fecha de Instalación / Puesta en Marcha</label>
-                                    <div class="relative">
-                                        <input type="text" name="installation_date" 
-                                               x-init="flatpickr($el, { dateFormat: 'Y-m-d', theme: 'dark', locale: 'es' })"
-                                               x-model="formData.installation_date"
-                                               class="w-full bg-black/40 border-white/10 rounded-lg text-white h-10 px-3 pl-10">
-                                        <div class="absolute left-3 top-2.5 text-gray-600">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div>
-                                    <label class="block text-gray-400 text-xs font-bold uppercase mb-1">Último Mantenimiento Preventivo</label>
-                                    <div class="relative">
-                                        <input type="text" name="last_maintenance_at" 
-                                               x-init="flatpickr($el, { dateFormat: 'Y-m-d', theme: 'dark', locale: 'es' })"
-                                               x-model="formData.last_maintenance_at"
-                                               class="w-full bg-black/40 border-white/10 rounded-lg text-white h-10 px-3 pl-10">
-                                        <div class="absolute left-3 top-2.5 text-gray-600">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg>
-                                        </div>
-                                    </div>
-                                    <p class="text-[10px] text-gray-600 mt-2 italic">Si se deja vacío, se calculará desde la fecha de instalación.</p>
-                                </div>
-                            </div>
-                        </div>
 
                         <!-- SECCIÓN DINÁMICA: Especificaciones Técnicas -->
                         <div x-show="activeSchema.length > 0" x-transition class="mt-8 p-6 bg-white/5 border border-white/5 rounded-xl">
@@ -664,7 +520,7 @@
                                             <select :name="'specs[' + field.label + ']'" x-model="formData.specs[field.label]"
                                                     class="w-full bg-black/60 border-white/5 rounded-lg text-sm text-white focus:border-tecsisa-yellow focus:ring-0 transition h-9 px-3">
                                                 <option value="">-- Seleccione --</option>
-                                                <template x-for="opt in (field.options || '').split(',').map(s => s.trim())" :key="opt">
+                                                <template x-for="(opt, idx) in getDropdownOptions(field.options)" :key="idx">
                                                     <option :value="opt" x-text="opt"></option>
                                                 </template>
                                             </select>
@@ -736,8 +592,9 @@
 
 <script>
     function inventoryManager(locations, systems, racks) {
+        const params = new URLSearchParams(window.location.search);
         return {
-            activeTab: 'equipment',
+            activeTab: params.get('tab') || 'equipment',
             allLocations: locations,
             allSystems: systems,
             allRacks: racks,
@@ -802,6 +659,11 @@
                 const sysId = String(this.formData.system_id);
                 const found = this.allSystems.find(s => String(s.id) === sysId);
                 return found ? (found.form_schema || []) : [];
+            },
+
+            getDropdownOptions(optionsStr) {
+                if (!optionsStr) return [];
+                return String(optionsStr).split(',').map(s => s.trim()).filter(s => s !== '');
             },
 
             // --- Equipment Logic ---
@@ -920,5 +782,7 @@
             }
         };
     }
+
+
 </script>
 </x-app-layout>

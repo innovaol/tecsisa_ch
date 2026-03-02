@@ -68,7 +68,7 @@
             @endif
 
             <!-- Page Content -->
-            <main class="flex-1 w-full relative">
+            <main class="flex-1 w-full relative sm:pb-0 pb-24">
                 {{ $slot }}
             </main>
         </div>
