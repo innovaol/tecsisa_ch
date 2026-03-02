@@ -3,31 +3,63 @@
         <!-- Header -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
             <div>
-                <h2 class="text-2xl md:text-3xl font-black text-white leading-tight">Control de <span class="text-tecsisa-yellow uppercase tracking-widest text-xs font-black">Tareas</span></h2>
-                <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1 px-1">Supervisión y asignación global de trabajos</p>
+                <h2 class="text-2xl md:text-3xl font-black text-white leading-tight">
+                    {{ Auth::user()->hasRole('Administrador') ? 'Gestión de' : 'Mis' }} 
+                    <span class="text-tecsisa-yellow uppercase tracking-widest text-xs font-black">Operaciones</span>
+                </h2>
+                <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1 px-1">
+                    {{ Auth::user()->hasRole('Administrador') ? 'Asignación, seguimiento y trazabilidad técnica' : 'Hoja de ruta y reportes asignados' }}
+                </p>
             </div>
             <div class="flex gap-3">
                 @if(Auth::user()->hasRole('Administrador'))
                 <button @click="showCreateModal = true" class="bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-black px-4 md:px-6 py-2 md:py-3 rounded-xl md:rounded-2xl text-[10px] md:text-xs uppercase tracking-widest transition shadow-xl shadow-yellow-400/20 flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                    Nueva Tarea
+                    Asignar Tarea
                 </button>
                 @endif
-                <a href="{{ route('catalog.index') }}?tab=equipment" class="bg-white/5 hover:bg-white/10 text-white font-bold px-4 md:px-6 py-2 md:py-3 rounded-xl md:rounded-2xl text-[10px] md:text-xs uppercase tracking-widest transition border border-white/10 flex items-center gap-2 hidden md:flex">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
-                    Ver Catálogo
-                </a>
             </div>
         </div>
 
-        <!-- Tasks Table -->
-        <div class="bg-[#0f1217]/50 backdrop-blur-xl border border-white/5 rounded-3xl overflow-hidden shadow-2xl">
+        @if(!empty($stats))
+        <!-- Stats Summary -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div class="bg-[#0f1217]/60 border border-white/5 p-4 rounded-3xl">
+                <p class="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-1">Total Tareas</p>
+                <p class="text-2xl font-black text-white">{{ $stats['total'] }}</p>
+            </div>
+            <div class="bg-tecsisa-yellow/10 border border-tecsisa-yellow/10 p-4 rounded-3xl">
+                <p class="text-[9px] font-black text-tecsisa-yellow uppercase tracking-widest mb-1">Pendientes</p>
+                <p class="text-2xl font-black text-tecsisa-yellow">{{ $stats['pending'] }}</p>
+            </div>
+            <div class="bg-blue-500/10 border border-blue-500/10 p-4 rounded-3xl">
+                <p class="text-[9px] font-black text-blue-400 uppercase tracking-widest mb-1">En Progreso</p>
+                <p class="text-2xl font-black text-blue-400">{{ $stats['in_progress'] }}</p>
+            </div>
+            <div class="bg-emerald-500/10 border border-emerald-500/10 p-4 rounded-3xl">
+                <p class="text-[9px] font-black text-emerald-400 uppercase tracking-widest mb-1">Completadas</p>
+                <p class="text-2xl font-black text-emerald-400">{{ $stats['completed'] }}</p>
+            </div>
+        </div>
+        @endif
+
+        <!-- Tabs / Filters -->
+        <div class="flex items-center gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
+            <a href="{{ route('tasks.index') }}" class="px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition {{ !request('status') ? 'bg-tecsisa-yellow text-tecsisa-dark' : 'bg-white/5 text-gray-500 hover:bg-white/10' }}">Todos</a>
+            <a href="{{ route('tasks.index', ['status' => 'pending']) }}" class="px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition {{ request('status') == 'pending' ? 'bg-tecsisa-yellow text-tecsisa-dark' : 'bg-white/5 text-gray-400 hover:bg-white/10' }}">Pendientes</a>
+            <a href="{{ route('tasks.index', ['status' => 'in_progress']) }}" class="px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition {{ request('status') == 'in_progress' ? 'bg-tecsisa-yellow text-tecsisa-dark' : 'bg-white/5 text-gray-400 hover:bg-white/10' }}">En Progreso</a>
+            <a href="{{ route('tasks.index', ['status' => 'completed']) }}" class="px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition {{ request('status') == 'completed' ? 'bg-tecsisa-yellow text-tecsisa-dark' : 'bg-white/5 text-gray-400 hover:bg-white/10' }}">Completadas</a>
+        </div>
+
+        <!-- Tasks Table (Desktop) -->
+        <div class="hidden md:block bg-[#0f1217]/50 backdrop-blur-xl border border-white/5 rounded-3xl overflow-hidden shadow-2xl">
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
                     <thead>
                         <tr class="bg-white/[0.02] border-b border-white/5">
                             <th class="px-6 py-4 text-[9px] font-black text-gray-500 uppercase tracking-[0.2em]">Tarea</th>
-                            <th class="px-6 py-4 text-[9px] font-black text-gray-500 uppercase tracking-[0.2em]">Activo / Ubicación</th>
+                            <th class="px-6 py-4 text-[9px] font-black text-gray-500 uppercase tracking-[0.2em]">Activo / Ubicación Original</th>
+                            <th class="px-6 py-4 text-[9px] font-black text-gray-500 uppercase tracking-[0.2em]">Tiempos</th>
                             <th class="px-6 py-4 text-[9px] font-black text-gray-500 uppercase tracking-[0.2em]">Responsable</th>
                             <th class="px-6 py-4 text-[9px] font-black text-gray-500 uppercase tracking-[0.2em]">Estado</th>
                             <th class="px-6 py-4 text-[9px] font-black text-gray-500 uppercase tracking-[0.2em] text-right">Acciones</th>
@@ -44,8 +76,22 @@
                             </td>
                             <td class="px-6 py-3.5 text-xs">
                                 <div class="flex flex-col">
-                                    <span class="font-bold text-gray-300 leading-tight">{{ $task->equipment->name ?? 'N/A' }}</span>
-                                    <span class="text-[9px] text-gray-500 uppercase font-black mt-0.5">{{ $task->equipment->location->name ?? 'Sin ubicación' }}</span>
+                                    <span class="font-bold text-gray-300 leading-tight">{{ $task->equipment->name ?? 'Activo eliminado' }}</span>
+                                    <span class="text-[9px] text-gray-500 uppercase font-black mt-0.5">{{ $task->location_snapshot ?? ($task->equipment->location->name ?? 'Sin ubicación') }}</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-3.5 text-xs">
+                                <div class="flex flex-col">
+                                    <div class="flex items-center gap-1.5 text-[9px] font-bold text-gray-400">
+                                        <span class="text-blue-500/60 uppercase tracking-tighter">Asign:</span>
+                                        <span>{{ $task->created_at->format('d/m H:i') }}</span>
+                                    </div>
+                                    @if($task->completed_at)
+                                    <div class="flex items-center gap-1.5 text-[9px] font-bold text-emerald-400 mt-0.5">
+                                        <span class="text-emerald-500/60 uppercase tracking-tighter">Termin:</span>
+                                        <span>{{ $task->completed_at->format('d/m H:i') }}</span>
+                                    </div>
+                                    @endif
                                 </div>
                             </td>
                             <td class="px-6 py-3.5 text-xs">
@@ -61,26 +107,36 @@
                                     {{ $task->status == 'completed' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : '' }}
                                     {{ $task->status == 'pending' ? 'bg-tecsisa-yellow/20 text-tecsisa-yellow border border-tecsisa-yellow/30' : '' }}
                                     {{ $task->status == 'draft' ? 'bg-gray-500/20 text-gray-400 border border-gray-500/30' : '' }}">
-                                    {{ $task->status }}
+                                    @if($task->status === 'draft') Borrador
+                                    @elseif($task->status === 'pending') Pendiente
+                                    @elseif($task->status === 'completed') Finalizada
+                                    @else {{ $task->status }} @endif
                                 </span>
                             </td>
                             <td class="px-6 py-3.5 text-right">
                                 <div class="flex items-center justify-end gap-1.5">
+                                    @if($task->status == 'completed')
+                                    <a href="#" class="p-1.5 bg-emerald-500/10 rounded-lg border border-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition tooltip" title="Ver Reporte PDF">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                    </a>
+                                    @endif
                                     <a href="{{ route('tasks.edit', $task) }}" class="p-1.5 bg-white/5 rounded-lg border border-white/10 text-gray-400 hover:text-white transition">
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                                     </a>
+                                    @if(Auth::user()->hasRole('Administrador') || ($task->assigned_to === Auth::id() && $task->status === 'draft'))
                                     <form action="{{ route('tasks.destroy', $task) }}" method="POST" onsubmit="return confirm('¿Eliminar esta tarea definitivamente?')">
                                         @csrf @method('DELETE')
                                         <button type="submit" class="p-1.5 bg-red-500/10 rounded-lg border border-red-500/10 text-red-400 hover:bg-red-500/20 transition">
                                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                         </button>
                                     </form>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-12 text-center">
+                            <td colspan="6" class="px-6 py-12 text-center">
                                 <div class="flex flex-col items-center justify-center opacity-40">
                                     <svg class="w-8 h-8 text-gray-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
                                     <p class="text-[10px] font-black uppercase tracking-widest">Sin tareas registradas</p>
@@ -91,6 +147,88 @@
                     </tbody>
                 </table>
             </div>
+        </div>
+
+        <!-- Tasks List (Mobile) -->
+        <div class="md:hidden space-y-4">
+            @forelse($tasks as $task)
+            <div class="bg-gradient-to-br from-[#12161f] to-[#0a0d14] border border-white/5 rounded-[2rem] p-5 shadow-2xl relative overflow-hidden group active:scale-[0.98] transition-all">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="flex flex-col">
+                        <span class="text-[9px] font-black text-gray-500 uppercase tracking-[0.2em] mb-1.5 flex items-center gap-1.5">
+                            <span class="w-1 h-1 rounded-full bg-tecsisa-yellow"></span>
+                            @if($task->task_type === 'maintenance') MANTENIMIENTO
+                            @elseif($task->task_type === 'replacement') REEMPLAZO
+                            @elseif($task->task_type === 'installation') INSTALACIÓN
+                            @else {{ $task->task_type }} @endif
+                             - 
+                            @if($task->priority === 'low') BAJA
+                            @elseif($task->priority === 'medium') MEDIA
+                            @elseif($task->priority === 'high') ALTA
+                            @elseif($task->priority === 'critical') CRÍTICA
+                            @else {{ $task->priority }} @endif
+                        </span>
+                        <h3 class="text-sm font-black text-white leading-tight group-hover:text-tecsisa-yellow transition-colors">{{ $task->title }}</h3>
+                    </div>
+                    <span class="px-2 py-0.5 rounded-lg text-[8px] font-black uppercase tracking-widest border
+                        {{ $task->status == 'completed' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : '' }}
+                        {{ $task->status == 'pending' ? 'bg-tecsisa-yellow/10 text-tecsisa-yellow border-tecsisa-yellow/20' : '' }}
+                        {{ $task->status == 'draft' ? 'bg-gray-500/10 text-gray-400 border-white/5' : '' }}">
+                        @if($task->status === 'draft') Borrador
+                        @elseif($task->status === 'pending') Pendiente
+                        @elseif($task->status === 'completed') Finalizada
+                        @else {{ $task->status }} @endif
+                    </span>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4 mb-5 p-4 rounded-2xl bg-black/30 border border-white/5 shadow-inner">
+                    <div>
+                        <p class="text-[8px] font-black text-gray-500 uppercase tracking-widest mb-1.5">Activo</p>
+                        <p class="text-[10px] font-bold text-gray-200 leading-tight">{{ $task->equipment->name ?? 'N/A' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-[8px] font-black text-gray-500 uppercase tracking-widest mb-1.5">Ubicación</p>
+                        <p class="text-[10px] font-bold text-gray-200 truncate leading-tight">{{ $task->location_snapshot ?? 'N/A' }}</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center border border-blue-500/10 text-blue-400 text-[10px] font-black uppercase shadow-lg">
+                            {{ substr($task->assignee->name ?? '?', 0, 1) }}
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] font-black text-gray-300 leading-none">{{ $task->assignee->name ?? 'Sin asignar' }}</span>
+                            <span class="text-[8px] text-gray-500 font-bold uppercase mt-1">{{ $task->created_at->format('d/m H:i') }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-2">
+                        @if($task->status == 'completed')
+                        <a href="#" class="w-10 h-10 flex items-center justify-center bg-emerald-500/10 rounded-xl border border-emerald-500/10 text-emerald-400 shadow-lg active:scale-90 transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        </a>
+                        @endif
+                        <a href="{{ route('tasks.edit', $task) }}" class="w-10 h-10 flex items-center justify-center bg-white/5 rounded-xl border border-white/10 text-gray-400 shadow-lg active:scale-90 transition hover:text-white">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                        </a>
+                        @if(Auth::user()->hasRole('Administrador') || ($task->assigned_to === Auth::id() && $task->status === 'draft'))
+                        <form action="{{ route('tasks.destroy', $task) }}" method="POST" onsubmit="return confirm('¿Eliminar esta tarea definitivamente?')">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="w-10 h-10 flex items-center justify-center bg-red-500/10 rounded-xl border border-red-500/10 text-red-400 shadow-lg active:scale-90 transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
+                        </form>
+                        @endif
+                    </div>
+                </div>
+            </div>
+            @empty
+            <div class="py-12 flex flex-col items-center opacity-40">
+                <svg class="w-10 h-10 text-gray-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+                <p class="text-xs font-black uppercase tracking-widest text-white">Sin tareas pendientes</p>
+            </div>
+            @endforelse
         </div>
 
         @if(Auth::user()->hasRole('Administrador'))
@@ -132,7 +270,7 @@
                                 <select name="task_type" required class="w-full bg-black/40 border-white/10 rounded-xl text-white text-sm focus:border-tecsisa-yellow focus:ring-tecsisa-yellow transition h-11 px-4 font-bold">
                                     <option value="maintenance">Mantenimiento</option>
                                     <option value="replacement">Reemplazo</option>
-                                    <option value="installation">Instalación / Deploy</option>
+                                    <option value="installation">Instalación</option>
                                 </select>
                             </div>
                             <div>

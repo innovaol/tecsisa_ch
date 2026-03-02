@@ -14,6 +14,7 @@ class Task extends Model
     protected $casts = [
         'form_data' => 'array',
         'completed_at' => 'datetime',
+        'started_at' => 'datetime',
     ];
 
     public function equipment()

@@ -44,19 +44,12 @@
         </div>
 
         <div x-ref="listContainer">
-            <!-- Tab Switcher (Consistent with Scanner Index) -->
-            <div class="flex bg-black/40 border border-white/5 p-1 rounded-full mb-8 relative">
-                <div class="absolute inset-y-1 w-[calc(33.33%-4px)] bg-[#1a202c] rounded-full shadow left-[66.66%] border border-white/5"></div>
-                
-                <a href="{{ route('technician.scanner', ['mode' => 'scan']) }}" class="flex-1 py-3 text-[10px] font-black uppercase tracking-widest text-center relative z-10 transition-colors text-gray-500 hover:text-white">
-                    Escáner
-                </a>
-                <a href="{{ route('technician.scanner', ['mode' => 'text']) }}" class="flex-1 py-3 text-[10px] font-black uppercase tracking-widest text-center relative z-10 transition-colors text-gray-500 hover:text-white">
-                    Por ID
-                </a>
-                <button class="flex-1 py-3 text-[10px] font-black uppercase tracking-widest text-center relative z-10 transition-colors text-white">
-                    Explorar
-                </button>
+            <!-- Título de Sección -->
+            <div class="flex items-center justify-between mb-8 px-1">
+                <h2 class="text-sm font-black text-white uppercase tracking-[0.2em] flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-tecsisa-yellow"></span> Explorar Inventario
+                </h2>
+                <span class="text-[9px] font-black text-gray-600 uppercase tracking-widest">{{ $locations->sum(fn($l) => $l->equipments->count()) }} Activos</span>
             </div>
 
             <!-- Location Groups -->

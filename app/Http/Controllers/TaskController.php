@@ -13,26 +13,41 @@ class TaskController extends Controller
     /**
      * Display a listing of the tasks.
      */
-    public function index()
+    public function index(Request $request)
     {
         $query = Task::with(['equipment.system', 'equipment.location', 'assignee']);
-        $users = collect();
-        $equipments = collect();
+
+        if ($request->has('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $users = \App\Models\User::all(['id', 'name']);
+        $equipments = \App\Models\Equipment::all(['id', 'name', 'internal_id']);
 
         if (Auth::user()->hasRole('Administrador')) {
-            // Admin sees everything
+            $allTasks = Task::all(); // For global stats
             $tasks = $query->orderBy('created_at', 'desc')->get();
-            $users = \App\Models\User::all(['id', 'name']);
-            $equipments = \App\Models\Equipment::all(['id', 'name', 'internal_id']);
+            $stats = [
+                'total' => $allTasks->count(),
+                'pending' => $allTasks->where('status', 'pending')->count(),
+                'in_progress' => $allTasks->where('status', 'in_progress')->count(),
+                'completed' => $allTasks->where('status', 'completed')->count(),
+            ];
         }
         else {
-            // Technicians only see their assignments
+            $myTasks = Task::where('assigned_to', Auth::id())->get();
             $tasks = $query->where('assigned_to', Auth::id())
                 ->orderBy('created_at', 'desc')
                 ->get();
+            $stats = [
+                'total' => $myTasks->count(),
+                'pending' => $myTasks->where('status', 'pending')->count(),
+                'in_progress' => $myTasks->where('status', 'in_progress')->count(),
+                'completed' => $myTasks->where('status', 'completed')->count(),
+            ];
         }
 
-        return view('tasks.index', compact('tasks', 'users', 'equipments'));
+        return view('tasks.index', compact('tasks', 'users', 'equipments', 'stats'));
     }
 
     /**
@@ -66,14 +81,23 @@ class TaskController extends Controller
             'form_data' => 'nullable|array',
         ]);
 
+        $equipment = Equipment::with('location')->findOrFail($validated['equipment_id']);
+        $locationPath = $equipment->location ? $equipment->location->name : 'Sin ubicación';
+
+        // Build full path if possible
+        if ($equipment->location && $equipment->location->parent) {
+            $locationPath = $equipment->location->parent->name . ' > ' . $locationPath;
+        }
+
         $task = Task::create([
             'equipment_id' => $validated['equipment_id'],
+            'location_snapshot' => $locationPath,
             'title' => $validated['title'],
             'description' => $validated['description'],
             'priority' => $validated['priority'],
             'task_type' => $validated['task_type'],
-            'assigned_to' => $validated['assigned_to'] ?? Auth::id(), // Allow admins to set assignee
-            'status' => $validated['status'] ?? 'pending', // Admins probably want directly pending tasks
+            'assigned_to' => $validated['assigned_to'] ?? Auth::id(),
+            'status' => $validated['status'] ?? 'pending',
             'form_data' => $validated['form_data'] ?? [],
         ]);
 
@@ -117,32 +141,94 @@ class TaskController extends Controller
         // Merge existing form data with new
         $mergedData = array_merge($task->form_data ?? [], $validated['form_data'] ?? []);
 
-        // HANDLE PHOTO UPLOADS
-        if ($request->hasFile('photos')) {
-            $photos = $request->file('photos');
-            $photoPaths = $mergedData['photos'] ?? [];
-
-            foreach ($photos as $key => $file) {
-                // Key can be 'before', 'after', etc.
+        // HANDLE PHOTO UPLOADS (BEFORE, AFTER, FLUKE)
+        // HANDLE PHOTO UPLOADS (BEFORE, AFTER, FLUKE)
+        $photoKeys = ['before', 'after', 'fluke_screen'];
+        $photoPaths = $mergedData['photos'] ?? [];
+        foreach ($photoKeys as $key) {
+            // Check both regular and capture variants
+            $file = $request->file("photos.$key") ?? $request->file("photos.{$key}_capture");
+            if ($file) {
                 $path = $file->store('tasks/' . $task->id, 'public');
                 $photoPaths[$key] = $path;
             }
-            $mergedData['photos'] = $photoPaths;
         }
+        $mergedData['photos'] = $photoPaths;
+
+        // HANDLE FINDINGS GALLERY (HALLAZGOS)
+        $findings = [];
+        $findingCaptions = $request->input('finding_captions', []);
+        $findingPaths = $request->input('finding_paths', []);
+        $findingPhotos = $request->file('finding_photos', []);
+        $findingPhotosCapture = $request->file('finding_photos_capture', []);
+
+        foreach ($findingCaptions as $index => $caption) {
+            $path = $findingPaths[$index] ?? null;
+
+            // Priority: New upload (Gallery or Camera) over existing path
+            $uploadedFile = $findingPhotos[$index] ?? $findingPhotosCapture[$index] ?? null;
+
+            if ($uploadedFile) {
+                $path = $uploadedFile->store('tasks/' . $task->id . '/findings', 'public');
+            }
+
+            if ($path || !empty($caption)) {
+                $findings[] = [
+                    'photo' => $path,
+                    'caption' => $caption
+                ];
+            }
+        }
+        $mergedData['findings'] = $findings;
+
+        // HANDLE MATERIALS
+        $materials = [];
+        $materialNames = $request->input('material_names', []);
+        $materialQtys = $request->input('material_qtys', []);
+        foreach ($materialNames as $index => $name) {
+            if (!empty($name)) {
+                $materials[] = [
+                    'name' => $name,
+                    'qty' => $materialQtys[$index] ?? 1
+                ];
+            }
+        }
+        $mergedData['materials'] = $materials;
 
         // Update task model
         $task->description = $validated['description'] ?? $task->description;
         $task->form_data = $mergedData;
 
+        // Auto-set started_at if not set and data is coming in
+        if (!$task->started_at && !empty($validated['form_data'])) {
+            $task->started_at = now();
+            $task->initial_status = $request->input('initial_status') ?? 'En revisión';
+        }
+
         if ($validated['action'] === 'submit') {
-            $task->status = 'pending';
+            $task->status = 'completed';
             $task->completed_at = now();
+            $task->final_status = $request->input('final_status') ?? 'Operativo / Finalizado';
             $task->save();
-            return redirect()->route('technician.scanner.result', $task->equipment_id)->with('success', 'Tarea completada profesionalmente.');
+            return redirect()->route('tasks.index')->with('success', 'Tarea completada profesionalmente.');
         }
         else {
             $task->save();
-            return redirect()->route('technician.scanner.result', $task->equipment_id)->with('success', 'Avance guardado.');
+            return redirect()->route('tasks.index')->with('success', 'Avance guardado.');
         }
+    }
+
+    public function destroy(Task $task)
+    {
+        // Admin can delete anything. Technician only their own drafts.
+        $isAdmin = Auth::user()->hasRole('Administrador');
+        $isOwner = $task->assigned_to === Auth::id();
+
+        if ($isAdmin || ($isOwner && ($task->status === 'draft' || $task->status === 'pending'))) {
+            $task->delete();
+            return redirect()->route('tasks.index')->with('success', 'Tarea eliminada correctamente.');
+        }
+
+        abort(403, 'No tienes permiso para eliminar esta tarea.');
     }
 }

@@ -1,10 +1,7 @@
 <x-technician-layout :hideNav="true" hideHeader="true">
     <div class="fixed top-0 inset-x-0 z-[60] bg-[#0a0d14]/95 backdrop-blur-3xl border-b border-white/5 pt-safe">
         <div class="px-4 py-4 flex items-center justify-between max-w-4xl mx-auto">
-            <a href="{{ route('technician.scanner.result', $task->equipment_id) }}" class="md:hidden w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white transition shadow-lg">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-            </a>
-            <a href="{{ route('tasks.index') }}" class="hidden md:flex w-10 h-10 rounded-full bg-white/5 border border-white/10 items-center justify-center text-gray-400 hover:text-white transition shadow-lg">
+            <a href="{{ route('tasks.index') }}" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white transition shadow-lg">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
             </a>
             <h1 class="text-xs md:text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
@@ -27,70 +24,220 @@
             </div>
         </div>
 
-        <form action="{{ route('tasks.update', $task) }}" method="POST" enctype="multipart/form-data" x-data="{
-            isSubmitting: false,
-            confirmFinal: false,
-            doSubmit(actionType) {
-                if(this.isSubmitting) return;
-                
-                if(actionType === 'save_draft' && !confirm('¿Deseas guardar los cambios actuales como borrador?')) {
-                    return;
-                }
-
-                if(actionType === 'submit') {
-                    if(!this.confirmFinal) {
-                        alert('Debes marcar la casilla de confirmación de reporte profesional.');
-                        return;
-                    }
-                    if(!confirm('¿Estás seguro de FINALIZAR este reporte? Una vez enviado no podrá ser editado.')) {
-                        return;
-                    }
-                }
-
-                this.isSubmitting = true;
-                this.$refs.actionField.value = actionType;
-                this.$refs.form.submit();
-            }
-        }" x-ref="form">
+        <form action="{{ route('tasks.update', $task) }}" method="POST" enctype="multipart/form-data" 
+              x-data="technicianForm({
+                  status: '{{ $task->status }}',
+                  findings: {{ json_encode($task->form_data['findings'] ?? []) }},
+                  materials: {{ json_encode($task->form_data['materials'] ?? []) }},
+                  previews: {
+                      before: '{{ isset($task->form_data['photos']['before']) ? asset('storage/' . $task->form_data['photos']['before']) : '' }}',
+                      after: '{{ isset($task->form_data['photos']['after']) ? asset('storage/' . $task->form_data['photos']['after']) : '' }}',
+                      fluke_screen: '{{ isset($task->form_data['photos']['fluke_screen']) ? asset('storage/' . $task->form_data['photos']['fluke_screen']) : '' }}'
+                  },
+                  storagePath: '{{ asset('storage') }}/'
+              })" 
+              x-ref="form" id="tech-form">
             @csrf
             @method('PUT')
             <input type="hidden" name="action" value="save_draft" x-ref="actionField">
 
             <!-- 📸 SECCIÓN UNIVERSAL: EVIDENCIA VISUAL -->
-            <h3 class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-4 px-1 flex items-center gap-2">
+            <h3 class="text-[10px] font-black text-white uppercase tracking-[0.3em] mb-4 px-1 flex items-center gap-2">
                 <svg class="w-4 h-4 text-tecsisa-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                Registro Fotográfico (Antes y Después)
+                Registro Fotográfico (Obligatorio)
             </h3>
-            <div class="grid grid-cols-2 md:grid-cols-2 gap-3 md:gap-6 mb-8">
-                <div class="bg-[#12161f] border border-white/5 p-4 md:p-6 rounded-3xl md:rounded-2xl flex flex-col items-center md:items-start text-center md:text-left">
-                    <span class="text-[9px] md:text-xs uppercase font-black text-gray-500 mb-3 md:mb-4">Situación Inicial</span>
-                    <div class="relative w-full aspect-square md:aspect-auto md:h-16 bg-black/60 rounded-2xl md:rounded-xl overflow-hidden flex flex-col md:flex-row items-center justify-center md:justify-start md:px-5 border border-dashed border-white/10 group active:scale-95 md:active:scale-100 md:hover:border-tecsisa-yellow/50 transition cursor-pointer">
-                        @if(isset($task->form_data['photos']['before']))
-                            <img src="{{ asset('storage/' . $task->form_data['photos']['before']) }}" class="absolute md:relative inset-0 w-full h-full md:w-10 md:h-10 object-cover md:rounded-md">
-                            <span class="hidden md:block text-[10px] text-green-400 font-bold ml-4 uppercase tracking-widest">Cargada ✓</span>
-                        @else
-                            <div class="flex flex-col md:flex-row items-center gap-1 md:gap-3 pointer-events-none">
-                                <svg class="w-6 h-6 md:w-5 md:h-5 text-gray-600 group-hover:text-tecsisa-yellow transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-width="2.5" stroke-linecap="round"></path></svg>
-                                <span class="text-[8px] md:text-[10px] font-black text-gray-700 md:text-gray-500 uppercase md:group-hover:text-tecsisa-yellow transition-colors tracking-widest">Explorar Archivos</span>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+                <!-- Foto Inicial -->
+                <div class="bg-[#12161f] border border-white/5 p-6 rounded-[2.5rem] flex flex-col items-center text-center shadow-2xl relative overflow-hidden">
+                    <span class="text-[9px] uppercase font-black text-gray-500 mb-4 tracking-[0.2em] flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> Situación Inicial
+                    </span>
+                    
+                    <div class="w-full relative">
+                        <div class="relative w-full aspect-video bg-black/60 rounded-3xl overflow-hidden flex flex-col items-center justify-center border border-dashed border-white/10 shadow-inner mb-4 transition-all duration-300" :class="previews.before ? 'border-solid border-tecsisa-yellow/30' : 'border-dashed border-white/10'">
+                            <template x-if="previews.before">
+                                <img :src="previews.before" class="absolute inset-0 w-full h-full object-cover">
+                            </template>
+                            <template x-if="!previews.before">
+                                <div class="flex flex-col items-center gap-3 opacity-20">
+                                    <svg class="w-10 h-10 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                </div>
+                            </template>
+                        </div>
+
+                        <!-- Acciones Dinámicas -->
+                        <div class="w-full">
+                            <div x-show="!previews.before" class="flex flex-col gap-3">
+                                <div class="flex md:hidden w-full gap-3">
+                                    <label class="flex-1 flex flex-col items-center gap-2 bg-tecsisa-yellow p-4 rounded-2xl text-black active:scale-95 transition cursor-pointer">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path></svg>
+                                        <span class="text-[8px] font-black uppercase tracking-widest leading-none">Cámara</span>
+                                        <input type="file" name="photos[before_capture]" capture="environment" class="hidden" accept="image/*" @change="previewPhoto($event, 'before')">
+                                    </label>
+                                    <label class="flex-1 flex flex-col items-center gap-2 bg-white/10 border border-white/10 p-4 rounded-2xl text-white active:scale-95 transition cursor-pointer">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                        <span class="text-[8px] font-black uppercase tracking-widest leading-none">Galería</span>
+                                        <input type="file" name="photos[before]" class="hidden" accept="image/*" @change="previewPhoto($event, 'before')">
+                                    </label>
+                                </div>
+                                <label class="hidden md:flex w-full items-center justify-center gap-3 bg-white/5 border border-white/10 hover:border-tecsisa-yellow/50 p-4 rounded-2xl text-gray-400 hover:text-tecsisa-yellow transition cursor-pointer group">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                                    <span class="text-xs font-black uppercase tracking-widest leading-none">Seleccionar Archivo</span>
+                                    <input type="file" name="photos[before]" class="hidden" accept="image/*" @change="previewPhoto($event, 'before')">
+                                </label>
                             </div>
-                        @endif
-                        <input type="file" name="photos[before]" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*">
+                            <div x-show="previews.before" class="flex gap-3">
+                                <button type="button" @click="removePhoto('before')" class="flex-1 h-12 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-[10px] font-black uppercase tracking-widest active:scale-95 transition flex items-center justify-center gap-2">Quitar</button>
+                                <button type="button" @click="removePhoto('before')" class="flex-1 h-12 bg-white/5 border border-white/10 rounded-xl text-white text-[10px] font-black uppercase tracking-widest active:scale-95 transition flex items-center justify-center gap-2">Repetir</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="bg-[#12161f] border border-white/5 p-4 md:p-6 rounded-3xl md:rounded-2xl flex flex-col items-center md:items-start text-center md:text-left">
-                    <span class="text-[9px] md:text-xs uppercase font-black text-gray-500 mb-3 md:mb-4">Trabajo Finalizado</span>
-                    <div class="relative w-full aspect-square md:aspect-auto md:h-16 bg-black/60 rounded-2xl md:rounded-xl overflow-hidden flex flex-col md:flex-row items-center justify-center md:justify-start md:px-5 border border-dashed border-white/10 group active:scale-95 md:active:scale-100 md:hover:border-tecsisa-yellow/50 transition cursor-pointer">
-                        @if(isset($task->form_data['photos']['after']))
-                            <img src="{{ asset('storage/' . $task->form_data['photos']['after']) }}" class="absolute md:relative inset-0 w-full h-full md:w-10 md:h-10 object-cover md:rounded-md">
-                            <span class="hidden md:block text-[10px] text-green-400 font-bold ml-4 uppercase tracking-widest">Cargada ✓</span>
-                        @else
-                            <div class="flex flex-col md:flex-row items-center gap-1 md:gap-3 pointer-events-none">
-                                <svg class="w-6 h-6 md:w-5 md:h-5 text-gray-600 group-hover:text-tecsisa-yellow transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-width="2.5" stroke-linecap="round"></path></svg>
-                                <span class="text-[8px] md:text-[10px] font-black text-gray-700 md:text-gray-500 uppercase md:group-hover:text-tecsisa-yellow transition-colors tracking-widest">Explorar Archivos</span>
+
+                <!-- Foto Final -->
+                <div class="bg-[#12161f] border border-white/5 p-6 rounded-[2.5rem] flex flex-col items-center text-center shadow-2xl relative overflow-hidden">
+                    <span class="text-[9px] uppercase font-black text-gray-500 mb-4 tracking-[0.2em] flex items-center gap-2">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Trabajo Finalizado
+                    </span>
+                    
+                    <div class="w-full relative">
+                        <div class="relative w-full aspect-video bg-black/60 rounded-3xl overflow-hidden flex flex-col items-center justify-center border border-dashed border-white/10 shadow-inner mb-4 transition-all duration-300" :class="previews.after ? 'border-solid border-tecsisa-yellow/30' : 'border-dashed border-white/10'">
+                            <template x-if="previews.after">
+                                <img :src="previews.after" class="absolute inset-0 w-full h-full object-cover">
+                            </template>
+                            <template x-if="!previews.after">
+                                <div class="flex flex-col items-center gap-3 opacity-20">
+                                    <svg class="w-10 h-10 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-width="1.5" stroke-linecap="round"></path></svg>
+                                </div>
+                            </template>
+                        </div>
+
+                        <!-- Acciones Dinámicas -->
+                        <div class="w-full">
+                            <div x-show="!previews.after" class="flex flex-col gap-3">
+                                <div class="flex md:hidden w-full gap-3">
+                                    <label class="flex-1 flex flex-col items-center gap-2 bg-tecsisa-yellow p-4 rounded-2xl text-black active:scale-95 transition cursor-pointer">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path></svg>
+                                        <span class="text-[8px] font-black uppercase tracking-widest leading-none">Cámara</span>
+                                        <input type="file" name="photos[after_capture]" capture="environment" class="hidden" accept="image/*" @change="previewPhoto($event, 'after')">
+                                    </label>
+                                    <label class="flex-1 flex flex-col items-center gap-2 bg-white/10 border border-white/10 p-4 rounded-2xl text-white active:scale-95 transition cursor-pointer">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                        <span class="text-[8px] font-black uppercase tracking-widest leading-none">Galería</span>
+                                        <input type="file" name="photos[after]" class="hidden" accept="image/*" @change="previewPhoto($event, 'after')">
+                                    </label>
+                                </div>
+                                <label class="hidden md:flex w-full items-center justify-center gap-3 bg-white/5 border border-white/10 hover:border-tecsisa-yellow/50 p-4 rounded-2xl text-gray-400 hover:text-tecsisa-yellow transition cursor-pointer group">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                                    <span class="text-xs font-black uppercase tracking-widest leading-none">Seleccionar Archivo</span>
+                                    <input type="file" name="photos[after]" class="hidden" accept="image/*" @change="previewPhoto($event, 'after')">
+                                </label>
                             </div>
-                        @endif
-                        <input type="file" name="photos[after]" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*">
+                            <div x-show="previews.after" class="flex gap-3">
+                                <button type="button" @click="removePhoto('after')" class="flex-1 h-12 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-[10px] font-black uppercase tracking-widest active:scale-95 transition flex items-center justify-center gap-2">Quitar</button>
+                                <button type="button" @click="removePhoto('after')" class="flex-1 h-12 bg-white/5 border border-white/10 rounded-xl text-white text-[10px] font-black uppercase tracking-widest active:scale-95 transition flex items-center justify-center gap-2">Repetir</button>
+                            </div>
+                        </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- 📸 SECCIÓN: GALERÍA DE HALLAZGOS (HALLAZGOS TÉCNICOS) -->
+            <h3 class="text-[10px] font-black text-tecsisa-yellow uppercase tracking-[0.3em] mb-4 px-1 flex items-center gap-2">
+                <svg class="w-4 h-4 text-tecsisa-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                Hallazgos Técnicos (Evidencia Detallada)
+            </h3>
+            <div class="space-y-4 mb-10">
+                <template x-for="(f, index) in findings" :key="index">
+                    <div class="bg-gradient-to-br from-[#12161f] to-[#0a0d14] border border-white/10 p-4 rounded-3xl relative shadow-2xl overflow-hidden group">
+                        <button type="button" @click="removeFinding(index)" class="absolute top-4 right-4 text-red-400/50 hover:text-red-400 transition z-10">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                        
+                        <div class="flex flex-col md:flex-row gap-4">
+                            <div class="w-full md:w-56">
+                                <div class="relative w-full aspect-square md:aspect-video bg-black/60 rounded-2xl border border-dashed border-white/10 flex flex-col items-center justify-center shadow-inner relative overflow-hidden transition-all duration-300" :class="previews.findings[index] ? 'border-solid border-tecsisa-yellow/30' : 'border-dashed border-white/10'">
+                                    <template x-if="previews.findings[index]">
+                                        <img :src="previews.findings[index]" class="absolute inset-0 w-full h-full object-cover">
+                                    </template>
+                                    
+                                    <template x-if="!previews.findings[index]">
+                                        <div class="flex flex-col items-center gap-2 opacity-10">
+                                            <svg class="w-8 h-8 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                        </div>
+                                    </template>
+                                </div>
+
+                                <!-- Acciones Dinámicas Findings -->
+                                <div class="mt-3">
+                                    <!-- Mobile Controls -->
+                                    <div x-show="!previews.findings[index]" class="flex md:hidden gap-3 w-full">
+                                        <label class="flex-1 flex flex-col items-center gap-2 bg-tecsisa-yellow p-3 rounded-xl text-black active:scale-95 transition cursor-pointer">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path></svg>
+                                            <span class="text-[7px] font-black uppercase tracking-widest leading-none">Cámara</span>
+                                            <input type="file" :name="'finding_photos_capture['+index+']'" capture="environment" class="hidden" accept="image/*" @change="previewPhoto($event, 'findings', index)">
+                                        </label>
+                                        <label class="flex-1 flex flex-col items-center gap-2 bg-white/10 border border-white/10 p-3 rounded-xl text-white active:scale-95 transition cursor-pointer">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                            <span class="text-[7px] font-black uppercase tracking-widest leading-none">Galería</span>
+                                            <input type="file" :name="'finding_photos['+index+']'" class="hidden" accept="image/*" @change="previewPhoto($event, 'findings', index)">
+                                        </label>
+                                    </div>
+                                    
+                                    <!-- PC Control -->
+                                    <label x-show="!previews.findings[index]" class="hidden md:flex flex-col items-center gap-2 text-gray-500 hover:text-tecsisa-yellow transition cursor-pointer bg-white/5 border border-white/10 p-4 rounded-xl">
+                                        <svg class="w-6 h-6 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                                        <span class="text-[8px] font-black uppercase tracking-widest">Añadir Archivo</span>
+                                        <input type="file" :name="'finding_photos['+index+']'" class="hidden" accept="image/*" @change="previewPhoto($event, 'findings', index)">
+                                    </label>
+
+                                    <!-- Action Buttons if Photo Exists -->
+                                    <div x-show="previews.findings[index]" class="flex gap-2">
+                                        <button type="button" @click="removePhoto('findings', index)" class="flex-1 h-10 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 text-[8px] font-black uppercase active:scale-95 transition">Quitar</button>
+                                        <button type="button" @click="removePhoto('findings', index)" class="flex-1 h-10 bg-white/5 border border-white/10 rounded-lg text-white text-[8px] font-black uppercase active:scale-95 transition">Repetir</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <label class="block text-[8px] font-black text-gray-500 uppercase tracking-widest mb-1.5 px-1">Leyenda / Hallazgo observado</label>
+                                <textarea :name="'finding_captions['+index+']'" x-model="f.caption" rows="2" class="w-full bg-black/40 border-none rounded-2xl text-[10px] font-bold text-gray-200 p-4 leading-relaxed focus:ring-1 focus:ring-tecsisa-yellow/30 placeholder:text-gray-700 transition" placeholder="Describa el detalle observado en sitio..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+                
+                <button type="button" @click="addFinding()" class="w-full h-16 bg-white/5 border border-dashed border-white/10 rounded-3xl flex items-center justify-center gap-3 text-gray-500 hover:text-tecsisa-yellow hover:border-tecsisa-yellow/30 active:scale-95 transition duration-300">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
+                    <span class="text-[9px] font-black uppercase tracking-[0.2em]">Añadir Nuevo Hallazgo</span>
+                </button>
+            </div>
+
+            <!-- 🛠️ SECCIÓN: INSUMOS Y MATERIALES UTILIZADOS -->
+            <h3 class="text-[10px] font-black text-emerald-500 uppercase tracking-[0.3em] mb-4 px-1 flex items-center gap-2">
+                <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                Materiales e Insumos Utilizados
+            </h3>
+            <div class="space-y-3 mb-12">
+                <div class="bg-[#12161f] rounded-3xl border border-white/5 p-4">
+                    <template x-for="(m, index) in materials" :key="index">
+                        <div class="flex items-center gap-3 mb-3 animate-fadeIn">
+                            <div class="flex-1">
+                                <input type="text" name="material_names[]" x-model="m.name" placeholder="Ej: Metros de Cable CAT6" class="w-full bg-black/40 border border-white/5 rounded-xl text-[10px] text-white font-bold h-11 px-4 focus:ring-1 focus:ring-emerald-500/30">
+                            </div>
+                            <div class="w-24">
+                                <input type="number" name="material_qtys[]" x-model="m.qty" class="w-full bg-black/40 border border-white/5 rounded-xl text-[10px] text-white font-bold h-11 px-2 text-center focus:ring-1 focus:ring-emerald-500/30">
+                            </div>
+                            <button type="button" @click="removeMaterial(index)" class="text-red-400 p-2 hover:bg-red-500/10 rounded-lg transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                        </div>
+                    </template>
+                    
+                    <button type="button" @click="addMaterial()" class="w-full h-11 bg-emerald-500/5 border border-dashed border-emerald-500/20 rounded-xl flex items-center justify-center gap-2 text-emerald-500/60 hover:text-emerald-500 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                        <span class="text-[9px] font-black uppercase tracking-widest">Añadir Insumo (Cable, RJ45, etc)</span>
+                    </button>
                 </div>
             </div>
 
@@ -102,36 +249,60 @@
             </h3>
             <div class="space-y-4 mb-8">
                 <div class="bg-gradient-to-br from-[#12161f] to-[#0a0d14] border border-white/10 p-5 rounded-3xl shadow-xl">
-                    <div class="flex items-center gap-4 mb-6">
-                        <div class="w-14 h-14 bg-blue-500/10 rounded-2xl border border-blue-500/20 flex items-center justify-center shrink-0">
-                            <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    <div class="flex flex-col md:flex-row items-center gap-6 mb-8">
+                        <div class="w-24 h-24 bg-blue-500/10 rounded-2xl border border-blue-500/20 flex items-center justify-center shrink-0 relative overflow-hidden shadow-inner transition-all duration-300" :class="previews.fluke_screen ? 'border-solid border-blue-400' : 'border-dashed border-blue-500/20'">
+                            <template x-if="previews.fluke_screen">
+                                <img :src="previews.fluke_screen" class="absolute inset-0 w-full h-full object-cover">
+                            </template>
+                            <template x-if="!previews.fluke_screen">
+                                <svg class="w-10 h-10 text-blue-400 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            </template>
                         </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-[9px] md:text-xs font-black text-blue-400 uppercase tracking-widest mb-1 leading-none text-center md:text-left">Captura de Pantalla Certificador</p>
-                            <div class="relative w-full h-12 md:h-14 bg-black/50 border border-white/5 rounded-xl overflow-hidden flex items-center justify-center md:justify-start md:px-5 group active:scale-[0.98] transition cursor-pointer md:hover:border-tecsisa-yellow/50">
-                                @if(isset($task->form_data['photos']['fluke_screen']))
-                                    <span class="text-[10px] md:text-xs text-green-400 font-bold uppercase tracking-widest flex items-center gap-2">
-                                        <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
-                                        Imagen Cargada
-                                    </span>
-                                @else
-                                    <div class="flex items-center gap-2 pointer-events-none">
-                                        <svg class="w-4 h-4 text-gray-500 group-hover:text-tecsisa-yellow transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-                                        <span class="text-[10px] text-gray-500 font-bold uppercase tracking-widest group-hover:text-tecsisa-yellow transition-colors">Adjuntar de Galería/Archivo</span>
+                        
+                        <div class="flex-1 w-full">
+                            <p class="text-[9px] font-black text-blue-400 uppercase tracking-widest mb-3 leading-none text-center md:text-left">Captura de Pantalla Certificador</p>
+                            
+                            <!-- Acciones Dinámicas Fluke -->
+                            <div class="w-full">
+                                <!-- Estado: Sin Foto -->
+                                <div x-show="!previews.fluke_screen" class="flex flex-col md:flex-row gap-3">
+                                    <!-- Mobile -->
+                                    <div class="flex md:hidden gap-3 w-full">
+                                        <label class="flex-1 flex items-center justify-center gap-2 bg-tecsisa-yellow h-12 rounded-xl text-black active:scale-95 transition cursor-pointer">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path></svg>
+                                            <span class="text-[8px] font-black uppercase tracking-widest leading-none">Cámara</span>
+                                            <input type="file" name="photos[fluke_screen_capture]" capture="environment" class="hidden" accept="image/*" @change="previewPhoto($event, 'fluke_screen')">
+                                        </label>
+                                        <label class="flex-1 flex items-center justify-center gap-2 bg-white/10 border border-white/10 h-12 rounded-xl text-white active:scale-95 transition cursor-pointer">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                            <span class="text-[8px] font-black uppercase tracking-widest leading-none">Galería</span>
+                                            <input type="file" name="photos[fluke_screen]" class="hidden" accept="image/*" @change="previewPhoto($event, 'fluke_screen')">
+                                        </label>
                                     </div>
-                                @endif
-                                <input type="file" name="photos[fluke_screen]" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*">
+                                    <!-- PC -->
+                                    <label class="hidden md:flex flex-1 items-center justify-center gap-3 bg-white/5 border border-white/10 hover:border-tecsisa-yellow/50 h-12 rounded-xl text-gray-400 hover:text-tecsisa-yellow transition cursor-pointer group px-4">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                                        <span class="text-[10px] font-black uppercase tracking-widest">Seleccionar Archivo</span>
+                                        <input type="file" name="photos[fluke_screen]" class="hidden" accept="image/*" @change="previewPhoto($event, 'fluke_screen')">
+                                    </label>
+                                </div>
+                                
+                                <!-- Estado: Con Foto -->
+                                <div x-show="previews.fluke_screen" class="flex gap-3">
+                                    <button type="button" @click="removePhoto('fluke_screen')" class="flex-1 h-12 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-[10px] font-black uppercase tracking-widest active:scale-95 transition flex items-center justify-center gap-2">Quitar</button>
+                                    <button type="button" @click="removePhoto('fluke_screen')" class="flex-1 h-12 bg-white/5 border border-white/10 rounded-xl text-white text-[10px] font-black uppercase tracking-widest active:scale-95 transition flex items-center justify-center gap-2">Repetir</button>
+                                </div>
                             </div>
                         </div>
                     </div>
                     
                     <div class="grid grid-cols-2 gap-3">
-                        <div class="bg-black/40 p-3 rounded-2xl border border-white/5">
-                            <label class="block text-[8px] font-black text-gray-500 uppercase mb-1">Margen (dB)</label>
+                        <div class="bg-black/40 p-4 rounded-2xl border border-white/5">
+                            <label class="block text-[8px] font-black text-gray-500 uppercase mb-1 tracking-widest">Margen (dB)</label>
                             <input type="text" name="form_data[fluke_margin]" value="{{ $task->form_data['fluke_margin'] ?? '' }}" placeholder="Ej: 6.4" class="w-full bg-transparent text-white font-mono font-bold text-center outline-none border-none p-0">
                         </div>
-                        <div class="bg-black/40 p-3 rounded-2xl border border-white/5">
-                            <label class="block text-[8px] font-black text-gray-500 uppercase mb-1">Longitud (m)</label>
+                        <div class="bg-black/40 p-4 rounded-2xl border border-white/5">
+                            <label class="block text-[8px] font-black text-gray-500 uppercase mb-1 tracking-widest">Longitud (m)</label>
                             <input type="text" name="form_data[fluke_length]" value="{{ $task->form_data['fluke_length'] ?? '' }}" placeholder="Ej: 42.1" class="w-full bg-transparent text-white font-mono font-bold text-center outline-none border-none p-0">
                         </div>
                     </div>
@@ -216,10 +387,10 @@
             @endif
 
             <!-- Área de Observaciones Generales (Aplicable a todas las tareas) -->
-            <h3 class="text-xs font-black text-gray-500 uppercase tracking-widest mb-3 px-1 text-center">Informe final del técnico</h3>
+            <h3 class="text-xs font-black text-gray-500 uppercase tracking-widest mb-3 px-1 text-center font-black">Resumen Ejecutivo Final</h3>
             <div class="bg-gradient-to-b from-[#12161f] to-[#0a0d14] border border-white/10 p-5 rounded-[2rem] mb-12 shadow-inner">
                 <textarea name="description" rows="5"
-                          class="w-full bg-transparent border-none text-gray-100 text-sm px-0 py-0 focus:ring-0 transition placeholder-gray-700 resize-none leading-relaxed"
+                          class="w-full bg-transparent border-none text-gray-100 text-sm px-0 py-0 focus:ring-0 transition placeholder-gray-700 resize-none leading-relaxed font-bold"
                           placeholder="Escribe aquí el resumen ejecutivo técnico de la labor realizada...">{{ old('description', $task->description) }}</textarea>
                 
                 <div class="mt-4 pt-4 border-t border-white/5 flex items-center justify-between">
@@ -253,4 +424,86 @@
             <div class="h-32 md:hidden"></div>
         </form>
     </div>
+
+    @push('scripts')
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('technicianForm', (config) => ({
+                isSubmitting: false,
+                confirmFinal: config.status === 'completed',
+                findings: config.findings,
+                materials: config.materials,
+                previews: {
+                    before: config.previews.before,
+                    after: config.previews.after,
+                    fluke_screen: config.previews.fluke_screen,
+                    findings: []
+                },
+                init() {
+                    this.findings.forEach((f, i) => {
+                        this.previews.findings[i] = f.photo ? config.storagePath + f.photo : '';
+                    });
+                },
+                previewPhoto(event, key, index = null) {
+                    const file = event.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        if (index !== null) {
+                            this.previews.findings[index] = e.target.result;
+                        } else {
+                            this.previews[key] = e.target.result;
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                },
+                removePhoto(key, index = null) {
+                    if (index !== null) {
+                        this.previews.findings[index] = '';
+                    } else {
+                        this.previews[key] = '';
+                    }
+                },
+                addFinding() {
+                    this.findings.push({ photo: null, caption: '' });
+                    this.previews.findings.push('');
+                },
+                removeFinding(index) {
+                    if(confirm('¿Seguro de remover este hallazgo?')) {
+                        this.findings.splice(index, 1);
+                        this.previews.findings.splice(index, 1);
+                    }
+                },
+                addMaterial() {
+                    this.materials.push({ name: '', qty: 1 });
+                },
+                removeMaterial(index) {
+                    this.materials.splice(index, 1);
+                },
+                doSubmit(actionType) {
+                    if(this.isSubmitting) return;
+                    
+                    if(actionType === 'save_draft' && !confirm('¿Deseas guardar los cambios actuales como borrador?')) {
+                        return;
+                    }
+
+                    if(actionType === 'submit') {
+                        if(!this.confirmFinal) {
+                            alert('Debes marcar la casilla de confirmación de reporte profesional.');
+                            return;
+                        }
+
+                        if(!confirm('¿Estás seguro de FINALIZAR este reporte? Una vez enviado no podrá ser editado.')) {
+                            return;
+                        }
+                    }
+
+                    this.isSubmitting = true;
+                    this.$refs.actionField.value = actionType;
+                    this.$refs.form.submit();
+                }
+            }));
+        });
+    </script>
+    @endpush
 </x-technician-layout>

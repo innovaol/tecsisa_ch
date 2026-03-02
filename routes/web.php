@@ -9,17 +9,23 @@ Route::redirect('/', '/login');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
-            if (\Illuminate\Support\Facades\Auth::user()->hasRole('Tecnico')) {
-                return redirect()->route('technician.dashboard');
+            $user = \Illuminate\Support\Facades\Auth::user();
+
+            if ($user->hasRole('Administrador')) {
+                $equipos_operativos = \App\Models\Equipment::where('status', 'operative')->count();
+                $trabajos_pendientes = \App\Models\Task::where('status', '!=', 'completed')->count();
+                $cable_instalado = "5,420";
+                $recent_activity = \App\Models\Task::with(['equipment.location'])->orderBy('updated_at', 'desc')->take(5)->get();
+            }
+            else {
+                // Technician Specific Stats
+                $equipos_operativos = \App\Models\Task::where('assigned_to', $user->id)->where('status', 'completed')->count();
+                $trabajos_pendientes = \App\Models\Task::where('assigned_to', $user->id)->where('status', '!=', 'completed')->count();
+                $cable_instalado = \App\Models\Task::where('assigned_to', $user->id)->count(); // Use this slot for "Total Asignadas"
+                $recent_activity = \App\Models\Task::with(['equipment.location'])->where('assigned_to', $user->id)->orderBy('updated_at', 'desc')->take(5)->get();
             }
 
-            $equipos_operativos = \App\Models\Equipment::where('status', 'operative')->count();
-            // Since we don't have tickets/tasks yet, let's hardcode or calculate maintenance
-            $trabajos_pendientes = \App\Models\Equipment::where('status', 'under_maintenance')->count();
-            // Fiber/Cobre total length (Just a simulated aggregate for now since we don't have links yet)
-            $cable_instalado = "5,420";
-
-            return view('dashboard', compact('equipos_operativos', 'trabajos_pendientes', 'cable_instalado'));
+            return view('dashboard', compact('equipos_operativos', 'trabajos_pendientes', 'cable_instalado', 'recent_activity'));
         }
         )->name('dashboard');
 
