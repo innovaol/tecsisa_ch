@@ -28,17 +28,17 @@
                 <button @click="activeTab = 'locations'" 
                         :class="activeTab === 'locations' ? 'text-tecsisa-yellow border-b-2 border-tecsisa-yellow' : 'text-gray-500 hover:text-gray-300'"
                         class="px-4 py-2 font-bold transition-all uppercase text-sm tracking-widest">
-                    Ubicaciones / Racks
+                    Ubicaciones
                 </button>
                 <button @click="activeTab = 'systems'" 
                         :class="activeTab === 'systems' ? 'text-tecsisa-yellow border-b-2 border-tecsisa-yellow' : 'text-gray-500 hover:text-gray-300'"
                         class="px-4 py-2 font-bold transition-all uppercase text-sm tracking-widest">
-                    Sistemas Técnicos
+                    Sistemas
                 </button>
                 <button @click="activeTab = 'equipment'" 
                         :class="activeTab === 'equipment' ? 'text-tecsisa-yellow border-b-2 border-tecsisa-yellow' : 'text-gray-500 hover:text-gray-300'"
                         class="px-4 py-2 font-bold transition-all uppercase text-sm tracking-widest">
-                    Inventario de Equipos
+                    Inventario
                 </button>
             </div>
 
