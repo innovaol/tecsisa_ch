@@ -41,6 +41,10 @@
             @method('PUT')
             <input type="hidden" name="action" value="save_draft" x-ref="actionField">
 
+            @php
+                $isReadOnly = in_array($task->status, ['completed', 'verified']);
+            @endphp
+
             <!-- 📸 SECCIÓN UNIVERSAL: EVIDENCIA VISUAL -->
             <h3 class="text-[10px] font-black text-white uppercase tracking-[0.3em] mb-4 px-1 flex items-center gap-2">
                 <svg class="w-4 h-4 text-tecsisa-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
@@ -68,6 +72,7 @@
 
                         <!-- Acciones Dinámicas -->
                         <div class="w-full">
+                            @unless($isReadOnly)
                             <div x-show="!previews.before" class="flex flex-col gap-3">
                                 <div class="flex md:hidden w-full gap-3">
                                     <label class="flex-1 flex flex-col items-center gap-2 bg-tecsisa-yellow p-4 rounded-2xl text-black active:scale-95 transition cursor-pointer">
@@ -87,13 +92,14 @@
                                     <input type="file" name="photos[before]" class="hidden" accept="image/*" @change="previewPhoto($event, 'before')">
                                 </label>
                             </div>
-                            <div x-show="previews.before" class="flex gap-3">
-                                <button type="button" @click="removePhoto('before')" class="flex-1 h-12 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-[10px] font-black uppercase tracking-widest active:scale-95 transition flex items-center justify-center gap-2">Quitar</button>
-                                <button type="button" @click="removePhoto('before')" class="flex-1 h-12 bg-white/5 border border-white/10 rounded-xl text-white text-[10px] font-black uppercase tracking-widest active:scale-95 transition flex items-center justify-center gap-2">Repetir</button>
+                                <div x-show="previews.before" class="flex gap-3">
+                                    <button type="button" @click="removePhoto('before')" class="flex-1 h-12 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-[10px] font-black uppercase tracking-widest active:scale-95 transition flex items-center justify-center gap-2">Quitar</button>
+                                    <button type="button" @click="removePhoto('before')" class="flex-1 h-12 bg-white/5 border border-white/10 rounded-xl text-white text-[10px] font-black uppercase tracking-widest active:scale-95 transition flex items-center justify-center gap-2">Repetir</button>
+                                </div>
                             </div>
+                            @endunless
                         </div>
                     </div>
-                </div>
 
                 <!-- Foto Final -->
                 <div class="bg-[#12161f] border border-white/5 p-6 rounded-[2.5rem] flex flex-col items-center text-center shadow-2xl relative overflow-hidden">
@@ -115,6 +121,7 @@
 
                         <!-- Acciones Dinámicas -->
                         <div class="w-full">
+                            @unless($isReadOnly)
                             <div x-show="!previews.after" class="flex flex-col gap-3">
                                 <div class="flex md:hidden w-full gap-3">
                                     <label class="flex-1 flex flex-col items-center gap-2 bg-tecsisa-yellow p-4 rounded-2xl text-black active:scale-95 transition cursor-pointer">
@@ -138,6 +145,7 @@
                                 <button type="button" @click="removePhoto('after')" class="flex-1 h-12 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-[10px] font-black uppercase tracking-widest active:scale-95 transition flex items-center justify-center gap-2">Quitar</button>
                                 <button type="button" @click="removePhoto('after')" class="flex-1 h-12 bg-white/5 border border-white/10 rounded-xl text-white text-[10px] font-black uppercase tracking-widest active:scale-95 transition flex items-center justify-center gap-2">Repetir</button>
                             </div>
+                            @endunless
                         </div>
                     </div>
                 </div>
@@ -151,9 +159,11 @@
             <div class="space-y-4 mb-10">
                 <template x-for="(f, index) in findings" :key="index">
                     <div class="bg-gradient-to-br from-[#12161f] to-[#0a0d14] border border-white/10 p-4 rounded-3xl relative shadow-2xl overflow-hidden group">
+                        @unless($isReadOnly)
                         <button type="button" @click="removeFinding(index)" class="absolute top-4 right-4 text-red-400/50 hover:text-red-400 transition z-10">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                         </button>
+                        @endunless
                         
                         <div class="flex flex-col md:flex-row gap-4">
                             <div class="w-full md:w-56">
@@ -171,6 +181,7 @@
 
                                 <!-- Acciones Dinámicas Findings -->
                                 <div class="mt-3">
+                                    @unless($isReadOnly)
                                     <!-- Mobile Controls -->
                                     <div x-show="!previews.findings[index]" class="flex md:hidden gap-3 w-full">
                                         <label class="flex-1 flex flex-col items-center gap-2 bg-tecsisa-yellow p-3 rounded-xl text-black active:scale-95 transition cursor-pointer">
@@ -201,17 +212,19 @@
                             </div>
                             <div class="flex-1 min-w-0">
                                 <label class="block text-[8px] font-black text-gray-500 uppercase tracking-widest mb-1.5 px-1">Leyenda / Hallazgo observado</label>
-                                <textarea :name="'finding_captions['+index+']'" x-model="f.caption" rows="2" class="w-full bg-black/40 border-none rounded-2xl text-[10px] font-bold text-gray-200 p-4 leading-relaxed focus:ring-1 focus:ring-tecsisa-yellow/30 placeholder:text-gray-700 transition" placeholder="Describa el detalle observado en sitio..."></textarea>
+                                <textarea :name="'finding_captions['+index+']'" x-model="f.caption" rows="2" {{ $isReadOnly ? 'disabled' : '' }} class="w-full bg-black/40 border-none rounded-2xl text-[10px] font-bold text-gray-200 p-4 leading-relaxed focus:ring-1 focus:ring-tecsisa-yellow/30 placeholder:text-gray-700 transition disabled:opacity-70 disabled:cursor-not-allowed" placeholder="{{ $isReadOnly ? '' : 'Describa el detalle observado en sitio...' }}"></textarea>
                                 <input type="hidden" :name="'finding_paths['+index+']'" :value="f.photo">
                             </div>
                         </div>
                     </div>
                 </template>
                 
+                @unless($isReadOnly)
                 <button type="button" @click="addFinding()" class="w-full h-16 bg-white/5 border border-dashed border-white/10 rounded-3xl flex items-center justify-center gap-3 text-gray-500 hover:text-tecsisa-yellow hover:border-tecsisa-yellow/30 active:scale-95 transition duration-300">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
                     <span class="text-[9px] font-black uppercase tracking-[0.2em]">Añadir Nuevo Hallazgo</span>
                 </button>
+                @endunless
             </div>
 
             <!-- 🛠️ SECCIÓN: INSUMOS Y MATERIALES UTILIZADOS -->
@@ -224,10 +237,10 @@
                     <template x-for="(m, index) in materials" :key="index">
                         <div class="flex items-center gap-3 mb-3 animate-fadeIn">
                             <div class="flex-1">
-                                <input type="text" name="material_names[]" x-model="m.name" placeholder="Ej: Metros de Cable CAT6" class="w-full bg-black/40 border border-white/5 rounded-xl text-[10px] text-white font-bold h-11 px-4 focus:ring-1 focus:ring-emerald-500/30">
+                                <input type="text" name="material_names[]" x-model="m.name" placeholder="Ej: Metros de Cable CAT6" {{ $isReadOnly ? 'disabled' : '' }} class="w-full bg-black/40 border border-white/5 rounded-xl text-[10px] text-white font-bold h-11 px-4 focus:ring-1 focus:ring-emerald-500/30 disabled:opacity-70">
                             </div>
                             <div class="w-24">
-                                <input type="number" name="material_qtys[]" x-model="m.qty" class="w-full bg-black/40 border border-white/5 rounded-xl text-[10px] text-white font-bold h-11 px-2 text-center focus:ring-1 focus:ring-emerald-500/30">
+                                <input type="number" name="material_qtys[]" x-model="m.qty" {{ $isReadOnly ? 'disabled' : '' }} class="w-full bg-black/40 border border-white/5 rounded-xl text-[10px] text-white font-bold h-11 px-2 text-center focus:ring-1 focus:ring-emerald-500/30 disabled:opacity-70">
                             </div>
                             <button type="button" @click="removeMaterial(index)" class="text-red-400 p-2 hover:bg-red-500/10 rounded-lg transition">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -235,10 +248,12 @@
                         </div>
                     </template>
                     
+                    @unless($isReadOnly)
                     <button type="button" @click="addMaterial()" class="w-full h-11 bg-emerald-500/5 border border-dashed border-emerald-500/20 rounded-xl flex items-center justify-center gap-2 text-emerald-500/60 hover:text-emerald-500 transition">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
                         <span class="text-[9px] font-black uppercase tracking-widest">Añadir Insumo (Cable, RJ45, etc)</span>
                     </button>
+                    @endunless
                 </div>
             </div>
 
@@ -265,6 +280,7 @@
                             
                             <!-- Acciones Dinámicas Fluke -->
                             <div class="w-full">
+                                @unless($isReadOnly)
                                 <!-- Estado: Sin Foto -->
                                 <div x-show="!previews.fluke_screen" class="flex flex-col md:flex-row gap-3">
                                     <!-- Mobile -->
@@ -293,6 +309,7 @@
                                     <button type="button" @click="removePhoto('fluke_screen')" class="flex-1 h-12 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-[10px] font-black uppercase tracking-widest active:scale-95 transition flex items-center justify-center gap-2">Quitar</button>
                                     <button type="button" @click="removePhoto('fluke_screen')" class="flex-1 h-12 bg-white/5 border border-white/10 rounded-xl text-white text-[10px] font-black uppercase tracking-widest active:scale-95 transition flex items-center justify-center gap-2">Repetir</button>
                                 </div>
+                                @endunless
                             </div>
                         </div>
                     </div>
@@ -300,11 +317,11 @@
                     <div class="grid grid-cols-2 gap-3">
                         <div class="bg-black/40 p-4 rounded-2xl border border-white/5">
                             <label class="block text-[8px] font-black text-gray-500 uppercase mb-1 tracking-widest">Margen (dB)</label>
-                            <input type="text" name="form_data[fluke_margin]" value="{{ $task->form_data['fluke_margin'] ?? '' }}" placeholder="Ej: 6.4" class="w-full bg-transparent text-white font-mono font-bold text-center outline-none border-none p-0">
+                            <input type="text" name="form_data[fluke_margin]" value="{{ $task->form_data['fluke_margin'] ?? '' }}" placeholder="Ej: 6.4" {{ $isReadOnly ? 'disabled' : '' }} class="w-full bg-transparent text-white font-mono font-bold text-center outline-none border-none p-0 disabled:opacity-70">
                         </div>
                         <div class="bg-black/40 p-4 rounded-2xl border border-white/5">
                             <label class="block text-[8px] font-black text-gray-500 uppercase mb-1 tracking-widest">Longitud (m)</label>
-                            <input type="text" name="form_data[fluke_length]" value="{{ $task->form_data['fluke_length'] ?? '' }}" placeholder="Ej: 42.1" class="w-full bg-transparent text-white font-mono font-bold text-center outline-none border-none p-0">
+                            <input type="text" name="form_data[fluke_length]" value="{{ $task->form_data['fluke_length'] ?? '' }}" placeholder="Ej: 42.1" {{ $isReadOnly ? 'disabled' : '' }} class="w-full bg-transparent text-white font-mono font-bold text-center outline-none border-none p-0 disabled:opacity-70">
                         </div>
                     </div>
                 </div>
@@ -347,15 +364,15 @@
                 <div class="bg-[#12161f] border border-white/5 rounded-3xl p-5 mb-8 space-y-4 shadow-xl">
                     <label class="flex items-center justify-between p-3 bg-black/30 rounded-2xl border border-white/5 group active:bg-tecsisa-yellow/5">
                         <span class="text-xs font-bold text-gray-400 group-hover:text-white transition">Limpieza Física y Soplado</span>
-                        <input type="checkbox" name="form_data[maint_clean]" value="1" {{ ($task->form_data['maint_clean'] ?? false) ? 'checked' : '' }} class="w-5 h-5 rounded border-white/10 bg-black text-tecsisa-yellow focus:ring-tecsisa-yellow">
+                        <input type="checkbox" name="form_data[maint_clean]" value="1" {{ ($task->form_data['maint_clean'] ?? false) ? 'checked' : '' }} {{ $isReadOnly ? 'disabled' : '' }} class="w-5 h-5 rounded border-white/10 bg-black text-tecsisa-yellow focus:ring-tecsisa-yellow disabled:opacity-50">
                     </label>
                     <label class="flex items-center justify-between p-3 bg-black/30 rounded-2xl border border-white/5 group active:bg-tecsisa-yellow/5">
                         <span class="text-xs font-bold text-gray-400 group-hover:text-white transition">Ajuste de Conectores / Peinado</span>
-                        <input type="checkbox" name="form_data[maint_cables]" value="1" {{ ($task->form_data['maint_cables'] ?? false) ? 'checked' : '' }} class="w-5 h-5 rounded border-white/10 bg-black text-tecsisa-yellow focus:ring-tecsisa-yellow">
+                        <input type="checkbox" name="form_data[maint_cables]" value="1" {{ ($task->form_data['maint_cables'] ?? false) ? 'checked' : '' }} {{ $isReadOnly ? 'disabled' : '' }} class="w-5 h-5 rounded border-white/10 bg-black text-tecsisa-yellow focus:ring-tecsisa-yellow disabled:opacity-50">
                     </label>
                     <label class="flex items-center justify-between p-3 bg-black/30 rounded-2xl border border-white/5 group active:bg-tecsisa-yellow/5">
                         <span class="text-xs font-bold text-gray-400 group-hover:text-white transition">Verificación de Etiquetado</span>
-                        <input type="checkbox" name="form_data[maint_tags]" value="1" {{ ($task->form_data['maint_tags'] ?? false) ? 'checked' : '' }} class="w-5 h-5 rounded border-white/10 bg-black text-tecsisa-yellow focus:ring-tecsisa-yellow">
+                        <input type="checkbox" name="form_data[maint_tags]" value="1" {{ ($task->form_data['maint_tags'] ?? false) ? 'checked' : '' }} {{ $isReadOnly ? 'disabled' : '' }} class="w-5 h-5 rounded border-white/10 bg-black text-tecsisa-yellow focus:ring-tecsisa-yellow disabled:opacity-50">
                     </label>
                 </div>
 
@@ -367,7 +384,7 @@
                 <div class="bg-red-500/5 border border-red-500/10 rounded-3xl p-5 mb-8 space-y-4">
                     <div class="bg-black/40 p-3 rounded-2xl border border-white/5">
                         <label class="block text-[8px] font-black text-red-400 uppercase mb-1 tracking-tighter">S/N Equipo Entrante</label>
-                        <input type="text" name="form_data[new_serial]" value="{{ $task->form_data['new_serial'] ?? '' }}" placeholder="Escanea serial nuevo..." class="w-full bg-transparent text-white font-mono font-bold text-sm outline-none border-none p-0">
+                        <input type="text" name="form_data[new_serial]" value="{{ $task->form_data['new_serial'] ?? '' }}" placeholder="Escanea serial nuevo..." {{ $isReadOnly ? 'disabled' : '' }} class="w-full bg-transparent text-white font-mono font-bold text-sm outline-none border-none p-0 disabled:opacity-70">
                     </div>
                 </div>
 
@@ -379,7 +396,7 @@
                 <div class="bg-cyan-500/5 border border-cyan-500/10 rounded-3xl p-5 mb-8 space-y-4">
                     <div class="bg-black/40 p-4 rounded-2xl border border-white/5">
                         <label class="block text-[9px] font-black text-cyan-400 uppercase mb-2">Prueba de Continuidad / Link</label>
-                        <select name="form_data[install_test]" class="w-full bg-transparent text-white text-xs font-bold outline-none border-none p-0 uppercase">
+                        <select name="form_data[install_test]" {{ $isReadOnly ? 'disabled' : '' }} class="w-full bg-transparent text-white text-xs font-bold outline-none border-none p-0 uppercase disabled:opacity-70">
                             <option value="PASS" {{ ($task->form_data['install_test'] ?? '') == 'PASS' ? 'selected' : '' }}>Prueba Exitosa (PASS) ✓</option>
                             <option value="FAIL" {{ ($task->form_data['install_test'] ?? '') == 'FAIL' ? 'selected' : '' }}>Prueba Fallida (FAIL) ✗</option>
                         </select>
@@ -396,31 +413,31 @@
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div>
                         <label class="block text-[8px] font-black text-gray-500 uppercase mb-2 tracking-widest pl-1">Edificio / Bloque</label>
-                        <input type="text" name="form_data[building]" value="{{ $task->form_data['building'] ?? '' }}" placeholder="Ej: Edificio G" class="w-full bg-black/40 border-white/5 rounded-xl text-[11px] text-white font-bold h-11 px-4 focus:ring-1 focus:ring-tecsisa-yellow/30 transition">
+                        <input type="text" name="form_data[building]" value="{{ $task->form_data['building'] ?? '' }}" placeholder="Ej: Edificio G" {{ $isReadOnly ? 'disabled' : '' }} class="w-full bg-black/40 border-white/5 rounded-xl text-[11px] text-white font-bold h-11 px-4 focus:ring-1 focus:ring-tecsisa-yellow/30 transition disabled:opacity-70">
                     </div>
                     <div>
                         <label class="block text-[8px] font-black text-gray-500 uppercase mb-2 tracking-widest pl-1">Nivel / Piso</label>
-                        <input type="text" name="form_data[floor]" value="{{ $task->form_data['floor'] ?? '' }}" placeholder="Ej: Planta Alta" class="w-full bg-black/40 border-white/5 rounded-xl text-[11px] text-white font-bold h-11 px-4 focus:ring-1 focus:ring-tecsisa-yellow/30 transition">
+                        <input type="text" name="form_data[floor]" value="{{ $task->form_data['floor'] ?? '' }}" placeholder="Ej: Planta Alta" {{ $isReadOnly ? 'disabled' : '' }} class="w-full bg-black/40 border-white/5 rounded-xl text-[11px] text-white font-bold h-11 px-4 focus:ring-1 focus:ring-tecsisa-yellow/30 transition disabled:opacity-70">
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div>
                         <label class="block text-[8px] font-black text-gray-500 uppercase mb-2 tracking-widest pl-1">Área Específica</label>
-                        <input type="text" name="form_data[specific_area]" value="{{ $task->form_data['specific_area'] ?? '' }}" placeholder="Ej: Hospitalización" class="w-full bg-black/40 border-white/5 rounded-xl text-[11px] text-white font-bold h-11 px-4 focus:ring-1 focus:ring-tecsisa-yellow/30 transition">
+                        <input type="text" name="form_data[specific_area]" value="{{ $task->form_data['specific_area'] ?? '' }}" placeholder="Ej: Hospitalización" {{ $isReadOnly ? 'disabled' : '' }} class="w-full bg-black/40 border-white/5 rounded-xl text-[11px] text-white font-bold h-11 px-4 focus:ring-1 focus:ring-tecsisa-yellow/30 transition disabled:opacity-70">
                     </div>
                     <div>
                         <label class="block text-[8px] font-black text-gray-500 uppercase mb-2 tracking-widest pl-1">Sección</label>
-                        <input type="text" name="form_data[section]" value="{{ $task->form_data['section'] ?? '' }}" placeholder="Ej: Hemato Oncología" class="w-full bg-black/40 border-white/5 rounded-xl text-[11px] text-white font-bold h-11 px-4 focus:ring-1 focus:ring-tecsisa-yellow/30 transition">
+                        <input type="text" name="form_data[section]" value="{{ $task->form_data['section'] ?? '' }}" placeholder="Ej: Hemato Oncología" {{ $isReadOnly ? 'disabled' : '' }} class="w-full bg-black/40 border-white/5 rounded-xl text-[11px] text-white font-bold h-11 px-4 focus:ring-1 focus:ring-tecsisa-yellow/30 transition disabled:opacity-70">
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-[8px] font-black text-gray-400 uppercase mb-2 tracking-widest pl-1">Hora Inicio</label>
-                        <input type="time" name="form_data[start_time]" value="{{ $task->form_data['start_time'] ?? '' }}" class="w-full bg-black/40 border-white/5 rounded-xl text-[11px] text-white font-bold h-11 px-4 focus:ring-1 focus:ring-tecsisa-yellow/30">
+                        <input type="time" name="form_data[start_time]" value="{{ $task->form_data['start_time'] ?? '' }}" {{ $isReadOnly ? 'disabled' : '' }} class="w-full bg-black/40 border-white/5 rounded-xl text-[11px] text-white font-bold h-11 px-4 focus:ring-1 focus:ring-tecsisa-yellow/30 disabled:opacity-70">
                     </div>
                     <div>
                         <label class="block text-[8px] font-black text-gray-400 uppercase mb-2 tracking-widest pl-1">Hora Término</label>
-                        <input type="time" name="form_data[end_time]" value="{{ $task->form_data['end_time'] ?? '' }}" class="w-full bg-black/40 border-white/5 rounded-xl text-[11px] text-white font-bold h-11 px-4 focus:ring-1 focus:ring-tecsisa-yellow/30">
+                        <input type="time" name="form_data[end_time]" value="{{ $task->form_data['end_time'] ?? '' }}" {{ $isReadOnly ? 'disabled' : '' }} class="w-full bg-black/40 border-white/5 rounded-xl text-[11px] text-white font-bold h-11 px-4 focus:ring-1 focus:ring-tecsisa-yellow/30 disabled:opacity-70">
                     </div>
                 </div>
             </div>
@@ -465,7 +482,7 @@
                             <td class="px-5 py-3">
                                 <input type="text" name="form_data[evaluation][{{ $index }}][comment]" 
                                        value="{{ $task->form_data['evaluation'][$index]['comment'] ?? '' }}"
-                                       placeholder="..." class="w-full bg-transparent border-b border-white/10 text-[9px] text-gray-400 focus:text-white transition focus:border-tecsisa-yellow outline-none px-1 h-8">
+                                       placeholder="..." {{ $isReadOnly ? 'disabled' : '' }} class="w-full bg-transparent border-b border-white/10 text-[9px] text-gray-400 focus:text-white transition focus:border-tecsisa-yellow outline-none px-1 h-8 disabled:opacity-70">
                             </td>
                         </tr>
                         @endforeach
@@ -512,7 +529,7 @@
                 
                 <label class="flex items-center gap-4 cursor-pointer group">
                     <div class="relative">
-                        <input type="checkbox" x-model="confirmFinal" class="hidden">
+                        <input type="checkbox" x-model="confirmFinal" {{ $isReadOnly ? 'disabled' : '' }} class="hidden">
                         <div class="w-8 h-8 rounded-xl border-2 transition-all flex items-center justify-center" :class="confirmFinal ? 'bg-tecsisa-yellow border-tecsisa-yellow' : 'bg-black/40 border-white/10 group-hover:border-tecsisa-yellow/50'">
                             <svg x-show="confirmFinal" class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                         </div>

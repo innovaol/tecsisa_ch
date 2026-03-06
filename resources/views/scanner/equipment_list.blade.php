@@ -30,115 +30,95 @@
             </div>
         </div>
 
-        <!-- Desktop View: Table (Hidden on mobile) -->
-        <div class="hidden md:block bg-[#0f1217]/50 backdrop-blur-xl border border-white/5 rounded-3xl overflow-hidden shadow-2xl">
-            <table class="w-full text-left">
-                <thead>
-                    <tr class="bg-white/[0.02] border-b border-white/5">
-                        <th class="px-6 py-4 text-[9px] font-black text-gray-500 uppercase tracking-[0.2em]">ID Interno</th>
-                        <th class="px-6 py-4 text-[9px] font-black text-gray-500 uppercase tracking-[0.2em]">Equipo / Activo</th>
-                        <th class="px-6 py-4 text-[9px] font-black text-gray-500 uppercase tracking-[0.2em]">Ubicación</th>
-                        <th class="px-6 py-4 text-[9px] font-black text-gray-500 uppercase tracking-[0.2em]">Sistema</th>
-                        <th class="px-6 py-4 text-[9px] font-black text-gray-500 uppercase tracking-[0.2em]">Estado</th>
-                        <th class="px-6 py-4 text-[9px] font-black text-gray-500 uppercase tracking-[0.2em] text-right">Ver Detalle</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-white/5">
-                    @foreach($locations as $location)
-                        @foreach($location->equipments as $eq)
-                            @php
-                                $searchString = strtolower($eq->name . ' ' . $eq->internal_id . ' ' . ($eq->serial_number ?? '') . ' ' . $location->name);
-                            @endphp
-                            <tr class="equipment-item hover:bg-white/[0.02] transition-colors" 
-                                data-search="{{ $searchString }}"
-                                x-show="matches('{{ $searchString }}')">
-                                <td class="px-6 py-4 text-xs font-black text-tecsisa-yellow font-mono tracking-widest">
-                                    {{ $eq->internal_id }}
-                                </td>
-                                <td class="px-6 py-4 text-xs font-bold text-gray-200">
-                                    {{ $eq->name }}
-                                </td>
-                                <td class="px-6 py-4 text-xs text-gray-400 font-bold uppercase tracking-tight">
+        <!-- Unified Responsive Inventory View -->
+        <div class="bg-[#0f1217]/50 backdrop-blur-xl border border-white/5 rounded-3xl overflow-hidden shadow-2xl">
+            <!-- Table Header (Desktop Only) -->
+            <div class="hidden md:grid grid-cols-12 bg-white/[0.02] border-b border-white/5 px-6 py-4 text-[9px] font-black text-gray-500 uppercase tracking-[0.2em] items-center">
+                <div class="col-span-2">ID Interno</div>
+                <div class="col-span-4">Equipo / Activo</div>
+                <div class="col-span-3">Ubicación de Site</div>
+                <div class="col-span-1">Sistema</div>
+                <div class="col-span-1 text-center">Estado</div>
+                <div class="col-span-1 text-right">Detalle</div>
+            </div>
+
+            <div class="divide-y divide-white/5">
+                @foreach($locations as $location)
+                    @foreach($location->equipments as $eq)
+                        @php
+                            $searchString = strtolower($eq->name . ' ' . $eq->internal_id . ' ' . ($eq->serial_number ?? '') . ' ' . $location->name);
+                        @endphp
+                        <div class="equipment-item group transition-all" 
+                             data-search="{{ $searchString }}"
+                             x-show="matches('{{ $searchString }}')">
+                            
+                            <!-- DESKTOP LAYOUT (Row) -->
+                            <div class="hidden md:grid grid-cols-12 px-6 py-5 items-center hover:bg-white/[0.02] transition-colors">
+                                <div class="col-span-2 text-xs font-black text-tecsisa-yellow font-mono tracking-widest">{{ $eq->internal_id }}</div>
+                                <div class="col-span-4 flex flex-col">
+                                    <span class="text-xs font-bold text-gray-200">{{ $eq->name }}</span>
+                                    <span class="text-[8px] text-gray-600 font-bold uppercase tracking-widest mt-0.5">SN: {{ $eq->serial_number ?? 'N/A' }}</span>
+                                </div>
+                                <div class="col-span-3 text-xs text-gray-400 font-bold uppercase tracking-tight flex items-center gap-2">
+                                    <svg class="w-3 h-3 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
                                     {{ $location->name }}
-                                </td>
-                                <td class="px-6 py-4 text-xs">
-                                    <span class="text-[10px] bg-white/5 border border-white/5 px-2 py-1 rounded text-gray-500 font-black uppercase">
+                                </div>
+                                <div class="col-span-1">
+                                    <span class="text-[9px] bg-white/5 border border-white/5 px-2 py-1 rounded text-gray-500 font-black uppercase tracking-tighter">
                                         {{ $eq->system->name ?? 'SC' }}
                                     </span>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <div class="flex items-center gap-2">
-                                        @if($eq->status === 'operative')
-                                            <span class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
-                                            <span class="text-[9px] font-black text-emerald-500 uppercase">Operativo</span>
-                                        @elseif($eq->status === 'under_maintenance')
-                                            <span class="w-2 h-2 rounded-full bg-yellow-500"></span>
-                                            <span class="text-[9px] font-black text-yellow-500 uppercase">En Mantenimiento</span>
-                                        @else
-                                            <span class="w-2 h-2 rounded-full bg-red-500"></span>
-                                            <span class="text-[9px] font-black text-red-500 uppercase">Fallo</span>
-                                        @endif
-                                    </div>
-                                </td>
-                                <td class="px-6 py-4 text-right">
-                                    <a href="{{ route('technician.scanner.result', $eq->id) }}" class="inline-flex p-2 bg-white/5 hover:bg-tecsisa-yellow hover:text-black rounded-lg transition overflow-hidden">
+                                </div>
+                                <div class="col-span-1 flex justify-center">
+                                    @if($eq->status === 'operative')
+                                        <div class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" title="Operativo"></div>
+                                    @elseif($eq->status === 'under_maintenance')
+                                        <div class="w-2 h-2 rounded-full bg-yellow-500" title="Mantenimiento"></div>
+                                    @else
+                                        <div class="w-2 h-2 rounded-full bg-red-500" title="Fallo"></div>
+                                    @endif
+                                </div>
+                                <div class="col-span-1 text-right">
+                                    <a href="{{ route('technician.scanner.result', $eq->id) }}" class="inline-flex p-2 bg-white/5 hover:bg-tecsisa-yellow hover:text-black rounded-xl transition">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                                     </a>
-                                </td>
-                            </tr>
-                        @endforeach
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
+                                </div>
+                            </div>
 
-        <!-- Mobile View: Cards (Visible on mobile) -->
-        <div class="md:hidden space-y-4">
-            @foreach($locations as $location)
-                <div class="mb-6" x-show="!search || Array.from($el.querySelectorAll('.equipment-card')).some(el => el.getAttribute('data-search').includes(search.toLowerCase()))">
-                    <h3 class="text-[10px] font-black text-gray-600 uppercase tracking-[0.3em] mb-4 flex items-center gap-2 px-1">
-                        <svg class="w-3 h-3 text-tecsisa-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
-                        {{ $location->name }}
-                    </h3>
-                    
-                    <div class="space-y-3">
-                        @foreach($location->equipments as $eq)
-                            @php
-                                $searchString = strtolower($eq->name . ' ' . $eq->internal_id . ' ' . ($eq->serial_number ?? ''));
-                            @endphp
-                            <a href="{{ route('technician.scanner.result', $eq->id) }}" 
-                               class="equipment-card block equipment-item" 
-                               data-search="{{ $searchString }}"
-                               x-show="matches('{{ $searchString }}')">
-                                <div class="bg-gradient-to-br from-[#12161f] to-[#0a0d14] border border-white/5 rounded-2xl p-4 flex items-center justify-between active:scale-95 transition-all shadow-xl">
-                                    <div class="flex items-center gap-4">
-                                        <div class="w-10 h-10 bg-black/50 rounded-xl flex items-center justify-center border border-white/5 text-tecsisa-yellow">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
+                            <!-- MOBILE LAYOUT (Card) -->
+                            <a href="{{ route('technician.scanner.result', $eq->id) }}" class="md:hidden flex items-center justify-between p-4 active:bg-white/5 group">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 bg-black/50 rounded-2xl flex items-center justify-center border border-white/5 text-tecsisa-yellow transition group-active:scale-90 overflow-hidden relative">
+                                        <div class="absolute inset-0 bg-tecsisa-yellow/5 opacity-0 group-hover:opacity-100 transition"></div>
+                                        <svg class="w-6 h-6 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <div class="flex items-center gap-2 mb-1">
+                                            <span class="text-[9px] font-black text-tecsisa-yellow font-mono uppercase tracking-widest">{{ $eq->internal_id }}</span>
+                                            <span class="text-[8px] bg-white/5 px-1.5 py-0.5 rounded text-gray-500 font-black uppercase tracking-tighter">{{ $location->name }}</span>
                                         </div>
-                                        <div>
-                                            <div class="flex items-center gap-2 mb-0.5">
-                                                <span class="text-[9px] font-black text-tecsisa-yellow font-mono uppercase tracking-widest">{{ $eq->internal_id }}</span>
-                                                <span class="text-[8px] bg-white/5 px-1 py-0.5 rounded text-gray-500 font-bold">{{ $eq->system->name ?? 'SC' }}</span>
-                                            </div>
-                                            <h4 class="text-sm font-black text-white leading-tight truncate max-w-[150px]">{{ $eq->name }}</h4>
+                                        <h4 class="text-[13px] font-black text-white leading-tight truncate pr-4">{{ $eq->name }}</h4>
+                                        <div class="flex items-center gap-2 mt-1.5">
+                                            <span class="w-1 h-1 rounded-full {{ $eq->status === 'operative' ? 'bg-emerald-500' : 'bg-red-500' }}"></span>
+                                            <span class="text-[8px] font-bold text-gray-600 uppercase tracking-widest">{{ $eq->system->name ?? 'SC' }}</span>
                                         </div>
                                     </div>
-                                    <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-5 h-5 text-gray-700 group-active:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
                                 </div>
                             </a>
-                        @endforeach
-                    </div>
-                </div>
-            @endforeach
+                        </div>
+                    @endforeach
+                @endforeach
+            </div>
         </div>
 
-        <!-- Empty State -->
-        <div x-show="!hasAnyMatch()" style="display: none;" class="py-20 flex flex-col items-center opacity-40">
-            <svg class="w-12 h-12 text-gray-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            <p class="text-xs font-black uppercase tracking-widest text-white">No se encontraron activos</p>
+        <!-- Static Empty State -->
+        <div x-show="!hasAnyMatch()" style="display: none;" class="py-24 flex flex-col items-center animate-fadeIn">
+            <div class="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-6 border border-white/5">
+                <svg class="w-10 h-10 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+            <p class="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500">Sin coincidencias para "<span class="text-white" x-text="search"></span>"</p>
         </div>
     </div>
-</x-technician-layout>
-
-
 </x-technician-layout>
