@@ -1,17 +1,25 @@
-<x-technician-layout>
-    <div class="fixed top-0 inset-x-0 z-[60] bg-[#0a0d14]/95 backdrop-blur-3xl border-b border-white/5 pt-safe">
-        <div class="px-4 py-4 flex items-center justify-between max-w-4xl mx-auto">
-            <a href="{{ route('tasks.index') }}" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white transition shadow-lg">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-            </a>
-            <h1 class="text-xs md:text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-tecsisa-yellow animate-pulse"></span> Formulario Técnico
-            </h1>
-            <div class="w-10 h-10"></div>
+<x-technician-layout :hideHeader="true" :hideNav="false">
+    <!-- Contextual Header -->
+    <div class="fixed top-0 inset-x-0 z-[60] bg-[#0a0d14]/90 backdrop-blur-xl border-b border-white/5 pt-safe">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="h-16 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <a href="{{ route('tasks.index') }}" class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-tecsisa-yellow transition active:scale-90">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+                    </a>
+                    <h1 class="text-xs font-black text-white uppercase tracking-widest flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-tecsisa-yellow animate-pulse"></span> 
+                        {{ $isReadOnly ? 'Vista de Reporte' : 'Edición de Tarea' }}
+                    </h1>
+                </div>
+                <div class="text-[10px] font-black text-gray-500 uppercase tracking-widest hidden sm:block">
+                    ID: {{ $task->id }}
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="pt-20 pb-32 md:pb-10 px-5 max-w-4xl mx-auto relative z-10">
+    <div class="pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative z-10">
         <!-- Resumen del Equipo -->
         <div class="bg-[#12161f] rounded-3xl border border-white/10 p-5 mb-6 flex items-start gap-4">
             <div class="w-12 h-12 bg-black rounded-full border border-white/5 flex items-center justify-center shrink-0">
@@ -538,32 +546,34 @@
                 </label>
             </div>
 
-            <!-- Botones Flotantes de Acción Fijos Inferiores -->
-            <div class="fixed bottom-0 inset-x-0 bg-[#0a0d14]/98 backdrop-blur-3xl border-t border-white/10 pb-safe z-[70] md:relative md:bg-transparent md:border-transparent md:p-0 md:mt-8">
-                <div class="flex gap-4 p-5 max-w-lg mx-auto md:max-w-none md:p-0 md:justify-end">
+            <!-- Barra de Acciones (No fija en móvil para evitar solapamiento con el menú permanente) -->
+            <div class="mt-12 bg-[#12161f] border border-white/10 rounded-[2.5rem] p-6 shadow-2xl">
+                <div class="flex flex-col sm:flex-row gap-4 justify-end">
                     @if($task->status !== 'completed' && $task->status !== 'verified')
-                    <button type="button" @click="doSubmit('save_draft')" class="flex-1 md:flex-none md:w-auto bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold py-5 md:py-3 md:px-8 rounded-2xl text-[10px] md:text-xs uppercase tracking-[0.2em] transition" :class="{'opacity-50 cursor-not-allowed': isSubmitting}">
-                        <span x-show="!isSubmitting">Borrador</span>
-                        <span x-show="isSubmitting">...</span>
+                    <button type="button" @click="doSubmit('save_draft')" class="w-full sm:w-auto bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold py-4 px-8 rounded-2xl text-[10px] uppercase tracking-[0.2em] transition" :class="{'opacity-50 cursor-not-allowed': isSubmitting}">
+                        <span x-show="!isSubmitting">Guardar Borrador</span>
+                        <span x-show="isSubmitting">Guardando...</span>
                     </button>
                     
-                    <button type="button" @click="doSubmit('submit')" class="flex-[2] md:flex-none md:w-auto bg-tecsisa-yellow hover:bg-yellow-400 text-black font-black py-5 md:py-3 md:px-8 rounded-2xl text-[10px] md:text-xs uppercase tracking-[0.2em] shadow-[0_15px_40px_rgba(255,209,0,0.4)] transition active:scale-95 flex items-center justify-center gap-2" :class="{'opacity-50 cursor-not-allowed': isSubmitting}">
+                    <button type="button" @click="doSubmit('submit')" class="w-full sm:w-auto bg-tecsisa-yellow hover:bg-yellow-400 text-black font-black py-4 px-10 rounded-2xl text-[10px] uppercase tracking-[0.2em] shadow-[0_15px_40px_rgba(255,209,0,0.3)] transition active:scale-95 flex items-center justify-center gap-2" :class="{'opacity-50 cursor-not-allowed': isSubmitting}">
                         <span x-show="!isSubmitting">Finalizar Reporte</span>
                         <span x-show="isSubmitting">Enviando Tarea...</span>
-                        <svg x-show="!isSubmitting" class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        <svg x-show="!isSubmitting" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                     </button>
                     @else
-                    <div class="flex-1 bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center justify-center gap-3">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Este reporte ya ha sido cerrado</span>
-                        <a href="{{ route('tasks.pdf', $task) }}" class="ml-4 bg-tecsisa-yellow text-black px-4 py-2 rounded-lg text-[9px] font-black uppercase">Descargar PDF</a>
+                    <div class="w-full bg-emerald-500/5 border border-emerald-500/10 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div class="flex items-center gap-3">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span class="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Reporte Sellado Digitalmente</span>
+                        </div>
+                        <a href="{{ route('tasks.pdf', $task) }}" class="w-full sm:w-auto bg-tecsisa-yellow text-black px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-tecsisa-yellow/20 flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                            Descargar PDF
+                        </a>
                     </div>
                     @endif
                 </div>
             </div>
-            
-            <!-- Safe Spacer for fixed bottom buttons -->
-            <div class="h-32 md:hidden"></div>
         </form>
     </div>
 

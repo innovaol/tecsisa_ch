@@ -82,6 +82,7 @@
             </div>
         </div>
 
+        @if(!($hideHeader ?? false))
         <!-- Mobile Header (below md) -->
         <div class="md:hidden px-5 py-4 flex justify-between items-center bg-[#0f1217]/90 backdrop-blur-xl border-b border-white/5">
             <div class="flex items-center gap-3">
@@ -101,6 +102,7 @@
                 </svg>
             </button>
         </div>
+        @endif
 
         <!-- Responsive Drawer (For Profile/Extra Actions on Mobile) -->
     <div x-show="open" style="display: none;" class="md:hidden bg-[#0f1217] p-6 shadow-2xl relative z-[150] border-b border-white/5" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-4" x-transition:enter-end="opacity-100 translate-y-0 text-white">
@@ -125,6 +127,7 @@
     </div>
     </nav>
 
+    @if(!($hideNav ?? false))
     <!-- Mobile Bottom Navigation (Always hidden on md+) -->
     <div class="md:hidden">
         <div class="fixed bottom-0 inset-x-0 bg-[#0f1217]/98 backdrop-blur-3xl border-t border-white/10 z-[100] pb-safe-bottom shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
@@ -197,4 +200,5 @@
             </div>
         </div>
     </div>
+    @endif
 </div>

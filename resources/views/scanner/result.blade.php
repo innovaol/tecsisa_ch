@@ -1,114 +1,176 @@
-<x-technician-layout hideHeader="true" :hideNav="true">
-    <div class="fixed top-0 inset-x-0 z-[60] bg-[#0a0d14]/95 backdrop-blur-3xl border-b border-white/5 pt-safe">
-        <div class="px-4 py-4 flex items-center justify-between">
-            <a href="{{ route('technician.equipment.list') }}" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white transition shadow-lg">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-            </a>
-            <h1 class="text-xs font-black text-white uppercase tracking-widest flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span> Detalle del Activo
-            </h1>
-            <div class="w-10 h-10 flex items-center justify-center">
-                @if(Auth::user()->hasRole('Administrador'))
-                <a href="{{ route('catalog.index') }}?equipment_id={{ $equipment->id }}" class="w-8 h-8 rounded-full bg-tecsisa-yellow/10 border border-tecsisa-yellow/20 flex items-center justify-center text-tecsisa-yellow hover:bg-tecsisa-yellow hover:text-black transition">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
-                </a>
-                @endif
-            </div>
-        </div>
-    </div>
-
-    <div class="pt-20 pb-36 px-5 relative z-10">
-        <!-- Info Principal -->
-        <div class="bg-gradient-to-br from-[#12161f] to-[#0a0d14] rounded-3xl border border-white/10 p-6 shadow-2xl relative overflow-hidden mb-6">
-            <div class="absolute -right-10 -top-10 w-32 h-32 bg-tecsisa-yellow/10 rounded-full blur-2xl"></div>
-
-            <div class="w-16 h-16 bg-black border border-white/10 rounded-2xl flex items-center justify-center mb-4 shadow-inner">
-                <svg class="w-8 h-8 text-tecsisa-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path></svg>
-            </div>
-            
-            <p class="text-tecsisa-yellow font-mono text-sm tracking-widest font-bold mb-1">{{ $equipment->internal_id }}</p>
-            <h2 class="text-2xl font-bold text-white leading-tight mb-4">{{ $equipment->name }}</h2>
-            
-            <div class="flex flex-col gap-2">
-                <span class="bg-black/50 border border-white/5 px-3 py-2 rounded-xl text-xs text-gray-300 flex items-center gap-2 font-bold">
-                    <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                    Sistema: {{ $equipment->system->name ?? 'N/A' }}
-                </span>
-                <span class="bg-black/50 border border-white/5 px-3 py-2 rounded-xl text-xs text-gray-300 flex items-center gap-2 font-bold">
-                    <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                    Ub: {{ $equipment->location ? $equipment->location->name : 'No Asignada' }}
-                </span>
-            </div>
-        </div>
-
-        <!-- Specs Extra -->
-        <h3 class="text-xs font-black text-gray-500 uppercase tracking-widest mb-3 px-1">Ficha Técnica</h3>
-        <div class="bg-[#12161f] border border-white/5 rounded-3xl p-5 mb-8">
-            <div class="grid grid-cols-2 gap-4">
-                @if(is_array($equipment->specs) && count($equipment->specs) > 0)
-                    @foreach($equipment->specs as $key => $value)
-                        <div class="flex flex-col justify-end border-b border-white/5 pb-2">
-                            <span class="text-[9px] text-gray-500 font-bold uppercase tracking-wider">{{ str_replace('_', ' ', $key) }}</span>
-                            <span class="text-xs font-mono font-bold text-gray-200 mt-0.5 break-all">{{ is_array($value) ? implode(', ', $value) : $value }}</span>
-                        </div>
-                    @endforeach
-                @else
-                    <div class="col-span-2 py-4 text-center">
-                        <span class="text-xs text-gray-600 font-bold italic">Sin parámetros extendidos</span>
+<x-technician-layout :hideHeader="true" :hideNav="false">
+    <!-- Top Header (Contextual) -->
+    <div class="fixed top-0 inset-x-0 z-[60] bg-[#0a0d14]/90 backdrop-blur-xl border-b border-white/5 pt-safe">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="h-16 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <a href="{{ route('technician.equipment.list') }}" class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-tecsisa-yellow hover:border-tecsisa-yellow/30 transition shadow-lg group active:scale-90">
+                        <svg class="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+                    </a>
+                    <div class="flex flex-col">
+                        <span class="text-[8px] font-black text-tecsisa-yellow uppercase tracking-[0.3em] leading-none mb-1">Identificar Activo</span>
+                        <h1 class="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2">
+                             {{ $equipment->internal_id }}
+                        </h1>
                     </div>
-                @endif
+                </div>
+                
+                <div class="flex items-center gap-3">
+                    @if(Auth::user()->hasRole('Administrador'))
+                    <a href="{{ route('catalog.index') }}?equipment_id={{ $equipment->id }}" class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-tecsisa-yellow/10 border border-tecsisa-yellow/20 text-[10px] font-black text-tecsisa-yellow uppercase hover:bg-tecsisa-yellow hover:text-black transition">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        Editar Activo
+                    </a>
+                    @endif
+                    <div class="w-2.5 h-2.5 rounded-full {{ $equipment->status === 'operative' ? 'bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'bg-red-500' }}"></div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Barra de Acciones Fija Inferior -->
-    <div class="fixed bottom-0 inset-x-0 bg-[#0a0d14]/98 backdrop-blur-3xl border-t border-white/10 pb-safe z-[70]">
-        <div class="p-5 max-w-lg mx-auto">
-            <h3 class="text-[9px] font-black text-gray-500 uppercase tracking-[0.3em] mb-4 text-center">Abrir Reporte de Intervención</h3>
-            <div class="grid grid-cols-3 gap-3">
-                <!-- Botón Mantenimiento -->
-                <form action="{{ route('tasks.store') }}" method="POST" onsubmit="return confirm('¿Iniciar reporte de MANTENIMIENTO?')">
-                    @csrf
-                    <input type="hidden" name="equipment_id" value="{{ $equipment->id }}">
-                    <input type="hidden" name="title" value="Mantenimiento de Equipo">
-                    <input type="hidden" name="priority" value="medium">
-                    <input type="hidden" name="task_type" value="maintenance">
-                    <input type="hidden" name="description" value="Procedimiento de mantenimiento preventivo y/o correctivo.">
-                    <button type="submit" class="w-full flex flex-col items-center gap-2 bg-[#12161f] hover:bg-white/5 border border-white/10 rounded-2xl p-3 transition text-tecsisa-yellow">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg>
-                        <span class="text-[8px] font-black uppercase tracking-widest text-white">Mantenimiento</span>
-                    </button>
-                </form>
+    <div class="pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            <!-- LEFT COLUMN: Main Info & Specs (8/12) -->
+            <div class="lg:col-span-8 space-y-6">
+                <!-- Primary Identity Card -->
+                <div class="bg-[#12161f] rounded-[2.5rem] border border-white/10 p-8 shadow-2xl relative overflow-hidden">
+                    <div class="absolute -right-20 -top-20 w-64 h-64 bg-tecsisa-yellow/5 rounded-full blur-[100px] pointer-events-none"></div>
+                    
+                    <div class="flex flex-col sm:flex-row sm:items-start gap-6">
+                        <div class="w-20 h-20 bg-black/60 border border-white/10 rounded-3xl flex items-center justify-center shadow-inner shrink-0 scale-110 sm:scale-100">
+                            <svg class="w-10 h-10 text-tecsisa-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path></svg>
+                        </div>
+                        
+                        <div class="flex-1">
+                            <div class="flex flex-wrap items-center gap-2 mb-2">
+                                <span class="bg-tecsisa-yellow text-black text-[9px] font-black px-2 py-0.5 rounded tracking-widest uppercase">{{ $equipment->system->name ?? 'SISTEMA' }}</span>
+                                <span class="bg-white/5 border border-white/5 text-gray-500 text-[9px] font-black px-2 py-0.5 rounded tracking-widest uppercase">SERIAL: {{ $equipment->serial_number ?? 'N/A' }}</span>
+                            </div>
+                            <h2 class="text-3xl md:text-4xl font-black text-white leading-tight mb-4 tracking-tight">{{ $equipment->name }}</h2>
+                            
+                            <div class="flex flex-wrap items-center gap-4 text-xs font-bold text-gray-400">
+                                <div class="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-full border border-white/10">
+                                    <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
+                                    {{ $equipment->location ? $equipment->location->name : 'Área No Asignada' }}
+                                </div>
+                                <div class="flex items-center gap-2 opacity-50">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    Capturado {{ $equipment->created_at->format('d/m/Y') }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                <!-- Botón Instalación -->
-                <form action="{{ route('tasks.store') }}" method="POST" onsubmit="return confirm('¿Iniciar reporte de INSTALACIÓN?')">
-                    @csrf
-                    <input type="hidden" name="equipment_id" value="{{ $equipment->id }}">
-                    <input type="hidden" name="title" value="Instalación / Configuración">
-                    <input type="hidden" name="priority" value="medium">
-                    <input type="hidden" name="task_type" value="installation">
-                    <input type="hidden" name="description" value="Procedimiento de instalación y puesta a punto de un nuevo activo.">
-                    <button type="submit" class="w-full flex flex-col items-center gap-2 bg-[#12161f] hover:bg-white/5 border border-white/10 rounded-2xl p-3 transition text-cyan-500">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                        <span class="text-[8px] font-black uppercase tracking-widest text-white">Instalación</span>
-                    </button>
-                </form>
-
-                <!-- Botón Reemplazo -->
-                <form action="{{ route('tasks.store') }}" method="POST" onsubmit="return confirm('¿Iniciar reporte de REEMPLAZO?')">
-                    @csrf
-                    <input type="hidden" name="equipment_id" value="{{ $equipment->id }}">
-                    <input type="hidden" name="title" value="Sustitución / Reemplazo Físico">
-                    <input type="hidden" name="priority" value="high">
-                    <input type="hidden" name="task_type" value="replacement">
-                    <input type="hidden" name="description" value="Procedimiento de extracción y cambio de equipo por otro.">
-                    <button type="submit" class="w-full flex flex-col items-center gap-2 bg-[#12161f] hover:bg-white/5 border border-white/10 rounded-2xl p-3 transition text-red-500">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
-                        <span class="text-[8px] font-black uppercase tracking-widest text-white">Reemplazo</span>
-                    </button>
-                </form>
+                <!-- Extended Specs -->
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between px-2">
+                        <h3 class="text-[10px] font-black text-white uppercase tracking-[0.4em]">Ficha Técnica Detallada</h3>
+                        <div class="h-px bg-white/5 flex-1 ml-6"></div>
+                    </div>
+                    
+                    <div class="bg-[#12161f]/50 backdrop-blur-sm border border-white/5 rounded-[2rem] p-6 sm:p-8">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
+                            @if(is_array($equipment->specs) && count($equipment->specs) > 0)
+                                @foreach($equipment->specs as $key => $value)
+                                    <div class="group">
+                                        <p class="text-[8px] text-gray-500 font-black uppercase tracking-widest mb-1.5 group-hover:text-tecsisa-yellow transition-colors">{{ str_replace('_', ' ', $key) }}</p>
+                                        <div class="bg-black/40 border border-white/5 rounded-2xl p-4 transition group-hover:border-tecsisa-yellow/20">
+                                            <p class="text-xs font-mono font-bold text-white break-all leading-relaxed">{{ is_array($value) ? implode(', ', $value) : $value }}</p>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @else
+                                <div class="col-span-full py-10 flex flex-col items-center opacity-30">
+                                    <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                    <p class="text-[10px] font-black uppercase tracking-widest">Sin parámetros registrados</p>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
             </div>
-            <a href="{{ route('technician.equipment.list') }}" class="block mt-4 text-center text-gray-500 text-[10px] font-black uppercase tracking-[0.2em] hover:text-white transition">Cancelar y Volver</a>
+
+            <!-- RIGHT COLUMN: Actions (4/12) -->
+            <div class="lg:col-span-4 lg:sticky lg:top-24 space-y-6">
+                 <div class="bg-gradient-to-b from-[#1a1f2e] to-[#0a0d14] rounded-[2.5rem] border border-white/10 p-8 shadow-2xl relative">
+                    <h3 class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-6 text-center">Protocolo de Intervención</h3>
+                    
+                    <div class="space-y-4">
+                        <!-- Botón Mantenimiento -->
+                        <form action="{{ route('tasks.store') }}" method="POST" onsubmit="return confirm('¿Iniciar reporte de MANTENIMIENTO?')">
+                            @csrf
+                            <input type="hidden" name="equipment_id" value="{{ $equipment->id }}">
+                            <input type="hidden" name="title" value="Mantenimiento de Equipo">
+                            <input type="hidden" name="priority" value="medium">
+                            <input type="hidden" name="task_type" value="maintenance">
+                            <input type="hidden" name="description" value="Procedimiento de mantenimiento preventivo y/o correctivo.">
+                            <button type="submit" class="w-full group flex items-center gap-4 bg-white/5 hover:bg-tecsisa-yellow border border-white/10 hover:border-tecsisa-yellow rounded-2xl p-4 transition-all active:scale-95">
+                                <div class="w-12 h-12 bg-black/40 rounded-xl flex items-center justify-center text-tecsisa-yellow group-hover:text-black transition-colors">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg>
+                                </div>
+                                <div class="text-left">
+                                    <p class="text-[10px] font-black text-white group-hover:text-black uppercase leading-tight">Mantenimiento</p>
+                                    <p class="text-[8px] font-bold text-gray-500 group-hover:text-black/60 uppercase mt-0.5">Preventivo / Limpieza</p>
+                                </div>
+                            </button>
+                        </form>
+
+                        <!-- Botón Instalación -->
+                        <form action="{{ route('tasks.store') }}" method="POST" onsubmit="return confirm('¿Iniciar reporte de INSTALACIÓN?')">
+                            @csrf
+                            <input type="hidden" name="equipment_id" value="{{ $equipment->id }}">
+                            <input type="hidden" name="title" value="Instalación / Configuración">
+                            <input type="hidden" name="priority" value="medium">
+                            <input type="hidden" name="task_type" value="installation">
+                            <input type="hidden" name="description" value="Procedimiento de instalación y puesta a punto de un nuevo activo.">
+                            <button type="submit" class="w-full group flex items-center gap-4 bg-white/5 hover:bg-cyan-500 border border-white/10 hover:border-cyan-400 rounded-2xl p-4 transition-all active:scale-95">
+                                <div class="w-12 h-12 bg-black/40 rounded-xl flex items-center justify-center text-cyan-400 group-hover:text-white transition-colors">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                                </div>
+                                <div class="text-left">
+                                    <p class="text-[10px] font-black text-white group-hover:text-white uppercase leading-tight">Instalación</p>
+                                    <p class="text-[8px] font-bold text-gray-500 group-hover:text-white/80 uppercase mt-0.5">Configuración Inicial</p>
+                                </div>
+                            </button>
+                        </form>
+
+                        <!-- Botón Reemplazo -->
+                        <form action="{{ route('tasks.store') }}" method="POST" onsubmit="return confirm('¿Iniciar reporte de REEMPLAZO?')">
+                            @csrf
+                            <input type="hidden" name="equipment_id" value="{{ $equipment->id }}">
+                            <input type="hidden" name="title" value="Sustitución / Reemplazo Físico">
+                            <input type="hidden" name="priority" value="high">
+                            <input type="hidden" name="task_type" value="replacement">
+                            <input type="hidden" name="description" value="Procedimiento de extracción y cambio de equipo por otro.">
+                            <button type="submit" class="w-full group flex items-center gap-4 bg-white/5 hover:bg-red-500 border border-white/10 hover:border-red-400 rounded-2xl p-4 transition-all active:scale-95">
+                                <div class="w-12 h-12 bg-black/40 rounded-xl flex items-center justify-center text-red-400 group-hover:text-white transition-colors">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
+                                </div>
+                                <div class="text-left">
+                                    <p class="text-[10px] font-black text-white group-hover:text-white uppercase leading-tight">Sustitución</p>
+                                    <p class="text-[8px] font-bold text-gray-500 group-hover:text-white/80 uppercase mt-0.5">Cambio de Activo Físico</p>
+                                </div>
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="mt-8 pt-6 border-t border-white/5">
+                        <a href="{{ route('technician.equipment.list') }}" class="flex items-center justify-center gap-2 text-gray-500 text-[10px] font-black uppercase tracking-[0.2em] hover:text-white transition group">
+                            <svg class="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"></path></svg>
+                            Volver al Listado
+                        </a>
+                    </div>
+                 </div>
+
+                 <!-- Security Notice -->
+                 <div class="px-6 py-4 bg-blue-500/5 rounded-3xl border border-blue-500/10">
+                    <p class="text-[8px] text-blue-400 font-bold uppercase tracking-wider leading-relaxed">
+                        ⚠️ Al iniciar un reporte, se capturará tu ubicación actual, fecha y hora bajo el protocolo AUDIT-TRUCK de Tecsisa.
+                    </p>
+                 </div>
+            </div>
         </div>
     </div>
 </x-technician-layout>
