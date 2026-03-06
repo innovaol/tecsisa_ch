@@ -13,8 +13,9 @@ class SystemSeeder extends Seeder
     public function run(): void
     {
         // 1. VOZ Y DATOS
-        System::create([
-            'name' => 'Voz y Datos',
+        System::updateOrCreate(
+        ['name' => 'Voz y Datos'],
+        [
             'form_schema' => [
                 'checklist' => [
                     'CABLEADO (UTP): REVISIÓN DE ESTADO FISICO, ETIQUETADO Y CERTIFICACIÓN',
@@ -34,11 +35,13 @@ class SystemSeeder extends Seeder
                     ['name' => 'puertos_fibra', 'label' => 'Puertos de Fibra (SFP/SFP+)', 'type' => 'number'],
                 ]
             ]
-        ]);
+        ]
+        );
 
         // 2. CONTROL DE ACCESO
-        System::create([
-            'name' => 'Control de Acceso',
+        System::updateOrCreate(
+        ['name' => 'Control de Acceso'],
+        [
             'form_schema' => [
                 'checklist' => [
                     'REMOCIÓN DE EQUIPOS DE CONTROL DE ACCESO EXISTENTES',
@@ -52,11 +55,13 @@ class SystemSeeder extends Seeder
                     'INSTALACIÓN DE FUENTES DE PODER'
                 ]
             ]
-        ]);
+        ]
+        );
 
         // 3. SONIDO
-        System::create([
-            'name' => 'Sonido',
+        System::updateOrCreate(
+        ['name' => 'Sonido'],
+        [
             'form_schema' => [
                 'checklist' => [
                     'CABLEADO: REVISION DE ESTADO FISICO, ETIQUETADO Y CERTIFICACIÓN',
@@ -67,11 +72,13 @@ class SystemSeeder extends Seeder
                     'REALIZAR PRUEBAS DE OPERATIVIDAD DEL SISTEMA DE SONIDO'
                 ]
             ]
-        ]);
+        ]
+        );
 
         // 4. LLAMADO DE ENFERMERA
-        System::create([
-            'name' => 'Llamado de Enfermera',
+        System::updateOrCreate(
+        ['name' => 'Llamado de Enfermera'],
+        [
             'form_schema' => [
                 'checklist' => [
                     'CABLEADO (UTP): REVISIÓN DE ESTADO FISICO, ETIQUETADO Y CERTIFICACIÓN',
@@ -84,11 +91,13 @@ class SystemSeeder extends Seeder
                     'PRUEBAS DE OPERATIVIDAD DEL SISTEMA DE LLAMADO DE ENFERMERA'
                 ]
             ]
-        ]);
+        ]
+        );
 
         // 5. RELOJES (TIEMPO)
-        System::create([
-            'name' => 'Relojes / Tiempo',
+        System::updateOrCreate(
+        ['name' => 'Relojes / Tiempo'],
+        [
             'form_schema' => [
                 'checklist' => [
                     'VERIFICACIÓN, LIMPIEZA E IDENTIFICACIÓN DE RELOJES',
@@ -96,6 +105,7 @@ class SystemSeeder extends Seeder
                     'PRUEBA DE OPERATIVIDAD DEL SISTEMA DE TIEMPO'
                 ]
             ]
-        ]);
+        ]
+        );
     }
 }
