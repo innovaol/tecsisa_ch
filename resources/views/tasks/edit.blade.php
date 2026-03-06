@@ -386,6 +386,17 @@
                 </div>
             @endif
 
+            <!-- 🏗️ SECCIÓN: REQUERIMIENTOS E INSTALACIONES PENDIENTES -->
+            <h3 class="text-[10px] font-black text-orange-500 uppercase tracking-[0.3em] mb-4 px-1 flex items-center gap-2">
+                <svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                Instalaciones Requeridas / Faltantes en Sitio
+            </h3>
+            <div class="bg-orange-500/5 border border-orange-500/10 rounded-3xl p-5 mb-11 shadow-inner">
+                <textarea name="form_data[required_installations]" rows="3"
+                          class="w-full bg-transparent border-none text-gray-200 text-[11px] px-0 py-0 focus:ring-0 transition placeholder:text-gray-600 font-bold leading-relaxed resize-none"
+                          placeholder="Ej: Falta energía para el gabinete, faltan organizadores verticales, 1 PDU, barra de ground...">{{ $task->form_data['required_installations'] ?? '' }}</textarea>
+            </div>
+
             <!-- Área de Observaciones Generales (Aplicable a todas las tareas) -->
             <h3 class="text-xs font-black text-gray-500 uppercase tracking-widest mb-3 px-1 text-center font-black">Resumen Ejecutivo Final</h3>
             <div class="bg-gradient-to-b from-[#12161f] to-[#0a0d14] border border-white/10 p-5 rounded-[2rem] mb-12 shadow-inner">

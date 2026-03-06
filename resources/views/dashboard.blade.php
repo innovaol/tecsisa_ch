@@ -62,7 +62,15 @@
                         <span class="w-1.5 h-1.5 rounded-full bg-tecsisa-yellow animate-pulse"></span>
                         {{ Auth::user()->hasRole('Administrador') ? 'Última Actividad Registrada' : 'Mis Cambios Recientes' }}
                     </h3>
-                    <a href="{{ route('tasks.index') }}" class="text-[10px] font-black text-tecsisa-yellow hover:text-yellow-300 transition uppercase tracking-widest border border-tecsisa-yellow/20 px-3 py-1.5 rounded-lg">{{ Auth::user()->hasRole('Administrador') ? 'Ver Reportes' : 'Mi Hoja de Ruta' }}</a>
+                    <div class="flex gap-2">
+                        @if(Auth::user()->hasRole('Administrador'))
+                        <a href="{{ route('reports.weekly.index') }}" class="text-[10px] font-black text-emerald-400 hover:text-emerald-300 transition uppercase tracking-widest border border-emerald-500/20 px-3 py-1.5 rounded-lg flex items-center gap-2">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            Reporte Semanal
+                        </a>
+                        @endif
+                        <a href="{{ route('tasks.index') }}" class="text-[10px] font-black text-tecsisa-yellow hover:text-yellow-300 transition uppercase tracking-widest border border-tecsisa-yellow/20 px-3 py-1.5 rounded-lg">{{ Auth::user()->hasRole('Administrador') ? 'Ver Reportes' : 'Mi Hoja de Ruta' }}</a>
+                    </div>
                 </div>
                 <div class="p-6">
                     @if($equipos_operativos > 0 || $trabajos_pendientes > 0)

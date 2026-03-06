@@ -71,10 +71,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
             // User and Role Management
             Route::resource('users', \App\Http\Controllers\UserController::class);
+
+            // Reportes Semanales
+            Route::get('/reportes/semanal', [\App\Http\Controllers\ReportController::class , 'index'])->name('reports.weekly.index');
+            Route::post('/reportes/semanal/generar', [\App\Http\Controllers\ReportController::class , 'generateWeekly'])->name('reports.weekly.generate');
         }
         );
 
         // Módulo Técnico Móvil (Buscador Activos y Tareas)
+        Route::get('/tasks/{task}/pdf', [\App\Http\Controllers\TaskController::class , 'generatePDF'])->name('tasks.pdf');
         Route::resource('tasks', \App\Http\Controllers\TaskController::class);
     });
 

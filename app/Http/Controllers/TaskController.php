@@ -7,6 +7,7 @@ use App\Models\System;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class TaskController extends Controller
 {
@@ -209,6 +210,16 @@ class TaskController extends Controller
             $task->status = 'completed';
             $task->completed_at = now();
             $task->final_status = $request->input('final_status') ?? 'Operativo / Finalizado';
+
+            // Sync with Equipment status if needed
+            if ($task->equipment) {
+                $task->equipment->update([
+                    'status' => 'operative',
+                    'last_maintenance_at' => now(),
+                    'next_maintenance_at' => now()->addMonths(6)
+                ]);
+            }
+
             $task->save();
             return redirect()->route('tasks.index')->with('success', 'Tarea completada profesionalmente.');
         }
@@ -230,5 +241,28 @@ class TaskController extends Controller
         }
 
         abort(403, 'No tienes permiso para eliminar esta tarea.');
+    }
+
+    /**
+     * Generate PDF Report for a single task
+     */
+    public function generatePDF(Task $task)
+    {
+        // Ensure user is authorized
+        if ($task->assigned_to !== Auth::id() && !Auth::user()->hasRole('Administrador')) {
+            abort(403, 'No autorizado.');
+        }
+
+        $task->load('equipment.system', 'equipment.location', 'assignee');
+
+        $formData = $task->form_data;
+
+        // DomPDF options for image resolution and remote paths if needed
+        $pdf = Pdf::loadView('tasks.pdf_template', compact('task', 'formData'))
+            ->setPaper('a4', 'portrait');
+
+        $filename = 'Reporte-' . $task->equipment->internal_id . '-' . date('Ymd_His') . '.pdf';
+
+        return $pdf->download($filename);
     }
 }
