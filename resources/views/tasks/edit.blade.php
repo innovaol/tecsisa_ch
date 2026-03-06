@@ -1,3 +1,7 @@
+@php
+    $isReadOnly = in_array($task->status, ['completed', 'verified']);
+@endphp
+
 <x-technician-layout :hideHeader="true" :hideNav="false">
     <!-- Contextual Header -->
     <div class="fixed top-0 inset-x-0 z-[60] bg-[#0a0d14]/90 backdrop-blur-xl border-b border-white/5 pt-safe">
@@ -49,9 +53,6 @@
             @method('PUT')
             <input type="hidden" name="action" value="save_draft" x-ref="actionField">
 
-            @php
-                $isReadOnly = in_array($task->status, ['completed', 'verified']);
-            @endphp
 
             <!-- 📸 SECCIÓN UNIVERSAL: EVIDENCIA VISUAL -->
             <h3 class="text-[10px] font-black text-white uppercase tracking-[0.3em] mb-4 px-1 flex items-center gap-2">
