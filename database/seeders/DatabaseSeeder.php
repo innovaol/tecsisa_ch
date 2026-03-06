@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             SystemSeeder::class ,
             EquipmentSeeder::class ,
             RackSeeder::class ,
+            TaskSeeder::class ,
         ]);
     }
 }
