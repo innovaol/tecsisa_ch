@@ -102,7 +102,7 @@ class TaskController extends Controller
             'form_data' => $validated['form_data'] ?? [],
         ]);
 
-        return redirect()->route('tasks.index')->with('success', 'Tarea ' . $task->title . ' creada correctamente.');
+        return redirect()->route('tasks.edit', $task)->with('success', 'Reporte de ' . $task->title . ' iniciado correctamente.');
     }
 
     /**
@@ -111,7 +111,7 @@ class TaskController extends Controller
     public function edit(Task $task)
     {
         // Ensure user can only edit their own tasks or is admin
-        if ($task->assigned_to !== Auth::id() && !Auth::user()->hasRole('Administrador')) {
+        if ($task->assigned_to != Auth::id() && !Auth::user()->hasRole('Administrador')) {
             abort(403, 'No autorizado para ver esta tarea.');
         }
 
@@ -128,7 +128,7 @@ class TaskController extends Controller
      */
     public function update(Request $request, Task $task)
     {
-        if ($task->assigned_to !== Auth::id() && !Auth::user()->hasRole('Administrador')) {
+        if ($task->assigned_to != Auth::id() && !Auth::user()->hasRole('Administrador')) {
             abort(403, 'No autorizado.');
         }
 
@@ -229,14 +229,20 @@ class TaskController extends Controller
         }
     }
 
-    public function destroy(Task $task)
+    public function destroy(Task $task, Request $request)
     {
         // Admin can delete anything. Technician only their own drafts.
         $isAdmin = Auth::user()->hasRole('Administrador');
-        $isOwner = $task->assigned_to === Auth::id();
+        $isOwner = $task->assigned_to == Auth::id();
+        $equipmentId = $task->equipment_id;
 
         if ($isAdmin || ($isOwner && ($task->status === 'draft' || $task->status === 'pending'))) {
             $task->delete();
+
+            if ($request->has('redirect_to_equipment') && $equipmentId) {
+                return redirect()->route('technician.scanner.result', $equipmentId)->with('info', 'Intervención cancelada y eliminada.');
+            }
+
             return redirect()->route('tasks.index')->with('success', 'Tarea eliminada correctamente.');
         }
 

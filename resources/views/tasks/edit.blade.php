@@ -498,6 +498,7 @@
                 </table>
             </div>
             @endif
+            @endif
 
             <!-- 📸 SECCIÓN: ANEXOS AL INFORME -->
             <h3 class="text-[10px] font-black text-white uppercase tracking-[0.3em] mb-4 px-1 flex items-center gap-2 text-center">
@@ -548,8 +549,12 @@
 
             <!-- Barra de Acciones (No fija en móvil para evitar solapamiento con el menú permanente) -->
             <div class="mt-12 bg-[#12161f] border border-white/10 rounded-[2.5rem] p-6 shadow-2xl">
-                <div class="flex flex-col sm:flex-row gap-4 justify-end">
+                <div class="flex flex-col sm:flex-row gap-4 justify-end items-center">
                     @if($task->status !== 'completed' && $task->status !== 'verified')
+                    <button type="button" @click="if(confirm('¿Seguro que deseas cancelar y descartar este reporte?')) document.getElementById('cancel-form').submit();" class="w-full sm:w-auto text-[10px] font-black text-gray-500 hover:text-red-400 uppercase tracking-widest px-6 py-4 transition-colors order-last sm:order-first">
+                        Cancelar e Invalidar
+                    </button>
+
                     <button type="button" @click="doSubmit('save_draft')" class="w-full sm:w-auto bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold py-4 px-8 rounded-2xl text-[10px] uppercase tracking-[0.2em] transition" :class="{'opacity-50 cursor-not-allowed': isSubmitting}">
                         <span x-show="!isSubmitting">Guardar Borrador</span>
                         <span x-show="isSubmitting">Guardando...</span>
@@ -574,6 +579,13 @@
                     @endif
                 </div>
             </div>
+        </form>
+
+        {{-- Hidden form for cancellation/deletion --}}
+        <form id="cancel-form" action="{{ route('tasks.destroy', $task) }}" method="POST" class="hidden">
+            @csrf
+            @method('DELETE')
+            <input type="hidden" name="redirect_to_equipment" value="1">
         </form>
     </div>
 
