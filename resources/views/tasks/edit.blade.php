@@ -386,33 +386,119 @@
                 </div>
             @endif
 
-            <!-- 🏗️ SECCIÓN: REQUERIMIENTOS E INSTALACIONES PENDIENTES -->
-            <h3 class="text-[10px] font-black text-orange-500 uppercase tracking-[0.3em] mb-4 px-1 flex items-center gap-2">
-                <svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                Instalaciones Requeridas / Faltantes en Sitio
+            <!-- 🏢 SECCIÓN: INFORMACIÓN DETALLADA DEL ÁREA (ESTILO ANITA MORENO) -->
+            <h3 class="text-[10px] font-black text-white uppercase tracking-[0.3em] mb-4 px-1 flex items-center gap-2">
+                <svg class="w-4 h-4 text-tecsisa-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                Protocolo de Localización y Horario
             </h3>
-            <div class="bg-orange-500/5 border border-orange-500/10 rounded-3xl p-5 mb-11 shadow-inner">
-                <textarea name="form_data[required_installations]" rows="3"
-                          class="w-full bg-transparent border-none text-gray-200 text-[11px] px-0 py-0 focus:ring-0 transition placeholder:text-gray-600 font-bold leading-relaxed resize-none"
-                          placeholder="Ej: Falta energía para el gabinete, faltan organizadores verticales, 1 PDU, barra de ground...">{{ $task->form_data['required_installations'] ?? '' }}</textarea>
+            <div class="bg-[#12161f] border border-white/10 rounded-[2rem] p-6 mb-10 shadow-2xl">
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-[8px] font-black text-gray-500 uppercase mb-2 tracking-widest pl-1">Edificio / Bloque</label>
+                        <input type="text" name="form_data[building]" value="{{ $task->form_data['building'] ?? '' }}" placeholder="Ej: Edificio G" class="w-full bg-black/40 border-white/5 rounded-xl text-[11px] text-white font-bold h-11 px-4 focus:ring-1 focus:ring-tecsisa-yellow/30 transition">
+                    </div>
+                    <div>
+                        <label class="block text-[8px] font-black text-gray-500 uppercase mb-2 tracking-widest pl-1">Nivel / Piso</label>
+                        <input type="text" name="form_data[floor]" value="{{ $task->form_data['floor'] ?? '' }}" placeholder="Ej: Planta Alta" class="w-full bg-black/40 border-white/5 rounded-xl text-[11px] text-white font-bold h-11 px-4 focus:ring-1 focus:ring-tecsisa-yellow/30 transition">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-[8px] font-black text-gray-500 uppercase mb-2 tracking-widest pl-1">Área Específica</label>
+                        <input type="text" name="form_data[specific_area]" value="{{ $task->form_data['specific_area'] ?? '' }}" placeholder="Ej: Hospitalización" class="w-full bg-black/40 border-white/5 rounded-xl text-[11px] text-white font-bold h-11 px-4 focus:ring-1 focus:ring-tecsisa-yellow/30 transition">
+                    </div>
+                    <div>
+                        <label class="block text-[8px] font-black text-gray-500 uppercase mb-2 tracking-widest pl-1">Sección</label>
+                        <input type="text" name="form_data[section]" value="{{ $task->form_data['section'] ?? '' }}" placeholder="Ej: Hemato Oncología" class="w-full bg-black/40 border-white/5 rounded-xl text-[11px] text-white font-bold h-11 px-4 focus:ring-1 focus:ring-tecsisa-yellow/30 transition">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[8px] font-black text-gray-400 uppercase mb-2 tracking-widest pl-1">Hora Inicio</label>
+                        <input type="time" name="form_data[start_time]" value="{{ $task->form_data['start_time'] ?? '' }}" class="w-full bg-black/40 border-white/5 rounded-xl text-[11px] text-white font-bold h-11 px-4 focus:ring-1 focus:ring-tecsisa-yellow/30">
+                    </div>
+                    <div>
+                        <label class="block text-[8px] font-black text-gray-400 uppercase mb-2 tracking-widest pl-1">Hora Término</label>
+                        <input type="time" name="form_data[end_time]" value="{{ $task->form_data['end_time'] ?? '' }}" class="w-full bg-black/40 border-white/5 rounded-xl text-[11px] text-white font-bold h-11 px-4 focus:ring-1 focus:ring-tecsisa-yellow/30">
+                    </div>
+                </div>
             </div>
 
-            <!-- Área de Observaciones Generales (Aplicable a todas las tareas) -->
-            <h3 class="text-xs font-black text-gray-500 uppercase tracking-widest mb-3 px-1 text-center font-black">Resumen Ejecutivo Final</h3>
-            <div class="bg-gradient-to-b from-[#12161f] to-[#0a0d14] border border-white/10 p-5 rounded-[2rem] mb-12 shadow-inner">
-                <textarea name="description" rows="5"
-                          class="w-full bg-transparent border-none text-gray-100 text-sm px-0 py-0 focus:ring-0 transition placeholder-gray-700 resize-none leading-relaxed font-bold"
-                          placeholder="Escribe aquí el resumen ejecutivo técnico de la labor realizada...">{{ old('description', $task->description) }}</textarea>
-                
-                <div class="mt-4 pt-4 border-t border-white/5 flex items-center justify-between">
-                    <label class="flex items-center gap-3 cursor-pointer group">
-                        <div class="w-6 h-6 rounded-lg border-2 border-white/10 flex items-center justify-center transition group-hover:border-tecsisa-yellow" :class="confirmFinal ? 'bg-tecsisa-yellow border-tecsisa-yellow' : 'bg-black/50'">
-                            <svg x-show="confirmFinal" class="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"></path></svg>
-                        </div>
-                        <input type="checkbox" x-model="confirmFinal" class="hidden">
-                        <span class="text-[10px] font-black uppercase text-gray-500 tracking-tighter" :class="confirmFinal ? 'text-tecsisa-yellow' : ''">Certifico labor de alta calidad</span>
-                    </label>
-                </div>
+            <!-- ✅ SECCIÓN: EVALUACIÓN TÉCNICA (CHECKLIST DINÁMICO) -->
+            @php
+                $checklist = $task->equipment->system->form_schema['checklist'] ?? [];
+            @endphp
+            @if(count($checklist) > 0)
+            <h3 class="text-[10px] font-black text-white uppercase tracking-[0.3em] mb-4 px-1 flex items-center gap-2">
+                <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                Evaluación Técnica de Actividades
+            </h3>
+            <div class="bg-black/40 border border-white/10 rounded-[2rem] overflow-hidden mb-10 shadow-2xl">
+                <table class="w-full text-left">
+                    <thead class="bg-white/5 border-b border-white/5 text-gray-500 font-black text-[8px] uppercase tracking-widest">
+                        <tr>
+                            <th class="px-5 py-3 w-1/2">Actividad</th>
+                            <th class="px-5 py-3 text-center">Cumple</th>
+                            <th class="px-5 py-3">Comentarios</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5">
+                        @foreach($checklist as $index => $item)
+                        <tr class="group hover:bg-white/[0.02] transition-colors">
+                            <td class="px-5 py-3 text-[9px] font-bold text-gray-300 leading-tight">{{ $item }}</td>
+                            <td class="px-5 py-3 text-center">
+                                <div class="inline-flex bg-black/60 p-1 rounded-lg border border-white/5">
+                                    <label class="relative flex items-center justify-center cursor-pointer group/si px-2 py-1 transition rounded-md" :class="evaluations[{{ $index }}] === 'SI' ? 'bg-emerald-500/20' : 'opacity-40'">
+                                        <input type="radio" name="form_data[evaluation][{{ $index }}][status]" value="SI" 
+                                               x-model="evaluations[{{ $index }}]" class="hidden">
+                                        <span class="text-[9px] font-black text-emerald-400 uppercase">SI</span>
+                                    </label>
+                                    <label class="relative flex items-center justify-center cursor-pointer group/no px-2 py-1 transition rounded-md ml-1" :class="evaluations[{{ $index }}] === 'NO' ? 'bg-red-500/20' : 'opacity-40'">
+                                        <input type="radio" name="form_data[evaluation][{{ $index }}][status]" value="NO" 
+                                               x-model="evaluations[{{ $index }}]" class="hidden">
+                                        <span class="text-[9px] font-black text-red-400 uppercase">NO</span>
+                                    </label>
+                                </div>
+                                <input type="hidden" name="form_data[evaluation][{{ $index }}][item]" value="{{ $item }}">
+                            </td>
+                            <td class="px-5 py-3">
+                                <input type="text" name="form_data[evaluation][{{ $index }}][comment]" 
+                                       value="{{ $task->form_data['evaluation'][$index]['comment'] ?? '' }}"
+                                       placeholder="..." class="w-full bg-transparent border-b border-white/10 text-[9px] text-gray-400 focus:text-white transition focus:border-tecsisa-yellow outline-none px-1 h-8">
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+            @endif
+
+            <!-- 📸 SECCIÓN: ANEXOS AL INFORME -->
+            <h3 class="text-[10px] font-black text-white uppercase tracking-[0.3em] mb-4 px-1 flex items-center gap-2 text-center">
+                Anexos Incluidos
+            </h3>
+            <div class="grid grid-cols-3 gap-3 mb-10">
+                <label class="flex flex-col items-center gap-3 p-4 rounded-3xl border border-white/5 bg-[#12161f] cursor-pointer group active:bg-blue-500/10 transition shadow-xl" :class="annexPhoto ? 'border-blue-500/30' : ''">
+                    <input type="checkbox" name="form_data[annex_photos]" value="1" x-model="annexPhoto" class="hidden">
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center transition" :class="annexPhoto ? 'bg-blue-500 text-white' : 'bg-white/5 text-gray-600'">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    </div>
+                    <span class="text-[8px] font-black uppercase text-gray-500 transition group-hover:text-blue-400" :class="annexPhoto ? 'text-blue-400' : ''">Fotos</span>
+                </label>
+                <label class="flex flex-col items-center gap-3 p-4 rounded-3xl border border-white/5 bg-[#12161f] cursor-pointer group active:bg-orange-500/10 transition shadow-xl" :class="annexPlans ? 'border-orange-500/30' : ''">
+                    <input type="checkbox" name="form_data[annex_plans]" value="1" x-model="annexPlans" class="hidden">
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center transition" :class="annexPlans ? 'bg-orange-500 text-white' : 'bg-white/5 text-gray-600'">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+                    </div>
+                    <span class="text-[8px] font-black uppercase text-gray-500 transition group-hover:text-orange-400" :class="annexPlans ? 'text-orange-400' : ''">Planos</span>
+                </label>
+                <label class="flex flex-col items-center gap-3 p-4 rounded-3xl border border-white/5 bg-[#12161f] cursor-pointer group active:bg-emerald-500/10 transition shadow-xl" :class="annexCert ? 'border-emerald-500/30' : ''">
+                    <input type="checkbox" name="form_data[annex_cert]" value="1" x-model="annexCert" class="hidden">
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center transition" :class="annexCert ? 'bg-emerald-500 text-white' : 'bg-white/5 text-gray-600'">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <span class="text-[8px] font-black uppercase text-gray-500 transition group-hover:text-emerald-400" :class="annexCert ? 'text-emerald-400' : ''">Certific.</span>
+                </label>
             </div>
 
             <!-- Botones Flotantes de Acción Fijos Inferiores -->
@@ -444,6 +530,10 @@
                 confirmFinal: config.status === 'completed',
                 findings: config.findings,
                 materials: config.materials,
+                evaluations: {{ json_encode($task->form_data['evaluation'] ?? []) }},
+                annexPhoto: {{ isset($task->form_data['annex_photos']) ? 'true' : 'false' }},
+                annexPlans: {{ isset($task->form_data['annex_plans']) ? 'true' : 'false' }},
+                annexCert: {{ isset($task->form_data['annex_cert']) ? 'true' : 'false' }},
                 previews: {
                     before: config.previews.before,
                     after: config.previews.after,
@@ -451,6 +541,12 @@
                     findings: []
                 },
                 init() {
+                    // Initialize evaluations if empty
+                    if (Object.keys(this.evaluations).length === 0) {
+                        @foreach($checklist as $i => $item)
+                        this.evaluations[{{ $i }}] = '';
+                        @endforeach
+                    }
                     this.findings.forEach((f, i) => {
                         this.previews.findings[i] = f.photo ? config.storagePath + f.photo : '';
                     });

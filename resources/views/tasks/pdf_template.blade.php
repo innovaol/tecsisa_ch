@@ -2,247 +2,208 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Reporte Técnico - {{ $task->equipment->internal_id }}</title>
+    <title>REPORTE TÉCNICO - {{ $task->equipment->internal_id }}</title>
     <style>
-        @page {
-            margin: 1cm;
-        }
-        body {
-            font-family: 'Helvetica', 'Arial', sans-serif;
-            font-size: 10pt;
-            color: #333;
-            line-height: 1.4;
-        }
-        .header {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 10px;
-        }
-        .logo-box {
-            width: 150px;
-            text-align: left;
-        }
-        .title-box {
-            text-align: center;
-            background-color: #f3f4f6;
-            padding: 10px;
-            border: 1px solid #ddd;
-        }
-        .title-main {
-            font-weight: bold;
-            font-size: 14pt;
-            display: block;
-        }
-        .title-sub {
-            font-size: 12pt;
-            color: #d97706; /* Tecsisa Yellow-ish */
-            font-weight: bold;
-        }
-        .section-header {
-            background-color: #1e293b; /* Dark Blue */
-            color: white;
-            padding: 5px 10px;
-            font-weight: bold;
-            font-size: 9pt;
-            text-transform: uppercase;
-            margin-top: 15px;
-            margin-bottom: 5px;
-        }
-        table.info-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 10px;
-        }
-        table.info-table td, table.info-table th {
-            border: 1px solid #ddd;
-            padding: 6px;
-            text-align: left;
-            font-size: 9pt;
-        }
-        .label {
-            background-color: #f9fafb;
-            font-weight: bold;
-            width: 30%;
-        }
-        .installation-box {
-            border: 1px solid #ddd;
-            padding: 10px;
-            min-height: 50px;
-            background-color: #fffbeb; /* Light orange for Required Installations */
-            font-size: 9pt;
-            margin-bottom: 15px;
-        }
-        .photo-container {
-            width: 100%;
-            margin-top: 10px;
-        }
-        .photo-row {
-            margin-bottom: 15px;
-            clear: both;
-        }
-        .photo-box {
-            width: 48%;
-            float: left;
-            margin-right: 2%;
-            border: 1px solid #eee;
-            padding: 5px;
-            text-align: center;
-        }
-        .photo-img {
-            max-width: 100%;
-            height: 180px;
-            object-fit: cover;
-        }
-        .photo-caption {
-            font-size: 8pt;
-            font-weight: bold;
-            margin-top: 5px;
-            background-color: #f3f4f6;
-            padding: 3px;
-        }
-        .footer {
-            margin-top: 30px;
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .signature-box {
-            width: 50%;
-            text-align: center;
-            padding-top: 40px;
-        }
-        .signature-line {
-            border-top: 1px solid #333;
-            width: 80%;
-            margin: 0 auto;
-            margin-bottom: 5px;
-        }
-        .signature-name {
-            font-size: 9pt;
-            font-weight: bold;
-        }
-        .signature-title {
-            font-size: 8pt;
-            color: #666;
-        }
+        @page { margin: 0.5cm; }
+        body { font-family: 'Helvetica', sans-serif; font-size: 8pt; color: #000; line-height: 1.2; }
+        .bg-tecsisa-yellow { background-color: #FFD200; }
+        .border-all { border: 0.5pt solid #000; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 2pt; }
+        td, th { border: 0.5pt solid #000; padding: 3pt; vertical-align: middle; }
+        .header-title { font-weight: bold; font-size: 10pt; text-align: center; }
+        .section-name { background-color: #DDEBF7; font-weight: bold; text-align: center; text-transform: uppercase; font-size: 8pt; }
+        .label { background-color: #F2F2F2; font-weight: bold; width: 18%; }
+        .value { width: 32%; }
+        .checklist-table td { padding: 2pt 4pt; }
+        .check-box { width: 12pt; height: 12pt; border: 0.5pt solid #000; display: inline-block; text-align: center; line-height: 12pt; font-weight: bold; margin-right: 2pt; }
+        .photo-grid { margin-top: 5pt; }
+        .photo-box { border: 0.5pt solid #000; padding: 2pt; margin-bottom: 5pt; }
+        .photo-title { background-color: #1e293b; color: white; font-weight: bold; padding: 2pt; font-size: 7pt; }
+        .photo-img { width: 100%; height: 160pt; object-fit: cover; }
+        .footer-table td { border: none; padding: 10pt; }
+        .sig-line { border-top: 1pt solid #000; width: 80%; margin: 0 auto; padding-top: 2pt; }
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <table class="header">
+
+    <!-- CABECERA PRINCIPAL -->
+    <table>
         <tr>
-            <td class="logo-box">
-                <div style="font-size: 24pt; font-weight: 900; color: #1e293b;">TECSISA</div>
-                <div style="font-size: 10pt; font-weight: bold; color: #64748b;">PANAMA S.A.</div>
+            <td rowspan="2" style="width: 20%; text-align: center; padding: 5pt;">
+                <div style="font-size: 18pt; font-weight: 900; letter-spacing: -1pt;">TECSISA</div>
+                <div style="font-size: 6pt; font-weight: bold;">TECSISA PANAMA S.A.</div>
             </td>
-            <td class="title-box">
-                <span class="title-main">REPORTE TÉCNICO DE SISTEMAS ESPECIALES</span>
-                <span class="title-sub">SISTEMA DE {{ strtoupper($task->equipment->system->name ?? 'GENERAL') }}</span>
+            <td class="header-title" style="width: 80%; background-color: #F2F2F2;">
+                REPORTE TECNICO DE SISTEMAS ESPECIALES<br>
+                SISTEMA DE {{ strtoupper($task->equipment->system->name ?? 'GENERAL') }}
+            </td>
+        </tr>
+        <tr>
+            <td style="font-weight: bold; text-align: left; padding-left: 10pt;">
+                PROYECTO: HOSPITAL CIUDAD HOSPITALARIA
             </td>
         </tr>
     </table>
 
-    <div style="font-size: 8pt; color: #666; margin-bottom: 10px;">
-        PROYECTO: HOSPITAL CIUDAD HOSPITALARIA | FECHA: {{ $task->completed_at ? $task->completed_at->format('d/m/Y') : now()->format('d/m/Y') }}
-    </div>
-
-    <!-- Area Information -->
-    <div class="section-header">Información del Area</div>
-    <table class="info-table">
+    <!-- INFORMACION DEL AREA -->
+    <div class="section-name">Informacion del Area</div>
+    <table>
         <tr>
-            <td class="label">Ubicación / Equipo:</td>
-            <td>{{ $task->location_snapshot }} | <strong>{{ $task->equipment->internal_id }}</strong></td>
-            <td class="label">Tipo Mantenimiento:</td>
-            <td>{{ strtoupper($task->task_type == 'maintenance' ? 'Preventivo' : ($task->task_type == 'replacement' ? 'Correctivo' : 'Instalación')) }}</td>
+            <td colspan="4" class="label" style="text-align: center; background-color: #D9D9D9;">TIPO DE MANTENIMIENTO: 
+                <span class="check-box" style="margin-left: 20pt">{{ $task->task_type == 'maintenance' ? 'X' : '' }}</span> PREVENTIVO
+                <span class="check-box" style="margin-left: 20pt">{{ $task->task_type != 'maintenance' ? 'X' : '' }}</span> CORRECTIVO
+            </td>
         </tr>
         <tr>
-            <td class="label">Equipo / Activo:</td>
-            <td>{{ $task->equipment->name }}</td>
-            <td class="label">Estatus Final:</td>
-            <td>{{ $task->final_status ?? 'Operativo' }}</td>
+            <td class="label">Edificio o Bloque</td><td class="value">{{ $task->form_data['building'] ?? 'N/A' }}</td>
+            <td class="label">Fecha</td><td class="value">{{ $task->completed_at ? $task->completed_at->format('d/m/Y') : now()->format('d/m/Y') }}</td>
         </tr>
         <tr>
-            <td class="label">Técnico Responsable:</td>
-            <td>{{ $task->assignee->name ?? 'No asignado' }}</td>
-            <td class="label">Hora de Término:</td>
-            <td>{{ $task->completed_at ? $task->completed_at->format('H:i') : '--:--' }}</td>
+            <td class="label">Nivel o Piso</td><td class="value">{{ $task->form_data['floor'] ?? 'N/A' }}</td>
+            <td class="label">Hora</td><td class="value">{{ $task->form_data['start_time'] ?? '--:--' }} - {{ $task->form_data['end_time'] ?? '--:--' }}</td>
+        </tr>
+        <tr>
+            <td class="label">Área</td><td class="value">{{ $task->form_data['specific_area'] ?? 'N/A' }}</td>
+            <td class="label">Estatus Inicial</td><td class="value">Operativo</td>
+        </tr>
+        <tr>
+            <td class="label">Sección</td><td class="value">{{ $task->form_data['section'] ?? 'N/A' }}</td>
+            <td class="label">Técnico Responsable</td><td class="value">{{ $task->assignee->name ?? 'N/A' }}</td>
         </tr>
     </table>
 
-    <!-- Installations Required -->
-    <div class="section-header">Instalaciones Requeridas / Pendientes</div>
-    <div class="installation-box">
-        {{ $task->form_data['required_installations'] ?? 'No se reportaron instalaciones pendientes.' }}
+    <!-- INSTALACIONES REQUERIDAS -->
+    <div class="section-name">Instalaciones Requeridas</div>
+    <div class="border-all" style="min-height: 40pt; padding: 5pt; margin-bottom: 5pt;">
+        {{ $task->form_data['required_installations'] ?? 'No se requiere personal o material adicional.' }}
     </div>
 
-    <!-- Summary / Observations -->
-    <div class="section-header">Resumen Ejecutivo de la Labor</div>
-    <div style="border: 1px solid #ddd; padding: 10px; font-size: 9pt; min-height: 80px; margin-bottom: 15px;">
-        {{ $task->description ?? 'Sin observaciones adicionales.' }}
+    <!-- COMENTARIOS DEL INSPECTOR -->
+    <div class="section-name">Comentarios del Inspector</div>
+    <div class="border-all" style="min-height: 30pt; padding: 5pt; margin-bottom: 5pt;">
+        {{ $task->description ?? 'Sin observaciones.' }}
     </div>
 
-    <!-- Photo Gallery -->
-    <div class="section-header">Evidencia Fotográfica (Informe en Sitio)</div>
-    <div class="photo-container">
-        <!-- Main Photos (Before & After) -->
-        <div class="photo-row">
-            @if(isset($task->form_data['photos']['before']))
-            <div class="photo-box">
-                <img src="{{ public_path('storage/' . $task->form_data['photos']['before']) }}" class="photo-img">
-                <div class="photo-caption">EVIDENCIA: SITUACIÓN INICIAL</div>
-            </div>
-            @endif
-            
-            @if(isset($task->form_data['photos']['after']))
-            <div class="photo-box">
-                <img src="{{ public_path('storage/' . $task->form_data['photos']['after']) }}" class="photo-img">
-                <div class="photo-caption">EVIDENCIA: TRABAJO FINALIZADO</div>
-            </div>
-            @endif
-            <div style="clear: both;"></div>
-        </div>
+    <!-- ANEXOS -->
+    <div class="section-name">Anexos al Informe</div>
+    <table>
+        <tr style="text-align: center; font-weight: bold;">
+            <td><span class="check-box">{{ isset($task->form_data['annex_photos']) ? 'X' : '' }}</span> REGISTRO FOTOGRÁFICO</td>
+            <td><span class="check-box">{{ isset($task->form_data['annex_plans']) ? 'X' : '' }}</span> PLANOS</td>
+            <td><span class="check-box">{{ isset($task->form_data['annex_cert']) ? 'X' : '' }}</span> CERTIFICACIÓN</td>
+        </tr>
+    </table>
 
-        <!-- Findings Gallery -->
+    <!-- CHECKLIST TÉCNICO -->
+    <div class="section-name" style="margin-top: 5pt;">Detalle de la Actividad Realizada</div>
+    <table class="checklist-table">
+        <thead style="background-color: #F2F2F2;">
+            <tr>
+                <th style="width: 50%;">DETALLE DE LA ACTIVIDAD</th>
+                <th style="width: 15%; text-align: center;">REALIZADO</th>
+                <th style="width: 35%;">COMENTARIOS</th>
+            </tr>
+        </thead>
+        <tbody>
+            @php $evaluation = $task->form_data['evaluation'] ?? []; @endphp
+            @foreach($evaluation as $item)
+            <tr>
+                <td>{{ $item['item'] ?? 'N/A' }}</td>
+                <td style="text-align: center;">
+                    <span class="check-box">{{ ($item['status'] ?? '') == 'SI' ? 'X' : '' }}</span> SI 
+                    <span class="check-box">{{ ($item['status'] ?? '') == 'NO' ? 'X' : '' }}</span> NO
+                </td>
+                <td>{{ $item['comment'] ?? '' }}</td>
+            </tr>
+            @endforeach
+            @if(count($evaluation) == 0)
+            <tr><td colspan="3" style="text-align: center; color: #999;">No hay checklist definido para este sistema.</td></tr>
+            @endif
+        </tbody>
+    </table>
+
+    <div style="font-size: 6pt; font-style: italic; margin-bottom: 10pt;">*TODAS LAS RESPUESTAS SELECCIONADAS COMO "NO" DEBEN EXPLICARSE EN LA COLUMNA DE COMENTARIOS*</div>
+
+    <!-- FIRMAS -->
+    <table class="footer-table" style="margin-top: 20pt;">
+        <tr style="text-align: center; font-weight: bold;">
+            <td>Información</td>
+            <td>Técnico Responsable</td>
+            <td>Ingeniero Responsable</td>
+        </tr>
+        <tr style="text-align: left;">
+            <td><strong>Nombre:</strong><br><strong>Cargo:</strong><br><strong>Firma:</strong></td>
+            <td style="text-align: center; vertical-align: bottom; width: 40%;">
+                <div style="font-weight: bold;">{{ $task->assignee->name ?? '________________' }}</div>
+                <div style="font-size: 7pt; color: #666;">Técnico Nivel 2</div>
+                <div class="sig-line"></div>
+            </td>
+            <td style="text-align: center; vertical-align: bottom; width: 40%;">
+                <div style="font-weight: bold;">Luis Gálvez</div>
+                <div style="font-size: 7pt; color: #666;">Ing. Supervisor de Obra</div>
+                <div class="sig-line"></div>
+            </td>
+        </tr>
+    </table>
+
+    <!-- INFORME FOTOGRÁFICO (PÁGINA APARTE O CONTINUACIÓN) -->
+    <div style="page-break-before: always;"></div>
+    <div class="section-name" style="background-color: #1e293b; color: white;">Informe Fotográfico</div>
+    
+    <div class="photo-grid">
+        @if(isset($task->form_data['photos']['before']) || isset($task->form_data['photos']['after']))
+        <table>
+            <tr>
+                <td style="width: 50%; border: none;">
+                    @if(isset($task->form_data['photos']['before']))
+                    <div class="photo-box">
+                        <div class="photo-title">Fotografía N°1: Situación Inicial</div>
+                        <img src="{{ public_path('storage/' . $task->form_data['photos']['before']) }}" class="photo-img">
+                        <div style="font-size: 7pt; padding: 2pt;"><strong>Ubicación:</strong> {{ $task->form_data['building'] ?? 'N/A' }}</div>
+                    </div>
+                    @endif
+                </td>
+                <td style="width: 50%; border: none;">
+                    @if(isset($task->form_data['photos']['after']))
+                    <div class="photo-box">
+                        <div class="photo-title">Fotografía N°2: Trabajo Finalizado</div>
+                        <img src="{{ public_path('storage/' . $task->form_data['photos']['after']) }}" class="photo-img">
+                        <div style="font-size: 7pt; padding: 2pt;"><strong>Ubicación:</strong> {{ $task->form_data['building'] ?? 'N/A' }}</div>
+                    </div>
+                    @endif
+                </td>
+            </tr>
+        </table>
+        @endif
+
         @php $findings = $task->form_data['findings'] ?? []; @endphp
         @for($i = 0; $i < count($findings); $i += 2)
-        <div class="photo-row">
-            <!-- Left Finding -->
-            <div class="photo-box">
-                @if(isset($findings[$i]['photo']))
-                    <img src="{{ public_path('storage/' . $findings[$i]['photo']) }}" class="photo-img">
-                @endif
-                <div class="photo-caption">HALLAZGO: {{ $findings[$i]['caption'] ?? 'Detalle Técnico' }}</div>
-            </div>
-            
-            <!-- Right Finding -->
-            @if(isset($findings[$i+1]))
-            <div class="photo-box">
-                @if(isset($findings[$i+1]['photo']))
-                    <img src="{{ public_path('storage/' . $findings[$i+1]['photo']) }}" class="photo-img">
-                @endif
-                <div class="photo-caption">HALLAZGO: {{ $findings[$i+1]['caption'] ?? 'Detalle Técnico' }}</div>
-            </div>
-            @endif
-            <div style="clear: both;"></div>
-        </div>
+        <table>
+            <tr>
+                <td style="width: 50%; border: none;">
+                    <div class="photo-box">
+                        <div class="photo-title">Fotografía N°{{ $i + 3 }}: Hallazgo Técnico</div>
+                        @if(isset($findings[$i]['photo']))
+                            <img src="{{ public_path('storage/' . $findings[$i]['photo']) }}" class="photo-img">
+                        @endif
+                        <div style="font-size: 7pt; padding: 2pt;"><strong>Detalle:</strong> {{ $findings[$i]['caption'] ?? 'N/A' }}</div>
+                    </div>
+                </td>
+                <td style="width: 50%; border: none;">
+                    @if(isset($findings[$i+1]))
+                    <div class="photo-box">
+                        <div class="photo-title">Fotografía N°{{ $i + 4 }}: Hallazgo Técnico</div>
+                        @if(isset($findings[$i+1]['photo']))
+                            <img src="{{ public_path('storage/' . $findings[$i+1]['photo']) }}" class="photo-img">
+                        @endif
+                        <div style="font-size: 7pt; padding: 2pt;"><strong>Detalle:</strong> {{ $findings[$i+1]['caption'] ?? 'N/A' }}</div>
+                    </div>
+                    @endif
+                </td>
+            </tr>
+        </table>
         @endfor
     </div>
-
-    <!-- Signatures -->
-    <table class="footer">
-        <tr>
-            <td class="signature-box">
-                <div class="signature-line"></div>
-                <div class="signature-name">{{ $task->assignee->name ?? '________________' }}</div>
-                <div class="signature-title">Técnico Responsable</div>
-                @if($task->assignee->phone ?? false)<div class="signature-title">{{ $task->assignee->phone }}</div>@endif
-            </td>
-            <td class="signature-box">
-                <div class="signature-line"></div>
-                <div class="signature-name">Luis Gálvez</div>
-                <div class="signature-title">Ingeniero Supervisor</div>
-            </td>
-        </tr>
-    </table>
 
 </body>
 </html>
