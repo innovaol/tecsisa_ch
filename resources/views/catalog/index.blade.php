@@ -109,9 +109,12 @@
                             <div class="space-y-2">
                                 <p class="text-[10px] text-gray-500 uppercase font-black tracking-widest">Esquema de Especificaciones:</p>
                                 <div class="flex flex-wrap gap-2">
-                                    @forelse($sys->form_schema ?? [] as $field)
+                                    @php
+                                        $fields = $sys->form_schema['specs'] ?? (isset($sys->form_schema[0]['label']) ? $sys->form_schema : []);
+                                    @endphp
+                                    @forelse($fields as $field)
                                         <span class="text-[10px] bg-white/5 border border-white/10 px-2 py-1 rounded text-gray-400">
-                                            {{ $field['label'] }} <span class="text-tecsisa-yellow/50">({{ $field['type'] }})</span>
+                                            {{ $field['label'] ?? 'Campo' }} <span class="text-tecsisa-yellow/50">({{ $field['type'] ?? 'text' }})</span>
                                         </span>
                                     @empty
                                         <span class="text-[10px] text-gray-600 italic">Sin campos personalizados</span>
@@ -137,9 +140,11 @@
                             <input type="text" placeholder="Buscar por ID..." class="w-full bg-black/40 border-2 border-white/10 text-xs font-bold text-white uppercase tracking-wider rounded-xl pl-10 pr-4 py-2.5 focus:ring-tecsisa-yellow focus:border-tecsisa-yellow transition-colors placeholder-gray-600 outline-none">
                             <svg class="w-4 h-4 text-gray-500 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </div>
+                        @if(Auth::user()->hasRole('Administrador'))
                         <button @click="openCreateModal()" class="w-full sm:w-auto flex justify-center items-center bg-tecsisa-yellow hover:bg-yellow-400 text-black px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-[0_10px_20px_rgba(255,209,0,0.3)] transition-all active:scale-95">
                             + Alta de Equipo
                         </button>
+                        @endif
                     </div>
                 </div>
 

@@ -125,23 +125,31 @@
     <div style="font-size: 6pt; font-style: italic; margin-bottom: 10pt;">*TODAS LAS RESPUESTAS SELECCIONADAS COMO "NO" DEBEN EXPLICARSE EN LA COLUMNA DE COMENTARIOS*</div>
 
     <!-- FIRMAS -->
-    <table class="footer-table" style="margin-top: 20pt;">
+    <table class="footer-table" style="margin-top: 30pt;">
         <tr style="text-align: center; font-weight: bold;">
-            <td>Información</td>
-            <td>Técnico Responsable</td>
-            <td>Ingeniero Responsable</td>
+            <td style="width: 20%; padding: 0;">Información</td>
+            <td style="width: 40%; padding: 0;">Técnico Responsable</td>
+            <td style="width: 40%; padding: 0;">Ingeniero Responsable</td>
         </tr>
-        <tr style="text-align: left;">
-            <td><strong>Nombre:</strong><br><strong>Cargo:</strong><br><strong>Firma:</strong></td>
-            <td style="text-align: center; vertical-align: bottom; width: 40%;">
-                <div style="font-weight: bold;">{{ $task->assignee->name ?? '________________' }}</div>
-                <div style="font-size: 7pt; color: #666;">Técnico Nivel 2</div>
-                <div class="sig-line"></div>
+        <tr>
+            <td style="padding: 10pt 0;">
+                <strong>Nombre:</strong><br><br>
+                <strong>Cargo:</strong><br><br>
+                <strong>Firma:</strong>
             </td>
-            <td style="text-align: center; vertical-align: bottom; width: 40%;">
-                <div style="font-weight: bold;">Luis Gálvez</div>
-                <div style="font-size: 7pt; color: #666;">Ing. Supervisor de Obra</div>
-                <div class="sig-line"></div>
+            <td style="text-align: center; vertical-align: bottom;">
+                <div style="margin-bottom: 2pt;">
+                    <div style="font-weight: bold; font-size: 9pt;">{{ $task->assignee->name ?? 'Admin Tecsisa' }}</div>
+                    <div style="font-size: 7pt; color: #333;">Técnico Nivel 2</div>
+                </div>
+                <div style="border-top: 1pt solid #000; width: 90%; margin: 0 auto;"></div>
+            </td>
+            <td style="text-align: center; vertical-align: bottom;">
+                <div style="margin-bottom: 2pt;">
+                    <div style="font-weight: bold; font-size: 9pt;">Luis Gálvez</div>
+                    <div style="font-size: 7pt; color: #333;">Ing. Supervisor de Obra</div>
+                </div>
+                <div style="border-top: 1pt solid #000; width: 90%; margin: 0 auto;"></div>
             </td>
         </tr>
     </table>

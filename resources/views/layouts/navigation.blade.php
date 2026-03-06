@@ -29,9 +29,9 @@
                             {{ __('Racks') }}
                         </x-nav-link>
                         @else
-                        <x-nav-link :href="route('technician.scanner')" :active="request()->routeIs('technician.scanner*')" class="h-full flex items-center gap-2">
+                        <x-nav-link :href="route('technician.equipment.list')" :active="request()->routeIs('technician.equipment.list')" class="h-full flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                            {{ __('Buscar Equipos') }}
+                            {{ __('Buscar Activos') }}
                         </x-nav-link>
                         @endif
 
@@ -149,13 +149,15 @@
                     </a>
                 @endif
 
-                <!-- Item 3: Escaneo (Central) -->
-                <button @click="showScannerMenu = true" class="flex flex-col items-center gap-1 text-gray-500 focus:outline-none relative">
-                    <div class="absolute -top-7 left-1/2 transform -translate-x-1/2 w-14 h-14 bg-tecsisa-yellow rounded-full shadow-[0_8px_30px_rgba(255,209,0,0.5)] flex items-center justify-center text-black border-4 border-[#0f1217] active:scale-90 transition-transform">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
-                    </div>
-                    <span class="text-[9px] font-black uppercase tracking-tighter mt-8">Escanear</span>
-                </button>
+                <!-- Item 3: Escaneo (Central) - Solo Móviles Verdaderos -->
+                <div class="md:hidden">
+                    <button @click="showScannerMenu = true" class="flex flex-col items-center gap-1 text-gray-500 focus:outline-none relative">
+                        <div class="absolute -top-7 left-1/2 transform -translate-x-1/2 w-14 h-14 bg-tecsisa-yellow rounded-full shadow-[0_8px_30px_rgba(255,209,0,0.5)] flex items-center justify-center text-black border-4 border-[#0f1217] active:scale-90 transition-transform">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                        </div>
+                        <span class="text-[9px] font-black uppercase tracking-tighter mt-8">Escanear</span>
+                    </button>
+                </div>
 
                 <!-- Item 4: Tareas (Shared) -->
                 <a href="{{ route('tasks.index') }}" class="flex flex-col items-center gap-1 {{ request()->routeIs('tasks.*') ? 'text-tecsisa-yellow' : 'text-gray-500 hover:text-gray-400' }} transition-colors">
