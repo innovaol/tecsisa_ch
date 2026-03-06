@@ -202,6 +202,7 @@
                             <div class="flex-1 min-w-0">
                                 <label class="block text-[8px] font-black text-gray-500 uppercase tracking-widest mb-1.5 px-1">Leyenda / Hallazgo observado</label>
                                 <textarea :name="'finding_captions['+index+']'" x-model="f.caption" rows="2" class="w-full bg-black/40 border-none rounded-2xl text-[10px] font-bold text-gray-200 p-4 leading-relaxed focus:ring-1 focus:ring-tecsisa-yellow/30 placeholder:text-gray-700 transition" placeholder="Describa el detalle observado en sitio..."></textarea>
+                                <input type="hidden" :name="'finding_paths['+index+']'" :value="f.photo">
                             </div>
                         </div>
                     </div>
@@ -501,9 +502,29 @@
                 </label>
             </div>
 
+            <!-- 🏁 CONFIRMACIÓN FINAL -->
+            <div x-show="status !== 'completed' && status !== 'verified'" class="mt-12 mb-8 bg-tecsisa-yellow/5 border border-tecsisa-yellow/20 rounded-[2.5rem] p-8 flex flex-col items-center text-center shadow-inner">
+                <div class="w-16 h-16 bg-tecsisa-yellow text-black rounded-3xl flex items-center justify-center mb-4 shadow-xl shadow-tecsisa-yellow/20">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <h4 class="text-sm font-black text-white uppercase tracking-widest mb-2">Finalización de Reporte</h4>
+                <p class="text-[10px] text-gray-500 font-bold uppercase tracking-tight max-w-xs mb-6">Al finalizar, este reporte será sellado digitalmente y no podrá ser modificado por el técnico.</p>
+                
+                <label class="flex items-center gap-4 cursor-pointer group">
+                    <div class="relative">
+                        <input type="checkbox" x-model="confirmFinal" class="hidden">
+                        <div class="w-8 h-8 rounded-xl border-2 transition-all flex items-center justify-center" :class="confirmFinal ? 'bg-tecsisa-yellow border-tecsisa-yellow' : 'bg-black/40 border-white/10 group-hover:border-tecsisa-yellow/50'">
+                            <svg x-show="confirmFinal" class="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                        </div>
+                    </div>
+                    <span class="text-xs font-black text-gray-400 group-hover:text-tecsisa-yellow transition-colors uppercase tracking-widest">Confirmo reporte técnico veraz</span>
+                </label>
+            </div>
+
             <!-- Botones Flotantes de Acción Fijos Inferiores -->
             <div class="fixed bottom-0 inset-x-0 bg-[#0a0d14]/98 backdrop-blur-3xl border-t border-white/10 pb-safe z-[70] md:relative md:bg-transparent md:border-transparent md:p-0 md:mt-8">
                 <div class="flex gap-4 p-5 max-w-lg mx-auto md:max-w-none md:p-0 md:justify-end">
+                    @if($task->status !== 'completed' && $task->status !== 'verified')
                     <button type="button" @click="doSubmit('save_draft')" class="flex-1 md:flex-none md:w-auto bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold py-5 md:py-3 md:px-8 rounded-2xl text-[10px] md:text-xs uppercase tracking-[0.2em] transition" :class="{'opacity-50 cursor-not-allowed': isSubmitting}">
                         <span x-show="!isSubmitting">Borrador</span>
                         <span x-show="isSubmitting">...</span>
@@ -514,6 +535,13 @@
                         <span x-show="isSubmitting">Enviando Tarea...</span>
                         <svg x-show="!isSubmitting" class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                     </button>
+                    @else
+                    <div class="flex-1 bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center justify-center gap-3">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Este reporte ya ha sido cerrado</span>
+                        <a href="{{ route('tasks.pdf', $task) }}" class="ml-4 bg-tecsisa-yellow text-black px-4 py-2 rounded-lg text-[9px] font-black uppercase">Descargar PDF</a>
+                    </div>
+                    @endif
                 </div>
             </div>
             
