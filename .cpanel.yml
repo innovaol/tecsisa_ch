@@ -1,0 +1,4 @@
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/innovaol/subdominios/tecsisa.innovaol.com/
+    - /bin/cp -R * $DEPLOYPATH
