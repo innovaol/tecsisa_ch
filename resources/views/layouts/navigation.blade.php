@@ -1,5 +1,5 @@
 <div x-data="{ open: false, showScannerMenu: false }">
-    <nav class="bg-tecsisa-dark/80 backdrop-blur-xl border-b border-white/10 shadow-lg sticky top-0 md:relative z-[100] {{ ($hideHeader ?? false) ? 'hidden md:block' : '' }}">
+    <nav class="bg-tecsisa-dark/80 backdrop-blur-xl border-b border-white/10 shadow-lg sticky top-0 md:relative z-[100]">
         <!-- Desktop Navigation Menu (md and up) -->
         <div class="hidden md:block max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-20">
@@ -29,9 +29,9 @@
                             {{ __('Racks') }}
                         </x-nav-link>
                         @else
-                        <x-nav-link :href="route('technician.equipment.list')" :active="request()->routeIs('technician.equipment.list')" class="h-full flex items-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                            {{ __('Buscar Activos') }}
+                        <x-nav-link :href="route('technician.equipment.list')" :active="request()->routeIs('technician.equipment.*')" class="h-full flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
+                            {{ __('Equipos') }}
                         </x-nav-link>
                         @endif
 
@@ -145,7 +145,7 @@
                     <!-- Item 2: Catálogos para Técnicos (Equivalente al Admin) -->
                     <a href="{{ route('technician.equipment.list') }}" class="flex flex-col items-center gap-1 {{ request()->routeIs('technician.equipment.list') ? 'text-tecsisa-yellow' : 'text-gray-500 hover:text-gray-400' }} transition-colors">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
-                        <span class="text-[9px] font-black uppercase tracking-tighter">Dispositivo</span>
+                        <span class="text-[9px] font-black uppercase tracking-tighter">Equipos</span>
                     </a>
                 @endif
 

@@ -1,4 +1,4 @@
-<x-technician-layout :hideNav="true" hideHeader="true">
+<x-technician-layout>
     <div class="fixed top-0 inset-x-0 z-[60] bg-[#0a0d14]/95 backdrop-blur-3xl border-b border-white/5 pt-safe">
         <div class="px-4 py-4 flex items-center justify-between max-w-4xl mx-auto">
             <a href="{{ route('tasks.index') }}" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white transition shadow-lg">

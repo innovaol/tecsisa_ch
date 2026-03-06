@@ -63,9 +63,7 @@
     <div class="fixed bottom-[-10%] right-[-10%] w-[30%] h-[30%] rounded-full bg-blue-500/5 blur-[120px] pointer-events-none z-0"></div>
 
     <!-- Unified Master Navigation -->
-    @unless($hideNav ?? false)
-        @include('layouts.navigation', ['hideHeader' => $hideHeader ?? false])
-    @endunless
+    @include('layouts.navigation', ['hideHeader' => $hideHeader ?? false])
 
     <!-- Contenido Principal -->
     <main class="flex-1 md:overflow-visible overflow-y-auto no-scrollbar relative z-10 {{ ($hideNav ?? false) ? '' : 'pb-28 md:pb-0' }}">
