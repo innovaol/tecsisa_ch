@@ -50,6 +50,7 @@
                             <h3 class="text-white text-2xl font-black uppercase tracking-wider">Infraestructura Física</h3>
                             <p class="text-gray-500 text-sm font-bold tracking-wide mt-1">Explora la jerarquía de edificios, pisos, cuartos técnicos y racks.</p>
                         </div>
+                        @if(Auth::user()->hasRole('Administrador'))
                         <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                             <button @click="openCreateLocationModal()" class="w-full sm:w-auto flex justify-center items-center bg-transparent border-2 border-white/10 hover:border-white/20 hover:bg-white/5 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95">
                                 + Nueva Ubicación
@@ -58,6 +59,7 @@
                                 + Registrar Rack
                             </button>
                         </div>
+                        @endif
                     </div>
 
                     <!-- Hierarchical Tree -->
@@ -82,9 +84,11 @@
                         <h3 class="text-white text-2xl font-black uppercase tracking-wider">Sistemas de Alta/Baja Tensión</h3>
                         <p class="text-gray-500 text-sm font-bold tracking-wide mt-1">Define los sistemas y sus parámetros técnicos personalizados.</p>
                     </div>
+                    @if(Auth::user()->hasRole('Administrador'))
                     <button @click="openCreateSystemModal()" class="w-full md:w-auto flex justify-center items-center bg-tecsisa-yellow hover:bg-yellow-400 text-black px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-[0_10px_20px_rgba(255,209,0,0.3)] transition-all active:scale-95">
                         + Nuevo Sistema
                     </button>
+                    @endif
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -92,15 +96,17 @@
                     <div class="bg-tecsisa-dark/40 backdrop-blur-md p-6 rounded-2xl border border-white/10 group hover:border-tecsisa-yellow/50 transition-all">
                         <div class="flex justify-between items-start mb-4">
                             <h4 class="font-bold text-lg text-white group-hover:text-tecsisa-yellow transition-colors">{{ $sys->name }}</h4>
+                            @if(Auth::user()->hasRole('Administrador'))
                             <div class="flex gap-2">
                                 <button @click="openEditSystemModal(@js($sys))" class="text-gray-500 hover:text-white transition">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                 </button>
                                 <form action="{{ route('catalog.systems.destroy', $sys) }}" method="POST" onsubmit="return confirm('¿Eliminar este sistema? No podrá eliminarse si tiene equipos asociados.')">
                                     @csrf @method('DELETE')
-                                    <button class="text-gray-600 hover:text-red-400 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                                    <button class="text-gray-500 hover:text-red-400 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
                                 </form>
                             </div>
+                            @endif
                         </div>
                         
                         <div class="space-y-4">

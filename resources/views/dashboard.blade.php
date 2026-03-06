@@ -115,9 +115,13 @@
                                 <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
                             </div>
                             <p class="text-gray-300 font-bold text-base uppercase tracking-widest">Sin datos registrados</p>
-                            <a href="{{ route('catalog.index') }}" class="mt-4 px-6 py-2 bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark rounded-xl text-[10px] font-black uppercase tracking-widest transition">
+                            @if(Auth::user()->hasRole('Administrador'))
+                            <a href="{{ route('catalog.index') }}" class="mt-4 px-6 py-2 bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark rounded-xl text-[10px] font-black uppercase tracking-widest transition shadow-xl">
                                 + Añadir Equipo
                             </a>
+                            @else
+                            <p class="text-xs text-gray-500 mt-2 uppercase font-black tracking-widest">Contacte al supervisor para asignar tareas</p>
+                            @endif
                         </div>
                     @endif
                 </div>
