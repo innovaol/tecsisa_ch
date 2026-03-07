@@ -31,8 +31,8 @@ class TaskController extends Controller
             $stats = [
                 'total' => $allTasks->count(),
                 'pending' => $allTasks->where('status', 'pending')->count(),
-                'in_progress' => $allTasks->where('status', 'in_progress')->count(),
-                'completed' => $allTasks->where('status', 'completed')->count(),
+                'in_review' => $allTasks->where('status', 'in_review')->count(),
+                'completed' => $allTasks->whereIn('status', ['completed', 'verified'])->count(),
             ];
         }
         else {
@@ -43,8 +43,8 @@ class TaskController extends Controller
             $stats = [
                 'total' => $myTasks->count(),
                 'pending' => $myTasks->where('status', 'pending')->count(),
-                'in_progress' => $myTasks->where('status', 'in_progress')->count(),
-                'completed' => $myTasks->where('status', 'completed')->count(),
+                'in_review' => $myTasks->where('status', 'in_review')->count(),
+                'completed' => $myTasks->whereIn('status', ['completed', 'verified'])->count(),
             ];
         }
 
@@ -116,11 +116,12 @@ class TaskController extends Controller
         }
 
         $task->load('equipment.system', 'equipment.location');
+        $users = Auth::user()->hasRole('Administrador') ? \App\Models\User::all(['id', 'name']) : [];
 
         // This is where the magic happens: Getting the JSON schema from the System
         $formSchema = $task->equipment->system->form_schema ?? [];
 
-        return view('tasks.edit', compact('task', 'formSchema'));
+        return view('tasks.edit', compact('task', 'formSchema', 'users'));
     }
 
     /**
@@ -135,19 +136,30 @@ class TaskController extends Controller
         $validated = $request->validate([
             'description' => 'nullable|string',
             'form_data' => 'nullable|array',
-            'action' => 'required|in:save_draft,submit',
+            'action' => 'required|in:save_draft,submit,approve,reject,reassign',
+            'assigned_to' => 'nullable|exists:users,id',
+            'review_comment' => 'nullable|string',
             'photos.*' => 'nullable|image|max:5120', // Max 5MB per photo
         ]);
 
+        $isAdmin = Auth::user()->hasRole('Administrador');
+
+        // REASSIGNMENT (Admin Only)
+        if ($isAdmin && $request->filled('assigned_to')) {
+            $task->assigned_to = $validated['assigned_to'];
+        }
+
         // Merge existing form data with new
         $mergedData = array_merge($task->form_data ?? [], $validated['form_data'] ?? []);
+        
+        if ($request->filled('review_comment')) {
+            $mergedData['review_comment'] = $validated['review_comment'];
+        }
 
-        // HANDLE PHOTO UPLOADS (BEFORE, AFTER, FLUKE)
         // HANDLE PHOTO UPLOADS (BEFORE, AFTER, FLUKE)
         $photoKeys = ['before', 'after', 'fluke_screen'];
         $photoPaths = $mergedData['photos'] ?? [];
         foreach ($photoKeys as $key) {
-            // Check both regular and capture variants
             $file = $request->file("photos.$key") ?? $request->file("photos.{$key}_capture");
             if ($file) {
                 $path = $file->store('tasks/' . $task->id, 'public');
@@ -165,19 +177,12 @@ class TaskController extends Controller
 
         foreach ($findingCaptions as $index => $caption) {
             $path = $findingPaths[$index] ?? null;
-
-            // Priority: New upload (Gallery or Camera) over existing path
             $uploadedFile = $findingPhotos[$index] ?? $findingPhotosCapture[$index] ?? null;
-
             if ($uploadedFile) {
                 $path = $uploadedFile->store('tasks/' . $task->id . '/findings', 'public');
             }
-
             if ($path || !empty($caption)) {
-                $findings[] = [
-                    'photo' => $path,
-                    'caption' => $caption
-                ];
+                $findings[] = ['photo' => $path, 'caption' => $caption];
             }
         }
         $mergedData['findings'] = $findings;
@@ -188,10 +193,7 @@ class TaskController extends Controller
         $materialQtys = $request->input('material_qtys', []);
         foreach ($materialNames as $index => $name) {
             if (!empty($name)) {
-                $materials[] = [
-                    'name' => $name,
-                    'qty' => $materialQtys[$index] ?? 1
-                ];
+                $materials[] = ['name' => $name, 'qty' => $materialQtys[$index] ?? 1];
             }
         }
         $mergedData['materials'] = $materials;
@@ -200,53 +202,78 @@ class TaskController extends Controller
         $task->description = $validated['description'] ?? $task->description;
         $task->form_data = $mergedData;
 
-        // Auto-set started_at if not set and data is coming in
-        if (!$task->started_at && !empty($validated['form_data'])) {
+        // Auto-set started_at
+        if (!$task->started_at && $validated['action'] !== 'reassign') {
             $task->started_at = now();
-            $task->initial_status = $request->input('initial_status') ?? 'En revisión';
         }
 
+        // STATE TRANSITIONS
         if ($validated['action'] === 'submit') {
+            // If tech submits, goes to review. If admin submits, it's completed immediately.
+            $task->status = $isAdmin ? 'completed' : 'in_review';
+            if ($isAdmin) $task->completed_at = now();
+            $message = $isAdmin ? 'Tarea finalizada directamente.' : 'Reporte enviado a revisión.';
+        } 
+        elseif ($validated['action'] === 'approve' && $isAdmin) {
             $task->status = 'completed';
             $task->completed_at = now();
-            $task->final_status = $request->input('final_status') ?? 'Operativo / Finalizado';
-
-            // Sync with Equipment status if needed
-            if ($task->equipment) {
-                $task->equipment->update([
-                    'status' => 'operative',
-                    'last_maintenance_at' => now(),
-                    'next_maintenance_at' => now()->addMonths(6)
-                ]);
-            }
-
-            $task->save();
-            return redirect()->route('tasks.index')->with('success', 'Tarea completada profesionalmente.');
+            $message = 'Tarea aprobada y finalizada.';
         }
-        else {
-            $task->save();
-            return redirect()->route('tasks.index')->with('success', 'Avance guardado.');
+        elseif ($validated['action'] === 'reject' && $isAdmin) {
+            $task->status = 'pending'; // Or 'draft'? Technician needs to edit it again.
+            $message = 'Tarea rechazada. Se ha notificado al técnico para correcciones.';
         }
+        elseif ($validated['action'] === 'save_draft') {
+            $task->status = $task->status === 'in_review' ? 'in_review' : 'pending';
+            $message = 'Borrador guardado.';
+        }
+        elseif ($validated['action'] === 'reassign' && $isAdmin) {
+             $message = 'Tarea reasignada correctamente.';
+        }
+
+        // Sync with Equipment status if completed
+        if ($task->status === 'completed' && $task->equipment) {
+            $task->equipment->update([
+                'status' => 'operative',
+                'last_maintenance_at' => now(),
+                'next_maintenance_at' => now()->addMonths(6)
+            ]);
+        }
+
+        $task->save();
+        return redirect()->route('tasks.index')->with('success', $message);
     }
 
     public function destroy(Task $task, Request $request)
     {
-        // Admin can delete anything. Technician only their own drafts.
         $isAdmin = Auth::user()->hasRole('Administrador');
         $isOwner = $task->assigned_to == Auth::id();
         $equipmentId = $task->equipment_id;
 
-        if ($isAdmin || ($isOwner && ($task->status === 'draft' || $task->status === 'pending'))) {
+        // Determination of "New/Fresh" task: 
+        // 1. Created within the last 30 minutes
+        // 2. No work started (started_at is null)
+        // 3. No form data filled (form_data findings and materials are empty)
+        $isRecentlyCreated = $task->created_at->diffInMinutes(now()) < 30;
+        $hasNoProgress = !$task->started_at && empty($task->form_data['findings']) && empty($task->form_data['materials']);
+        $isNewTask = $isRecentlyCreated && $hasNoProgress;
+
+        // If it's a new task or the user is admin, allow deletion.
+        // If it's an existing task, don't delete, just redirect as "canceled".
+        if ($isAdmin || ($isOwner && ($task->status === 'draft' || $isNewTask))) {
             $task->delete();
-
-            if ($request->has('redirect_to_equipment') && $equipmentId) {
-                return redirect()->route('technician.scanner.result', $equipmentId)->with('info', 'Intervención cancelada y eliminada.');
-            }
-
-            return redirect()->route('tasks.index')->with('success', 'Tarea eliminada correctamente.');
+            $message = 'Intervención descartada y eliminada.';
+            $type = 'info';
+        } else {
+            $message = 'Edición de tarea cancelada. Los datos existentes se mantienen.';
+            $type = 'warning';
         }
 
-        abort(403, 'No tienes permiso para eliminar esta tarea.');
+        if ($request->has('redirect_to_equipment') && $equipmentId) {
+            return redirect()->route('technician.scanner.result', $equipmentId)->with($type, $message);
+        }
+
+        return redirect()->route('tasks.index')->with($type, $message);
     }
 
     /**

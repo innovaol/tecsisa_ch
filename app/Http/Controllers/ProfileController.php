@@ -57,4 +57,20 @@ class ProfileController extends Controller
 
         return Redirect::to('/');
     }
+
+    /**
+     * Update user theme preference
+     */
+    public function updateTheme(Request $request)
+    {
+        $validated = $request->validate([
+            'theme' => 'required|in:light,dark'
+        ]);
+
+        $user = Auth::user();
+        $user->theme = $validated['theme'];
+        $user->save();
+
+        return response()->json(['status' => 'success', 'theme' => $user->theme]);
+    }
 }

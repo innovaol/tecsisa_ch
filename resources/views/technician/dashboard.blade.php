@@ -1,15 +1,19 @@
 <x-technician-layout>
     <div class="px-5 pt-6 max-w-7xl mx-auto md:py-10 md:px-8 lg:px-12">
-        <!-- Saludo y Header -->
-        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
-            <div>
-                <h2 class="text-3xl font-black text-white leading-tight">Control de<br><span class="text-tecsisa-yellow uppercase tracking-widest text-sm font-black">Tareas Asignadas</span></h2>
-                <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1 px-1 hidden md:block">Gestión de hoja de ruta y mantenimiento técnico</p>
-            </div>
-            <div class="flex gap-4">
-                <div class="bg-white/5 border border-white/10 px-6 py-2 rounded-2xl text-center shadow-xl backdrop-blur-md">
-                    <span class="block text-[10px] font-black text-gray-500 uppercase tracking-tighter mb-1">Total Pendientes</span>
-                    <span class="text-2xl font-black text-white leading-none">{{ count($tasks) }}</span>
+        <!-- Header Section: Tarjeta Propia -->
+        <div class="bg-theme-card border border-theme rounded-[2.5rem] p-8 mb-8 transition-all duration-500 shadow-xl relative overflow-hidden">
+            <div class="absolute -right-10 -top-10 w-32 h-32 bg-tecsisa-yellow/5 rounded-full blur-2xl"></div>
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+                <div>
+                    <h2 class="text-3xl font-black transition-colors duration-500 leading-tight" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">
+                        Control de <span class="text-tecsisa-yellow uppercase tracking-widest text-sm font-black">Tareas Asignadas</span>
+                    </h2>
+                    <p class="text-xs text-gray-500 font-bold uppercase tracking-widest mt-2 px-1">Gestión de hoja de ruta y mantenimiento técnico avanzado</p>
+                </div>
+                
+                <div class="bg-black/10 border border-theme px-8 py-4 rounded-[1.5rem] text-center shadow-inner backdrop-blur-md transition-all duration-500">
+                    <span class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">En Proceso</span>
+                    <span class="text-3xl font-black transition-colors duration-500 leading-none" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">{{ count($tasks) }}</span>
                 </div>
             </div>
         </div>
@@ -23,7 +27,7 @@
             </div>
         @endif
 
-        <!-- Listado Vertical de Tareas Pendientes -->
+        <!-- Listado Vertical de Tareas en Proceso -->
         <div class="mb-10">
             <h3 class="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em] mb-5 px-1 flex items-center gap-2">
                 <span class="w-1.5 h-1.5 rounded-full bg-tecsisa-yellow animate-pulse"></span> Hoja de Ruta Activa
@@ -37,7 +41,7 @@
                     @endphp
                     
                     <a href="{{ $route }}" class="block group">
-                        <div class="bg-gradient-to-r from-[#12161f] to-[#0a0d14] border border-white/5 rounded-[2rem] p-5 flex items-center gap-4 hover:border-tecsisa-yellow/30 transition-all active:scale-[0.98] relative overflow-hidden shadow-xl">
+                        <div class="bg-theme-card border border-theme rounded-[2rem] p-5 flex items-center gap-4 hover:border-tecsisa-yellow/30 transition-all active:scale-[0.98] relative overflow-hidden shadow-xl">
                             
                             <!-- Icono de Tipo de Tarea -->
                             <div class="w-14 h-14 shrink-0 rounded-2xl flex items-center justify-center relative z-10 
@@ -62,10 +66,10 @@
                                         <span class="text-[9px] font-black uppercase tracking-tighter px-2 py-0.5 rounded-md bg-tecsisa-yellow/20 text-tecsisa-yellow">BORRADOR</span>
                                     @endif
                                 </div>
-                                <h4 class="text-sm font-black text-white truncate group-hover:text-tecsisa-yellow transition-colors">{{ $task->title }}</h4>
+                                <h4 class="text-sm font-black truncate group-hover:text-tecsisa-yellow transition-colors" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">{{ $task->title }}</h4>
                                 <p class="text-[11px] text-gray-500 font-bold uppercase tracking-tight flex items-center gap-1.5 mt-0.5">
                                     <svg class="w-3 h-3 text-tecsisa-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
-                                    <span class="text-white">{{ $task->location_snapshot ?? ($task->equipment->location->name ?? 'Ubicación Desconocida') }}</span>
+                                    <span class="transition-colors duration-500" :class="theme === 'light' ? 'text-slate-600' : 'text-white'">{{ $task->location_snapshot ?? ($task->equipment->location->name ?? 'Ubicación Desconocida') }}</span>
                                 </p>
                             </div>
 
@@ -92,12 +96,12 @@
                 </h4>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     @foreach($completedTasks as $ct)
-                        <div class="flex items-center gap-4 bg-black/40 p-4 rounded-2xl border border-white/5 opacity-80 group hover:opacity-100 transition">
+                        <div class="flex items-center gap-4 bg-theme-card p-4 rounded-2xl border border-theme opacity-80 group hover:opacity-100 transition duration-500">
                             <div class="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center shrink-0 border border-green-500/20">
                                 <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             </div>
                             <div class="flex-1 min-w-0">
-                                <h5 class="text-xs font-bold text-gray-200 truncate">{{ $ct->title }}</h5>
+                                <h5 class="text-xs font-bold truncate transition-colors duration-500" :class="theme === 'light' ? 'text-slate-700' : 'text-gray-200'">{{ $ct->title }}</h5>
                                 <div class="flex items-center gap-2 mt-0.5">
                                     <span class="text-[9px] font-bold text-gray-600 uppercase tracking-tighter">{{ optional($ct->completed_at)->diffForHumans() }}</span>
                                     <span class="text-[8px] bg-white/5 px-1.5 rounded text-gray-500 font-mono">TK-{{ str_pad($ct->id, 4, '0', STR_PAD_LEFT) }}</span>
@@ -110,12 +114,12 @@
         @endif
 
         @if(count($tasks) == 0 && count($completedTasks) == 0)
-            <div class="flex flex-col items-center justify-center py-24 px-8 bg-[#12161f]/30 rounded-[3rem] border border-dashed border-white/5 text-center mt-10">
+            <div class="flex flex-col items-center justify-center py-24 px-8 bg-theme-card rounded-[3rem] border border-dashed border-theme text-center mt-10 transition-colors duration-500">
                 <div class="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center mb-6 border border-emerald-500/20">
                     <svg class="w-10 h-10 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 13l4 4L19 7"></path></svg>
                 </div>
-                <h3 class="font-black text-white text-xl uppercase tracking-widest">Día Productivo</h3>
-                <p class="text-sm text-gray-500 mt-2 leading-relaxed max-w-sm">No tienes tareas pendientes asignadas. Todo el equipo está funcionando según los parámetros.</p>
+                <h3 class="font-black text-xl uppercase tracking-widest transition-colors duration-500" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">Día Productivo</h3>
+                <p class="text-sm text-gray-500 mt-2 leading-relaxed max-w-sm transition-colors duration-500">No tienes tareas en proceso asignadas. Todo el equipo está funcionando según los parámetros.</p>
                 <button @click="showScannerMenu = true" class="mt-8 bg-tecsisa-yellow text-black font-black px-8 py-4 rounded-2xl text-[10px] uppercase tracking-widest shadow-xl shadow-yellow-400/20 active:scale-95 transition">Escanear Nuevo Equipo</button>
             </div>
         @endif

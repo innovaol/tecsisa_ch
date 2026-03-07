@@ -1,13 +1,12 @@
 <div x-data="{ open: false, showScannerMenu: false }">
-    <nav class="bg-tecsisa-dark/80 backdrop-blur-xl border-b border-white/10 shadow-lg sticky top-0 md:relative z-[100]">
+    <nav class="bg-theme-header backdrop-blur-xl border-b border-theme shadow-lg sticky top-0 md:relative z-[100] transition-colors duration-500">
         <!-- Desktop Navigation Menu (md and up) -->
         <div class="hidden md:block max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-20">
                 <div class="flex items-center">
-                    <!-- Logo -->
                     <div class="shrink-0 flex items-center">
                         <a href="{{ route('dashboard') }}">
-                            <x-application-logo class="block h-10 w-auto text-white" />
+                            <x-application-logo class="block h-10 w-auto text-tecsisa-yellow" />
                         </a>
                     </div>
 
@@ -53,13 +52,19 @@
 
                 <!-- Settings Dropdown -->
                 <div class="hidden md:flex md:items-center md:ms-6 gap-4">
-                    <button class="p-2 text-gray-400 hover:text-white transition group relative">
+                    <!-- Theme Toggle -->
+                    <button @click="toggleTheme()" class="p-2 text-gray-400 hover:text-tecsisa-yellow transition-colors duration-300 rounded-lg hover:bg-white/5" title="Cambiar Tema">
+                        <svg x-show="theme === 'dark'" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l.707.707M6.343 6.343l.707-.707M14.5 12a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path></svg>
+                        <svg x-show="theme === 'light'" style="display: none;" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                    </button>
+
+                    <button class="p-2 text-gray-400 transition group relative" :class="theme === 'light' ? 'hover:text-slate-900' : 'hover:text-white'">
                         <svg class="w-6 h-6 outline-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
                     </button>
                     
                     <x-dropdown align="right" width="48">
                         <x-slot name="trigger">
-                            <button class="inline-flex items-center px-4 py-2 border border-white/10 text-sm leading-4 font-medium rounded-xl text-gray-300 bg-white/5 hover:bg-white/10 hover:text-white focus:outline-none transition ease-in-out duration-150 backdrop-blur-sm shadow-xl">
+                            <button class="inline-flex items-center px-4 py-2 border border-theme text-sm leading-4 font-medium rounded-xl text-theme bg-theme-border/5 hover:bg-theme-border/10 focus:outline-none transition ease-in-out duration-150 backdrop-blur-sm shadow-xl">
                                 <div class="w-7 h-7 rounded-full bg-tecsisa-yellow/20 flex items-center justify-center text-tecsisa-yellow mr-3 border border-tecsisa-yellow/30 font-black text-xs uppercase">
                                     {{ substr(Auth::user()->name, 0, 1) }}
                                 </div>
@@ -72,9 +77,12 @@
 
                         <x-slot name="content">
                             <x-dropdown-link :href="route('profile.edit')">{{ __('Mi Perfil') }}</x-dropdown-link>
+                            @if(Auth::user()->hasRole('Administrador'))
+                                <x-dropdown-link :href="route('settings.index')">{{ __('Configuración Empresa') }}</x-dropdown-link>
+                            @endif
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
-                                <x-dropdown-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();" class="text-red-400 font-bold">{{ __('Cerrar Sesión') }}</x-dropdown-link>
+                                <x-dropdown-link :href="route('logout')" onclick="event.preventDefault(); if(confirm('¿Estás seguro de que deseas cerrar sesión?')) this.closest('form').submit();" class="text-red-400 font-bold">{{ __('Cerrar Sesión') }}</x-dropdown-link>
                             </form>
                         </x-slot>
                     </x-dropdown>
@@ -84,14 +92,19 @@
 
         @if(!($hideHeader ?? false))
         <!-- Mobile Header (below md) -->
-        <div class="md:hidden px-5 py-4 flex justify-between items-center bg-[#0f1217]/90 backdrop-blur-xl border-b border-white/5">
+        <div class="md:hidden px-5 py-4 flex justify-between items-center bg-theme-header backdrop-blur-xl border-b border-theme transition-colors duration-500">
             <div class="flex items-center gap-3">
+                <button @click="toggleTheme()" class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 active:scale-90 transition shadow-inner">
+                    <svg x-show="theme === 'dark'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l.707.707M6.343 6.343l.707-.707M14.5 12a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path></svg>
+                    <svg x-show="theme === 'light'" style="display: none;" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                </button>
+
                 <div class="w-10 h-10 rounded-full bg-tecsisa-yellow/10 flex items-center justify-center border border-tecsisa-yellow/20">
                     <span class="text-tecsisa-yellow font-black text-lg uppercase">{{ substr(Auth::user()->name, 0, 1) }}</span>
                 </div>
                 <div>
-                    <h1 class="text-[10px] text-gray-400 font-black uppercase tracking-widest leading-none">{{ Auth::user()->hasRole('Administrador') ? 'Administrador' : 'Técnico Especialista' }}</h1>
-                    <p class="text-sm font-black text-white leading-tight mt-1">{{ explode(' ', Auth::user()->name)[0] }}</p>
+                    <h1 class="text-[10px] font-black uppercase tracking-widest leading-none text-theme-muted transition-colors duration-500">{{ Auth::user()->hasRole('Administrador') ? 'Administrador' : 'Técnico Especialista' }}</h1>
+                    <p class="text-sm font-black leading-tight mt-1 transition-colors duration-500" :class="theme === 'light' ? 'text-black' : 'text-white'">{{ explode(' ', Auth::user()->name)[0] }}</p>
                 </div>
             </div>
             
@@ -105,48 +118,59 @@
         @endif
 
         <!-- Responsive Drawer (For Profile/Extra Actions on Mobile) -->
-    <div x-show="open" style="display: none;" class="md:hidden bg-[#0f1217] p-6 shadow-2xl relative z-[150] border-b border-white/5" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-4" x-transition:enter-end="opacity-100 translate-y-0 text-white">
-        <div class="space-y-4">
+        <div x-show="open" style="display: none;" class="md:hidden bg-theme-card p-6 shadow-2xl relative z-[150] border-b border-theme transition-colors duration-500" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-4" x-transition:enter-end="opacity-100 translate-y-0 text-theme">
+            <div class="space-y-4">
+                 <x-dropdown-link :href="route('profile.edit')" class="flex items-center gap-3 py-4 border-b border-theme transition-colors duration-500">
+                    <svg class="w-5 h-5 text-theme-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                    <span class="font-bold text-theme">Mi Perfil</span>
+                 </x-dropdown-link>
 
-             
-             <x-dropdown-link :href="route('profile.edit')" class="flex items-center gap-3 py-4 border-b border-white/5">
-                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-                <span class="font-bold text-gray-300">Mi Perfil</span>
-             </x-dropdown-link>
+                 @if(Auth::user()->hasRole('Administrador'))
+                 <x-dropdown-link :href="route('settings.index')" class="flex items-center gap-3 py-4 border-b border-theme transition-colors duration-500">
+                    <svg class="w-5 h-5 text-theme-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    <span class="font-bold text-theme">Configuración Empresa</span>
+                 </x-dropdown-link>
+                 @endif
 
-             <div class="pt-4">
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <x-dropdown-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();" class="text-red-400 flex items-center gap-3 py-4 font-black uppercase text-xs tracking-widest">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                        <span>Cerrar Sesión</span>
-                    </x-dropdown-link>
-                </form>
-             </div>
+                 <div class="pt-4">
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <x-dropdown-link :href="route('logout')" onclick="event.preventDefault(); if(confirm('¿Cerrar sesión ahora?')) this.closest('form').submit();" class="text-red-400 flex items-center gap-3 py-4 font-black uppercase text-xs tracking-widest">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                            <span>Cerrar Sesión</span>
+                        </x-dropdown-link>
+                    </form>
+                 </div>
+            </div>
         </div>
-    </div>
     </nav>
 
     @if(!($hideNav ?? false))
     <!-- Mobile Bottom Navigation (Always hidden on md+) -->
     <div class="md:hidden">
-        <div class="fixed bottom-0 inset-x-0 bg-[#0f1217]/98 backdrop-blur-3xl border-t border-white/10 z-[100] pb-safe-bottom shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
+        <div class="fixed bottom-0 inset-x-0 bg-theme-header backdrop-blur-3xl border-t border-theme z-[100] pb-safe-bottom shadow-[0_-10px_30px_rgba(0,0,0,0.5)] transition-colors duration-500">
             <div class="flex justify-around items-center py-3 px-2">
                 <!-- Item 1: Inicio -->
-                <a href="{{ route('dashboard') }}" class="flex flex-col items-center gap-1 {{ request()->routeIs('dashboard') ? 'text-tecsisa-yellow' : 'text-gray-500 hover:text-gray-400' }} transition-colors">
+                <a href="{{ route('dashboard') }}" class="flex flex-col items-center gap-1 {{ request()->routeIs('dashboard') ? 'text-tecsisa-yellow' : '' }} transition-colors" style="color: {{ request()->routeIs('dashboard') ? '#FFD100' : 'var(--theme-nav-inactive)' }}">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
                     <span class="text-[9px] font-black uppercase tracking-tighter">Inicio</span>
                 </a>
 
                 @if(Auth::user()->hasRole('Administrador'))
                     <!-- Item 2: Catálogos para Admins -->
-                    <a href="{{ route('catalog.index') }}" class="flex flex-col items-center gap-1 {{ request()->routeIs('catalog.*') ? 'text-tecsisa-yellow' : 'text-gray-500 hover:text-gray-400' }} transition-colors text-center">
+                    <a href="{{ route('catalog.index') }}" class="flex flex-col items-center gap-1 {{ request()->routeIs('catalog.*') ? 'text-tecsisa-yellow' : '' }} transition-colors text-center" style="color: {{ request()->routeIs('catalog.*') ? '#FFD100' : 'var(--theme-nav-inactive)' }}">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
                         <span class="text-[9px] font-black uppercase tracking-tighter">Catálogos</span>
                     </a>
+
+                    <!-- Item Racks para Admins (Mobile) -->
+                    <a href="{{ route('rack.builder') }}" class="flex flex-col items-center gap-1 {{ request()->routeIs('rack.*') ? 'text-tecsisa-yellow' : '' }} transition-colors text-center" style="color: {{ request()->routeIs('rack.*') ? '#FFD100' : 'var(--theme-nav-inactive)' }}">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"></path></svg>
+                        <span class="text-[9px] font-black uppercase tracking-tighter">Racks</span>
+                    </a>
                 @else
                     <!-- Item 2: Catálogos para Técnicos (Equivalente al Admin) -->
-                    <a href="{{ route('technician.equipment.list') }}" class="flex flex-col items-center gap-1 {{ request()->routeIs('technician.equipment.list') ? 'text-tecsisa-yellow' : 'text-gray-500 hover:text-gray-400' }} transition-colors">
+                    <a href="{{ route('technician.equipment.list') }}" class="flex flex-col items-center gap-1 {{ request()->routeIs('technician.equipment.list') ? 'text-tecsisa-yellow' : '' }} transition-colors" style="color: {{ request()->routeIs('technician.equipment.list') ? '#FFD100' : 'var(--theme-nav-inactive)' }}">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
                         <span class="text-[9px] font-black uppercase tracking-tighter">Equipos</span>
                     </a>
@@ -154,8 +178,8 @@
 
                 <!-- Item 3: Escaneo (Central) - Solo Móviles Verdaderos -->
                 <div class="md:hidden">
-                    <button @click="showScannerMenu = true" class="flex flex-col items-center gap-1 text-gray-500 focus:outline-none relative">
-                        <div class="absolute -top-7 left-1/2 transform -translate-x-1/2 w-14 h-14 bg-tecsisa-yellow rounded-full shadow-[0_8px_30px_rgba(255,209,0,0.5)] flex items-center justify-center text-black border-4 border-[#0f1217] active:scale-90 transition-transform">
+                    <button @click="showScannerMenu = true" class="flex flex-col items-center gap-1 text-theme-muted focus:outline-none relative">
+                        <div class="absolute -top-7 left-1/2 transform -translate-x-1/2 w-14 h-14 bg-tecsisa-yellow rounded-full shadow-[0_8px_30px_rgba(255,209,0,0.5)] flex items-center justify-center text-black border-4 border-theme active:scale-90 transition-transform">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
                         </div>
                         <span class="text-[9px] font-black uppercase tracking-tighter mt-8">Escanear</span>
@@ -163,15 +187,23 @@
                 </div>
 
                 <!-- Item 4: Tareas (Shared) -->
-                <a href="{{ route('tasks.index') }}" class="flex flex-col items-center gap-1 {{ request()->routeIs('tasks.*') ? 'text-tecsisa-yellow' : 'text-gray-500 hover:text-gray-400' }} transition-colors">
+                <a href="{{ route('tasks.index') }}" class="flex flex-col items-center gap-1 {{ request()->routeIs('tasks.*') ? 'text-tecsisa-yellow' : '' }} transition-colors" style="color: {{ request()->routeIs('tasks.*') ? '#FFD100' : 'var(--theme-nav-inactive)' }}">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
                     <span class="text-[9px] font-black uppercase tracking-tighter">Tareas</span>
                 </a>
 
-                <!-- Item 5: Salir -->
+                @if(Auth::user()->hasRole('Administrador'))
+                <!-- Item 5: Usuarios (Admin Only) -->
+                <a href="{{ route('users.index') }}" class="flex flex-col items-center gap-1 {{ request()->routeIs('users.*') ? 'text-tecsisa-yellow' : '' }} transition-colors text-center" style="color: {{ request()->routeIs('users.*') ? '#FFD100' : 'var(--theme-nav-inactive)' }}">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    <span class="text-[9px] font-black uppercase tracking-tighter">Usuarios</span>
+                </a>
+                @endif
+
+                <!-- Item 6: Salir (Restore) -->
                 <form method="POST" action="{{ route('logout') }}" class="flex">
                     @csrf
-                    <button type="submit" class="flex flex-col items-center gap-1 text-gray-500 hover:text-gray-400 transition-colors">
+                    <button type="submit" onclick="event.preventDefault(); if(confirm('¿Deseas cerrar sesión?')) this.closest('form').submit();" class="flex flex-col items-center gap-1 text-gray-500 hover:text-red-400 transition-colors">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
                         <span class="text-[9px] font-black uppercase tracking-tighter">Salir</span>
                     </button>
@@ -182,16 +214,16 @@
         <!-- Scanner Menu (Mobile Bottom Sheet) -->
         <div x-show="showScannerMenu" style="display: none;" class="fixed inset-0 z-[110] flex flex-col justify-end pointer-events-none">
             <div x-show="showScannerMenu" @click="showScannerMenu = false" class="absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity pointer-events-auto" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"></div>
-            <div x-show="showScannerMenu" class="bg-[#12161f] border-t border-white/10 rounded-t-[2.5rem] p-8 relative z-[120] pointer-events-auto shadow-[0_-15px_50px_rgba(0,0,0,0.8)] transition-transform" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="translate-y-full" x-transition:enter-end="translate-y-0" x-transition:leave="transition ease-in duration-200 transform" x-transition:leave-start="translate-y-0" x-transition:leave-end="translate-y-full">
+            <div x-show="showScannerMenu" class="bg-theme-card border-t border-theme rounded-t-[2.5rem] p-8 relative z-[120] pointer-events-auto shadow-[0_-15px_50px_rgba(0,0,0,0.8)] transition-all duration-500" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="translate-y-full" x-transition:enter-end="translate-y-0" x-transition:leave="transition ease-in duration-200 transform" x-transition:leave-start="translate-y-0" x-transition:leave-end="translate-y-full">
                 <div class="w-12 h-1.5 bg-white/10 rounded-full mx-auto mb-8"></div>
-                <h3 class="text-2xl font-black text-white mb-2 text-center uppercase tracking-widest">Identificar Activo</h3>
-                <p class="text-xs text-gray-500 text-center mb-10 uppercase font-bold tracking-[0.2em]">Selecciona el método de entrada</p>
+                <h3 class="text-2xl font-black mb-2 text-center uppercase tracking-widest transition-colors duration-500" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">Identificar Activo</h3>
+                <p class="text-xs text-center mb-10 uppercase font-bold tracking-[0.2em] transition-colors duration-500" :class="theme === 'light' ? 'text-slate-400' : 'text-gray-500'">Selecciona el método de entrada</p>
                 <div class="space-y-4">
                     <a href="{{ route('technician.scanner') }}?mode=scan" class="w-full bg-tecsisa-yellow hover:bg-yellow-400 text-black font-black py-5 rounded-[1.25rem] text-sm uppercase tracking-[0.15em] flex items-center justify-center gap-4 transition shadow-2xl active:scale-95">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
                         Escanear Código QR
                     </a>
-                    <a href="{{ route('technician.scanner') }}?mode=text" class="w-full bg-white/5 border border-white/10 text-white font-bold py-5 rounded-[1.25rem] text-sm uppercase tracking-[0.1em] flex items-center justify-center gap-4 transition active:scale-95">
+                    <a href="{{ route('technician.scanner') }}?mode=text" class="w-full bg-theme-card border border-theme font-bold py-5 rounded-[1.25rem] text-sm uppercase tracking-[0.1em] flex items-center justify-center gap-4 transition active:scale-95 shadow-xl" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                         Ingreso Manual
                     </a>

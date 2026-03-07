@@ -59,14 +59,20 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'role' => 'required|exists:roles,name',
+            'password' => 'nullable|string|min:8|confirmed',
         ]);
 
         $user->name = $validated['name'];
         $user->email = $validated['email'];
+        
+        if (!empty($validated['password'])) {
+            $user->password = bcrypt($validated['password']);
+        }
+
         $user->syncRoles($validated['role']);
         $user->save();
 
-        return redirect()->route('users.index')->with('success', 'Usuario actualizado.');
+        return redirect()->route('users.index')->with('success', 'Usuario actualizado correctamente.');
     }
 
     /**

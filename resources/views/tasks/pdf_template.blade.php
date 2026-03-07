@@ -29,9 +29,13 @@
     <!-- CABECERA PRINCIPAL -->
     <table>
         <tr>
-            <td rowspan="2" style="width: 20%; text-align: center; padding: 5pt;">
-                <div style="font-size: 18pt; font-weight: 900; letter-spacing: -1pt;">TECSISA</div>
-                <div style="font-size: 6pt; font-weight: bold;">TECSISA PANAMA S.A.</div>
+            <td rowspan="2" style="width: 20%; text-align: center; padding: 5pt; vertical-align: middle;">
+                @if($company_logo)
+                    <img src="{{ public_path('storage/' . $company_logo) }}" style="max-height: 40pt; max-width: 60pt;">
+                @else
+                    <div style="font-size: 14pt; font-weight: 900; letter-spacing: -1pt;">{{ $company_name }}</div>
+                @endif
+                <div style="font-size: 5pt; font-weight: bold; margin-top: 2pt;">{{ $company_footer }}</div>
             </td>
             <td class="header-title" style="width: 80%; background-color: #F2F2F2;">
                 REPORTE TECNICO DE SISTEMAS ESPECIALES<br>

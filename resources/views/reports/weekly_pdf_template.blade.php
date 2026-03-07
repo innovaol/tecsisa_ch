@@ -137,11 +137,15 @@
 <body>
     <!-- 1. PORTADA -->
     <div class="cover page-break">
-        <div class="cover-logo">TECSISA</div>
-        <div class="cover-sublogo">CONSORCIO NIÑA ANITA</div>
+        @if($company_logo)
+            <img src="{{ public_path('storage/' . $company_logo) }}" style="max-height: 120px; margin-bottom: 20px;">
+        @else
+            <div class="cover-logo">{{ $company_name }}</div>
+        @endif
+        <div class="cover-sublogo">{{ $company_footer }}</div>
         
-        <div class="cover-title">REPORTE</div>
-        <div class="cover-system">SISTEMAS ESPECIALES</div>
+        <div class="cover-title">REPORTE INTEGRADO</div>
+        <div class="cover-system">INFRAESTRUCTURA TÉCNICA</div>
         
         <div style="font-size: 18pt; font-weight: bold; margin-bottom: 40px;">
             HOSPITAL CIUDAD HOSPITALARIA
@@ -159,7 +163,7 @@
         <!-- Header Pequeño por página -->
         <table class="report-header">
             <tr>
-                <td style="width: 100px;"><strong>TECSISA</strong></td>
+                <td style="width: 120px;"><strong>{{ $company_name }}</strong></td>
                 <td class="title-box">
                    <div style="font-size: 11pt; font-weight: bold;">HOJA DE REPORTE TÉCNICO</div>
                    <div style="font-size: 8pt;">FOLIO: #{{ $task->id }} | SISTEMA: {{ strtoupper($system->name) }}</div>
@@ -184,11 +188,53 @@
             </tr>
         </table>
 
-        <!-- Instalaciones Faltantes -->
-        <div class="section-header">Instalaciones Requeridas / Pendientes</div>
-        <div style="border: 1px solid #ddd; padding: 8px; font-size: 8pt; min-height: 40px; background-color: #fffbeb;">
-            {{ $task->form_data['required_installations'] ?? 'Sin pendientes registrados.' }}
-        </div>
+        <!-- Evaluación de Actividades -->
+        @php $evaluation = $task->form_data['evaluation'] ?? []; @endphp
+        @if(count($evaluation) > 0)
+        <div class="section-header">Evaluación Técnica de Actividades</div>
+        <table class="info-table">
+            <thead>
+                <tr style="background-color: #f3f4f6;">
+                    <th>Actividad / Protocolo</th>
+                    <th style="width: 60px; text-align: center;">Cumple</th>
+                    <th>Observación</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($evaluation as $item)
+                <tr>
+                    <td>{{ $item['item'] ?? 'Actividad' }}</td>
+                    <td style="text-align: center; color: {{ ($item['status'] ?? '') == 'SI' ? 'green' : 'red' }};">
+                        <strong>{{ $item['status'] ?? '-' }}</strong>
+                    </td>
+                    <td>{{ $item['comment'] ?? '' }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+        @endif
+
+        <!-- Insumos Utilisados -->
+        @php $materials = $task->form_data['materials'] ?? []; @endphp
+        @if(count($materials) > 0)
+        <div class="section-header">Materiales e Insumos Utilizados</div>
+        <table class="info-table">
+            <thead>
+                <tr style="background-color: #f3f4f6;">
+                    <th>Descripción del Insumo</th>
+                    <th style="width: 80px; text-align: center;">Cantidad</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($materials as $mat)
+                <tr>
+                    <td>{{ $mat['name'] }}</td>
+                    <td style="text-align: center;">{{ $mat['qty'] }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+        @endif
 
         <!-- Evidencia -->
         <div class="section-header">Evidencia Fotográfica</div>

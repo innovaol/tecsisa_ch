@@ -1,11 +1,11 @@
 <x-technician-layout>
     <!-- Header Especial para la Tarea -->
-    <div class="fixed top-0 inset-x-0 z-40 bg-[#0a0d14]/90 backdrop-blur-xl border-b border-white/5 pt-safe">
+    <div class="fixed top-0 inset-x-0 z-40 bg-theme-header backdrop-blur-xl border-b border-theme pt-safe transition-colors duration-500">
         <div class="px-4 py-3 flex items-center justify-between">
-            <a href="{{ route('technician.dashboard') }}" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition">
+            <a href="{{ route('technician.dashboard') }}" class="w-10 h-10 rounded-full bg-theme-card border border-theme flex items-center justify-center text-gray-400 transition shadow-lg" :class="theme === 'light' ? 'hover:text-slate-900' : 'hover:text-white'">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
             </a>
-            <h1 class="text-xs font-black text-white uppercase tracking-widest">Detalle: TK-{{ str_pad($task->id, 4, '0', STR_PAD_LEFT) }}</h1>
+            <h1 class="text-xs font-black uppercase tracking-widest transition-colors duration-500" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">Detalle: TK-{{ str_pad($task->id, 4, '0', STR_PAD_LEFT) }}</h1>
             <div class="w-10 h-10"></div> <!-- Placeholder for symmetry -->
         </div>
     </div>
@@ -16,7 +16,7 @@
     <div class="px-5 py-2" x-data="{ confirming: false }">
         
         <!-- Tarjeta Equipo -->
-        <div class="bg-gradient-to-br from-[#12161f] to-[#0a0d14] rounded-3xl border border-white/10 p-5 mb-6 relative overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.5)]">
+        <div class="bg-theme-card rounded-3xl border border-theme p-5 mb-6 relative overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.5)] transition-colors duration-500">
             <!-- Deco -->
             <div class="absolute -right-10 -top-10 w-32 h-32 bg-tecsisa-yellow/5 rounded-full blur-2xl"></div>
 
@@ -30,15 +30,15 @@
                 </span>
             </div>
 
-            <h2 class="text-xl font-bold text-white leading-tight mb-1">{{ $task->equipment->name ?? 'Equipo Desconocido' }}</h2>
+            <h2 class="text-xl font-bold leading-tight mb-1 transition-colors duration-500" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">{{ $task->equipment->name ?? 'Equipo Desconocido' }}</h2>
             <p class="text-sm font-mono text-tecsisa-yellow mb-6">ID: {{ $task->equipment->internal_id ?? 'N/A' }}</p>
 
             <div class="grid grid-cols-2 gap-4">
-                <div class="bg-black/30 rounded-xl p-3 border border-white/5">
+                <div class="bg-black/30 rounded-xl p-3 border border-white/5 transition-opacity duration-500" :class="theme === 'light' ? 'bg-slate-100 border-slate-200' : ''">
                     <span class="block text-[9px] uppercase font-bold tracking-widest text-gray-600 mb-1">Ubicación Fija</span>
-                    <span class="text-xs font-bold text-gray-300 truncate block flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>{{ $task->equipment->location->name ?? 'No' }}</span>
+                    <span class="text-xs font-bold truncate block flex items-center gap-1.5 transition-colors duration-500" :class="theme === 'light' ? 'text-slate-700' : 'text-gray-300'"><svg class="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>{{ $task->equipment->location->name ?? 'No' }}</span>
                 </div>
-                <div class="bg-black/30 rounded-xl p-3 border border-white/5">
+                <div class="bg-black/30 rounded-xl p-3 border border-white/5 transition-opacity duration-500" :class="theme === 'light' ? 'bg-slate-100 border-slate-200' : ''">
                     <span class="block text-[9px] uppercase font-bold tracking-widest text-gray-600 mb-1">Prioridad Interv.</span>
                     <span class="text-xs font-bold text-red-400 uppercase truncate block">
                         {{ $task->priority }}
@@ -48,10 +48,10 @@
         </div>
 
         <!-- Instrucciones (Job Description) -->
-        <h3 class="text-xs font-black text-gray-500 uppercase tracking-widest mb-3">Descripción de la Tarea</h3>
-        <div class="bg-[#12161f] rounded-2xl p-5 border border-white/5 mb-8">
-            <h4 class="text-lg font-bold text-white mb-2">{{ $task->title }}</h4>
-            <p class="text-sm text-gray-400 leading-relaxed">{{ $task->description ?? 'Sin instrucciones adicionales' }}</p>
+        <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Descripción de la Tarea</h3>
+        <div class="bg-theme-card rounded-2xl p-5 border border-theme mb-8 transition-colors duration-500">
+            <h4 class="text-lg font-bold mb-2 transition-colors duration-500" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">{{ $task->title }}</h4>
+            <p class="text-sm leading-relaxed transition-colors duration-500" :class="theme === 'light' ? 'text-slate-600' : 'text-gray-400'">{{ $task->description ?? 'Sin instrucciones adicionales' }}</p>
         </div>
 
         <form method="POST" action="{{ route('technician.task.update', $task->id) }}">
@@ -60,12 +60,12 @@
             
             <!-- Checklists o Data entry Dinámico -->
             @if($task->status !== 'completed')
-                <h3 class="text-xs font-black text-gray-500 uppercase tracking-widest mb-3">Reporte Técnico (Formulario)</h3>
-                <div class="bg-[#12161f] rounded-2xl p-5 border border-white/5 mb-8 space-y-4">
+                <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Reporte Técnico (Formulario)</h3>
+                <div class="bg-theme-card rounded-2xl p-5 border border-theme mb-8 space-y-4 transition-colors duration-500">
                     
                     <div>
                         <label class="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Estado del Equipo post-revisión</label>
-                        <select name="form_data[equipment_condition]" class="w-full bg-black border-white/10 text-white rounded-xl focus:ring-tecsisa-yellow focus:border-tecsisa-yellow text-sm placeholder-gray-600 font-bold p-3">
+                        <select name="form_data[equipment_condition]" class="w-full border-theme rounded-xl focus:ring-tecsisa-yellow focus:border-tecsisa-yellow text-sm font-bold p-3 transition-colors duration-500" :class="theme === 'light' ? 'bg-slate-50 text-slate-800 border-slate-200' : 'bg-black text-white border-white/10'">
                             <option value="operative_optimal">Operativo - Óptimas Condiciones</option>
                             <option value="operative_with_notes">Operativo - Con Observaciones</option>
                             <option value="needs_replacement">Requiere Reemplazo</option>
@@ -75,7 +75,7 @@
 
                     <div>
                         <label class="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Comentarios / Evidencia</label>
-                        <textarea name="form_data[technician_notes]" rows="3" placeholder="Describe brevemente las acciones tomadas o refacciones utilizadas..." class="w-full bg-black border-white/10 text-white rounded-xl focus:ring-tecsisa-yellow focus:border-tecsisa-yellow text-sm placeholder-gray-600 p-3"></textarea>
+                        <textarea name="form_data[technician_notes]" rows="3" placeholder="Describe brevemente las acciones tomadas o refacciones utilizadas..." class="w-full border-theme rounded-xl focus:ring-tecsisa-yellow focus:border-tecsisa-yellow text-sm p-3 transition-colors duration-500" :class="theme === 'light' ? 'bg-slate-50 text-slate-800 border-slate-200' : 'bg-black text-white border-white/10'"></textarea>
                     </div>
 
                     <!-- Si necesitamos fotos podríamos añadir un campo de tipo file nativo de forms -->
@@ -99,13 +99,13 @@
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     </button>
 
-                    <button type="button" x-show="confirming" @click="confirming = false" class="w-full bg-transparent border-2 border-white/10 text-white font-bold py-3.5 rounded-2xl text-xs uppercase tracking-widest hover:bg-white/5 transition flex justify-center items-center gap-2">
+                    <button type="button" x-show="confirming" @click="confirming = false" class="w-full bg-transparent border-2 border-theme font-bold py-3.5 rounded-2xl text-xs uppercase tracking-widest transition flex justify-center items-center gap-2" :class="theme === 'light' ? 'text-slate-800 hover:bg-slate-100' : 'text-white hover:bg-white/5'">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                         Cancelar Cierre
                     </button>
                     
                     @if($task->status == 'draft' || $task->status == 'pending')
-                    <button type="button" onclick="document.getElementById('statusInput').value='in_progress'; this.form.submit();" x-show="!confirming" class="w-full bg-transparent border-2 border-white/10 text-white font-bold py-3.5 rounded-2xl text-xs uppercase tracking-widest hover:bg-white/5 transition flex justify-center items-center gap-2">
+                    <button type="button" onclick="document.getElementById('statusInput').value='in_progress'; this.form.submit();" x-show="!confirming" class="w-full bg-transparent border-2 border-theme font-bold py-3.5 rounded-2xl text-xs uppercase tracking-widest transition flex justify-center items-center gap-2" :class="theme === 'light' ? 'text-slate-800 hover:bg-slate-100' : 'text-white hover:bg-white/5'">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         Marcar En Progreso (Iniciar Trabajo)
                     </button>

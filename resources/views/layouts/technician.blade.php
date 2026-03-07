@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="{{ Auth::user()->theme ?? 'dark' }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Tecsisa App') }} - Técnico</title>
+    <title>{{ $company_name ?? config('app.name', 'Tecsisa App') }} - Técnico</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -15,14 +15,20 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
                         tecsisa: {
                             yellow: '#FFD100',
                             dark: '#0A0F1C',
-                            card: 'rgba(17, 24, 39, 0.7)',
-                        }
+                        },
+                        'theme-bg': 'var(--theme-bg)',
+                        'theme-text': 'var(--theme-text)',
+                        'theme-muted': 'var(--theme-text-muted)',
+                        'theme-card': 'var(--theme-card)',
+                        'theme-border': 'var(--theme-border)',
+                        'theme-header': 'var(--theme-header)',
                     },
                     fontFamily: {
                         sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
@@ -33,34 +39,91 @@
     </script>
     <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
     <style>
-        /* Desactiva el outline de selección en móviles para un feel más nativo */
-        * {
-            -webkit-tap-highlight-color: transparent;
+        /* Variables System */
+        :root {
+            --theme-bg: #0A0F1C;
+            --theme-text: #d1d5db;
+            --theme-text-muted: #9ca3af;
+            --theme-card: rgba(17, 24, 39, 0.82);
+            --theme-border: rgba(255, 255, 255, 0.1);
+            --theme-header: rgba(10, 15, 28, 0.85);
+            --theme-nav-active: #ffffff;
+            --theme-nav-inactive: #6b7280;
+            --theme-table-row-hover: rgba(255, 255, 255, 0.02);
+            --theme-grid: rgba(255, 255, 255, 0.02);
+            --theme-scrollbar-bg: #0A0F1C;
         }
-        
-        /* Oculta scrollbars nativas pero permite scroll */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
+
+        .light {
+            --theme-bg: #f3f4f6;
+            --theme-text: #1a1a1a;
+            --theme-text-muted: #64748b;
+            --theme-card: #ffffff;
+            --theme-border: #e2e8f0;
+            --theme-header: rgba(243, 244, 246, 0.9);
+            --theme-nav-active: #000000;
+            --theme-nav-inactive: #64748b;
+            --theme-table-row-hover: rgba(0, 0, 0, 0.02);
+            --theme-grid: rgba(0, 0, 0, 0.02);
+            --theme-scrollbar-bg: #f3f4f6;
         }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
+
+        .dark {
+            --theme-bg: #0A0F1C;
+            --theme-text: #d1d5db;
+            --theme-text-muted: #9ca3af;
+            --theme-card: rgba(17, 24, 39, 0.82);
+            --theme-border: rgba(255, 255, 255, 0.1);
+            --theme-header: rgba(10, 15, 28, 0.85);
+            --theme-nav-active: #ffffff;
+            --theme-nav-inactive: #6b7280;
+            --theme-table-row-hover: rgba(255, 255, 255, 0.02);
+            --theme-grid: rgba(255, 255, 255, 0.02);
+            --theme-scrollbar-bg: #0A0F1C;
         }
+
+        * { -webkit-tap-highlight-color: transparent; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
         body {
-            background-color: #05080f;
-            color: #ffffff;
-            /* Previene rebote de scroll (overscroll) en iOS/Android */
+            background-color: var(--theme-bg);
+            color: var(--theme-text);
             overscroll-behavior-y: none;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
+        .text-theme { color: var(--theme-text); }
+        .bg-theme { background-color: var(--theme-bg); }
+        .bg-theme-card { background-color: var(--theme-card); }
+        .border-theme { border-color: var(--theme-border); }
+        .bg-theme-header { background-color: var(--theme-header); }
+        .text-theme-muted { color: var(--theme-text-muted); }
     </style>
 </head>
-<body class="font-sans antialiased bg-[#05080f] text-white md:overflow-auto md:h-auto overflow-hidden h-[100dvh]" style="display: flex; flex-direction: column;">
+<body x-data="{ 
+        theme: '{{ Auth::user()->theme ?? 'dark' }}',
+        toggleTheme() {
+            this.theme = this.theme === 'dark' ? 'light' : 'dark';
+            document.documentElement.className = this.theme;
+            
+            fetch('{{ route('profile.theme.update') }}', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ theme: this.theme })
+            });
+        }
+    }" 
+    :class="theme"
+    class="font-sans antialiased md:overflow-auto md:h-auto overflow-hidden h-[100dvh]" style="display: flex; flex-direction: column;">
     
-    <!-- Background Glowing Orbs (Premium Aesthetic) -->
-    <div class="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-tecsisa-yellow/5 blur-[120px] pointer-events-none z-0"></div>
-    <div class="fixed bottom-[-10%] right-[-10%] w-[30%] h-[30%] rounded-full bg-blue-500/5 blur-[120px] pointer-events-none z-0"></div>
+    <!-- Background Glowing Orbs -->
+    <div class="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-tecsisa-yellow/5 blur-[120px] pointer-events-none z-0" :class="theme === 'light' ? 'opacity-20' : ''"></div>
+    <div class="fixed bottom-[-10%] right-[-10%] w-[30%] h-[30%] rounded-full bg-blue-500/5 blur-[120px] pointer-events-none z-0" :class="theme === 'light' ? 'opacity-20' : ''"></div>
 
     <!-- Unified Master Navigation -->
     @include('layouts.navigation', ['hideHeader' => $hideHeader ?? false])

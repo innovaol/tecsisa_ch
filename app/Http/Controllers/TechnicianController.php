@@ -15,7 +15,7 @@ class TechnicianController extends Controller
 
         // Get tasks: If Admin, show all. If Technician, show only assigned.
         $query = Task::with(['equipment.location', 'assignee'])
-            ->whereIn('status', ['draft', 'pending', 'in_progress'])
+            ->whereIn('status', ['draft', 'pending', 'in_progress', 'in_review'])
             ->orderBy('priority', 'desc')
             ->orderBy('created_at', 'desc');
 
@@ -53,25 +53,31 @@ class TechnicianController extends Controller
         }
 
         $validated = $request->validate([
-            'status' => 'required|in:in_progress,completed',
+            'status' => 'required|in:in_progress,completed,in_review',
             'form_data' => 'nullable|array'
         ]);
 
-        $task->status = $validated['status'];
+        $isAdmin = Auth::user()->hasRole('Administrador');
+        
+        // If tech finishes, it goes to review.
+        if ($validated['status'] === 'completed' && !$isAdmin) {
+            $task->status = 'in_review';
+            $message = 'Tarea enviada a revisión.';
+        } else {
+            $task->status = $validated['status'];
+            $message = 'Tarea actualizada correctamente.';
+        }
 
         if (isset($validated['form_data'])) {
             $task->form_data = $validated['form_data'];
         }
 
-        if ($validated['status'] === 'completed') {
+        if ($task->status === 'completed') {
             $task->completed_at = now();
-            // Optional: Also update the equipment 'status' to operative or schedule next maintenance
             if ($task->equipment) {
-                // simple simulated logic
                 $task->equipment->update([
                     'status' => 'operative',
                     'last_maintenance_at' => now(),
-                    // add 6 months for next maintenance
                     'next_maintenance_at' => now()->addMonths(6)
                 ]);
             }
@@ -79,7 +85,7 @@ class TechnicianController extends Controller
 
         $task->save();
 
-        return redirect()->route('technician.dashboard')->with('success', 'Tarea actualizada correctamente.');
+        return redirect()->route('technician.dashboard')->with('success', $message);
     }
 
     public function infrastructureHub()

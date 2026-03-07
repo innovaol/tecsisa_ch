@@ -41,33 +41,34 @@ class RackBuilderController extends Controller
     public function save(Request $request, Rack $rack)
     {
         $request->validate([
-            'units' => 'array',
+            'units' => 'required|array',
         ]);
 
-        // 1. Identificar equipos que estaban antes en el rack para detectar remociones
-        $oldEquipmentIds = $rack->units()->whereNotNull('equipment_id')->pluck('equipment_id')->unique()->toArray();
+        try {
+            \Illuminate\Support\Facades\DB::transaction(function () use ($request, $rack) {
+                // 1. Clear current state for this rack
+                $rack->units()->delete();
 
-        // 2. Limpiar estado actual para resincronizar
-        $rack->units()->delete();
+                $unitsData = $request->input('units', []);
 
-        $unitsData = $request->input('units', []);
-        $newEquipmentIds = [];
+                // 2. Re-install equipment according to the new map
+                foreach ($unitsData as $unit) {
+                    if (!empty($unit['occupied']) && !empty($unit['db_id'])) {
+                        RackUnit::create([
+                            'rack_id' => $rack->id,
+                            'unit_number' => $unit['number'],
+                            'side' => 'front',
+                            'equipment_id' => $unit['db_id'],
+                            'position_size' => $unit['size'],
+                            'content_type' => 'equipment',
+                        ]);
+                    }
+                }
+            });
 
-        // 3. Re-instalar equipos según el nuevo mapa
-        foreach ($unitsData as $unit) {
-            if (!empty($unit['occupied']) && !empty($unit['db_id'])) {
-                RackUnit::create([
-                    'rack_id' => $rack->id,
-                    'unit_number' => $unit['number'],
-                    'side' => 'front',
-                    'equipment_id' => $unit['db_id'],
-                    'position_size' => $unit['size'],
-                    'content_type' => 'equipment',
-                ]);
-                $newEquipmentIds[] = $unit['db_id'];
-            }
+            return response()->json(['status' => 'success', 'message' => 'Topología de rack guardada correctamente.']);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => 'Error al guardar la topología: ' . $e->getMessage()], 500);
         }
-
-        return response()->json(['status' => 'success', 'message' => 'Topología de rack guardada correctamente.']);
     }
 }

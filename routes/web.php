@@ -75,6 +75,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
             // Reportes Semanales
             Route::get('/reportes/semanal', [\App\Http\Controllers\ReportController::class , 'index'])->name('reports.weekly.index');
             Route::post('/reportes/semanal/generar', [\App\Http\Controllers\ReportController::class , 'generateWeekly'])->name('reports.weekly.generate');
+
+            // Configuración de la Empresa
+            Route::get('/configuracion', [\App\Http\Controllers\SettingController::class, 'index'])->name('settings.index');
+            Route::patch('/configuracion', [\App\Http\Controllers\SettingController::class, 'update'])->name('settings.update');
         }
         );
 
@@ -85,8 +89,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class , 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class , 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class , 'destroy'])->name('profile.destroy');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::patch('/profile/theme', [ProfileController::class, 'updateTheme'])->name('profile.theme.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 require __DIR__ . '/auth.php';

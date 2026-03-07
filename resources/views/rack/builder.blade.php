@@ -5,15 +5,20 @@
     <div x-data="rackBuilder(@js($unassignedEquipment))" class="flex flex-col min-h-screen lg:h-[calc(100vh-74px)] lg:overflow-hidden">
         
         <!-- Header con el Botón Guardar Topología Movido al lado del Título -->
-        <header class="bg-tecsisa-dark/40 backdrop-blur-md border-b border-white/5 shrink-0">
+        <header class="bg-theme-header backdrop-blur-md border-b border-theme shrink-0 transition-colors duration-500">
             <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center w-full">
-                <h2 class="font-bold text-2xl text-white tracking-wide leading-tight flex items-center gap-3">
-                    <svg class="w-6 h-6 text-tecsisa-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                    Distribución de Racks
-                </h2>
-                <button @click="saveTopology()" :disabled="saving" class="bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-black px-6 py-2.5 rounded-xl shadow-[0_5px_15px_rgba(255,209,0,0.3)] transition transform flex justify-center items-center gap-2" :class="saving ? 'opacity-70 cursor-not-allowed' : 'hover:-translate-y-0.5'">
+                <div class="flex items-center gap-4">
+                    <a href="{{ route('catalog.index') }}" class="p-2 text-theme-muted hover:text-tecsisa-yellow transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    </a>
+                    <h2 class="font-bold text-2xl text-theme tracking-wide leading-tight flex items-center gap-3">
+                        <svg class="w-6 h-6 text-tecsisa-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                        Distribución de Racks
+                    </h2>
+                </div>
+                <button @click="saveTopology()" :disabled="saving" class="bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-black px-6 py-2.5 rounded-xl shadow-xl shadow-tecsisa-yellow/20 transition transform flex justify-center items-center gap-2" :class="saving ? 'opacity-70 cursor-not-allowed' : 'hover:-translate-y-0.5'">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
-                    <svg x-show="saving" class="animate-spin -ml-6 mr-1 h-5 w-5 text-gray-900 absolute" style="display: none;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    <svg x-show="saving" class="animate-spin -ml-6 mr-1 h-5 w-5 text-tecsisa-dark absolute" style="display: none;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
                     <span x-text="saving ? 'Guardando...' : 'Guardar Topología'"></span>
                 </button>
             </div>
@@ -25,9 +30,9 @@
                 <!-- CONTROLES Y CATÁLOGO DE EQUIPACIÓN (LEFT PANEL) -->
                 <div class="w-full lg:w-96 flex flex-col gap-6 lg:h-full shrink-0">
                 <!-- Selector de Gabinete -->
-                <div class="bg-tecsisa-card backdrop-blur-md rounded-2xl shadow-[0_4px_30px_rgba(0,0,0,0.2)] border border-white/10 p-5">
-                    <label class="block text-sm font-medium text-gray-400 uppercase tracking-widest mb-2">Gabinete Activo</label>
-                    <select onchange="window.location.search = '?rack_id=' + this.value" class="w-full bg-black/40 border-white/10 text-white rounded-lg focus:ring-tecsisa-yellow focus:border-tecsisa-yellow text-sm font-bold">
+                <div class="bg-theme-card backdrop-blur-md rounded-2xl shadow-xl border border-theme p-5 transition-colors duration-500">
+                    <label class="block text-[10px] font-black text-theme-muted uppercase tracking-widest mb-2">Gabinete Activo</label>
+                    <select onchange="window.location.search = '?rack_id=' + this.value" class="w-full bg-theme/5 border-theme text-theme rounded-xl focus:ring-2 focus:ring-tecsisa-yellow transition h-12 px-4 text-sm font-black uppercase tracking-widest">
                         @foreach($racks as $r)
                             <option value="{{ $r->id }}" {{ $r->id == $rack->id ? 'selected' : '' }}>{{ $r->name }} ({{ $r->total_units }}U)</option>
                         @endforeach
@@ -35,50 +40,54 @@
                 </div>
 
                 <!-- Equipos Sin Asignar (Catálogo Arrastrable) -->
-                <div class="bg-tecsisa-card backdrop-blur-md rounded-2xl shadow-lg border border-white/10 flex-1 flex flex-col overflow-hidden">
-                    <div class="p-4 border-b border-white/10 bg-white/5 flex justify-between items-center">
-                        <h3 class="text-sm font-bold text-white uppercase tracking-wider">Activos en BDR (Sin Enrackar)</h3>
-                        <span class="text-xs text-tecsisa-yellow"><span x-text="filteredCount"></span> Items</span>
+                <div class="bg-theme-card backdrop-blur-md rounded-2xl shadow-xl border border-theme flex-1 flex flex-col overflow-hidden transition-colors duration-500">
+                    <div class="p-4 border-b border-theme bg-theme/5 flex justify-between items-center">
+                        <h3 class="text-xs font-black text-theme uppercase tracking-widest">Activos en BDR (Sin Enrackar)</h3>
+                        <span class="text-[10px] font-black text-tecsisa-yellow uppercase tracking-widest"><span x-text="filteredCount"></span> Items</span>
                     </div>
                     
-                    <div class="px-4 py-3 bg-black/20 border-b border-white/5">
+                    <div class="px-4 py-3 bg-theme/5 border-b border-theme">
                         <div class="relative">
-                            <input type="text" x-model="catalogSearch" placeholder="Filtro rápido (ID, Marca, Modelo...)" 
-                                   class="w-full bg-black/40 border-white/10 rounded-lg text-xs text-white placeholder-gray-600 focus:ring-tecsisa-yellow focus:border-tecsisa-yellow h-8 pl-8 pr-3 transition-all">
-                            <div class="absolute left-2.5 top-2 text-gray-600">
+                            <input type="text" x-model="catalogSearch" placeholder="Filtro rápido..." 
+                                   class="w-full bg-theme/5 border border-theme rounded-xl text-xs text-theme placeholder-theme-muted focus:ring-2 focus:ring-tecsisa-yellow h-10 pl-10 pr-4 transition-all uppercase font-bold tracking-widest">
+                            <div class="absolute left-3.5 top-3 text-theme-muted">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="p-4 overflow-y-auto flex-1 h-full scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
+                    <div class="p-4 overflow-y-auto flex-1 h-full custom-scrollbar">
                         <div class="space-y-3">
                             <template x-for="eq in unassignedCatalog" :key="eq.id">
                                 <div draggable="true" 
                                      x-show="!isPlaced(eq.id) && matchesSearch(eq.internal_id, eq.name)"
                                      x-transition
                                      @dragstart="startDrag($event, eq.id, eq.internal_id, eq.name, eq.u_height, eq.system ? eq.system.name : 'SC')"
+                                     @dragend="$event.target.classList.remove('opacity-50')"
                                      @click="selectEquipment(eq.id, eq.internal_id, eq.name, eq.u_height, eq.system ? eq.system.name : 'SC')"
                                      :class="{
-                                         'border-l-tecsisa-yellow bg-tecsisa-yellow/10 scale-[1.02] shadow-[0_0_15px_rgba(255,209,0,0.3)]': selectedItem && selectedItem.db_id == eq.id, 
-                                         'border-l-blue-500 bg-black/30 hover:bg-white/5': !selectedItem || selectedItem.db_id != eq.id
+                                         'border-l-tecsisa-yellow bg-tecsisa-yellow/10 border-tecsisa-yellow/40 scale-[1.02] shadow-[0_0_15px_rgba(255,209,0,0.3)]': selectedItem && selectedItem.db_id == eq.id, 
+                                         'bg-theme/5 hover:bg-theme/10 border-theme': !selectedItem || selectedItem.db_id != eq.id,
+                                         'border-l-blue-500 shadow-[0_5px_15px_rgba(59,130,246,0.1)]': getSystemColor(eq.system ? eq.system.name : 'SC') === 'blue' && (selectedItem ? selectedItem.db_id != eq.id : true),
+                                         'border-l-red-500 shadow-[0_5px_15px_rgba(239,68,68,0.1)]': getSystemColor(eq.system ? eq.system.name : 'SC') === 'red' && (selectedItem ? selectedItem.db_id != eq.id : true),
+                                         'border-l-tecsisa-yellow shadow-[0_5px_15px_rgba(255,209,0,0.1)]': getSystemColor(eq.system ? eq.system.name : 'SC') === 'yellow' && (selectedItem ? selectedItem.db_id != eq.id : true),
+                                         'border-l-green-500 shadow-[0_5px_15px_rgba(34,197,94,0.1)]': getSystemColor(eq.system ? eq.system.name : 'SC') === 'green' && (selectedItem ? selectedItem.db_id != eq.id : true)
                                      }"
-                                     class="p-3 border border-white/5 rounded-lg border-l-4 cursor-pointer transition-all flex justify-between items-center group">
+                                     class="p-3 border rounded-lg border-l-4 cursor-pointer transition-all flex justify-between items-center group">
                                     <div class="flex-1 overflow-hidden">
                                         <div class="flex items-center gap-2 mb-0.5">
-                                            <div class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-black/40" 
-                                                 :class="selectedItem && selectedItem.db_id == eq.id ? 'text-tecsisa-yellow' : 'text-tecsisa-yellow'">
+                                             <div class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-theme/10 text-tecsisa-yellow border border-theme">
                                                 <span x-text="eq.internal_id"></span>
                                             </div>
                                             <template x-if="eq.system">
                                                 <span class="text-[8px] uppercase tracking-tighter text-gray-500 font-bold border border-white/5 px-1 rounded" x-text="eq.system.name"></span>
                                             </template>
                                         </div>
-                                        <div class="text-xs font-medium whitespace-nowrap overflow-hidden text-ellipsis" 
-                                             :class="selectedItem && selectedItem.db_id == eq.id ? 'text-white' : 'text-gray-400'"
-                                             x-text="eq.name"></div>
+                                         <div class="text-xs font-black uppercase tracking-widest whitespace-nowrap overflow-hidden text-ellipsis transition-colors" 
+                                              :class="selectedItem && selectedItem.db_id == eq.id ? 'text-theme' : 'text-theme-muted group-hover:text-theme'"
+                                              x-text="eq.name"></div>
                                     </div>
-                                    <div class="bg-black/40 text-gray-500 text-[10px] px-1.5 py-1 rounded font-black border border-white/5 ml-2">
+                                     <div class="bg-theme/10 text-theme-muted font-bold text-[10px] px-1.5 py-1 rounded border border-theme ml-2 shrink-0">
                                         <span x-text="eq.u_height"></span>U
                                     </div>
                                 </div>
@@ -94,36 +103,36 @@
             </div>
 
             <!-- VISUALIZADOR PIXEL-PERFECT DEL RACK (RIGHT PANEL) -->
-            <div class="w-full flex-1 min-h-[600px] lg:min-h-0 lg:h-full flex flex-col bg-tecsisa-card backdrop-blur-md rounded-2xl shadow-[0_4px_40px_rgba(0,0,0,0.4)] border border-white/10 overflow-hidden relative">
+            <div class="w-full flex-1 min-h-[600px] lg:min-h-0 lg:h-full flex flex-col bg-theme-card backdrop-blur-md rounded-2xl shadow-2xl border border-theme overflow-hidden relative transition-colors duration-500">
                 
-                <div class="p-4 border-b border-white/10 bg-black/40 flex flex-col md:flex-row justify-between items-center gap-4 z-20" style="box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);">
+                <div class="p-4 border-b border-theme bg-theme/5 flex flex-col md:flex-row justify-between items-center gap-4 z-20">
                     <div class="flex items-center gap-3">
                         <div class="w-3 h-3 rounded-full bg-green-500 animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.5)]"></div>
-                        <h3 class="text-lg font-bold text-white tracking-widest whitespace-nowrap">{{ $rack->name }}</h3>
+                        <h3 class="text-lg font-black text-theme tracking-widest whitespace-nowrap uppercase">{{ $rack->name }}</h3>
                     </div>
                     
                     <!-- Horizontal Stats Widget -->
                     <div class="flex-1 max-w-xl w-full flex items-center gap-6 px-4 hidden md:flex">
                         <div class="flex-1">
                             <div class="flex justify-between text-[10px] mb-1.5">
-                                <span class="text-gray-400 font-bold uppercase tracking-widest">Ocupación (<span x-text="occupancyStats.count"></span> equipos)</span>
-                                <span class="text-tecsisa-yellow font-mono font-bold"><span x-text="occupancyStats.used"></span>/<span x-text="totalU"></span>U (<span x-text="occupancyStats.percent.toFixed(1) + '%'"></span>)</span>
+                                <span class="text-theme-muted font-black uppercase tracking-widest">Ocupación (<span x-text="occupancyStats.count"></span> equipos)</span>
+                                <span class="text-tecsisa-yellow font-black uppercase tracking-widest"><span x-text="occupancyStats.used"></span>/<span x-text="totalU"></span>U (<span x-text="occupancyStats.percent.toFixed(1) + '%'"></span>)</span>
                             </div>
-                            <div class="w-full h-1.5 bg-black/60 rounded-full overflow-hidden border border-white/5 bg-[#0a0f18] shadow-inner">
-                                <div class="h-full bg-tecsisa-yellow shadow-[0_0_10px_rgba(255,209,0,0.8)] transition-all duration-700 ease-out" :style="'width: ' + occupancyStats.percent + '%'"></div>
+                            <div class="w-full h-1.5 bg-theme/10 rounded-full overflow-hidden border border-theme bg-theme/10 shadow-inner group">
+                                <div class="h-full bg-tecsisa-yellow shadow-[0_0_10px_rgba(255,209,0,0.5)] transition-all duration-700 ease-out" :style="'width: ' + occupancyStats.percent + '%'"></div>
                             </div>
                         </div>
-                        <div class="text-[10px] text-center hidden lg:block shrink-0 border-l border-white/10 pl-6">
-                            <span class="block text-green-400 font-black text-sm" x-text="totalU - occupancyStats.used + 'U'"></span>
-                            <span class="text-gray-500 uppercase font-bold tracking-tighter">Libres</span>
+                        <div class="text-[10px] text-center hidden lg:block shrink-0 border-l border-theme pl-6">
+                            <span class="block text-green-500 font-black text-sm" x-text="totalU - occupancyStats.used + 'U'"></span>
+                            <span class="text-theme-muted uppercase font-black tracking-widest">Libres</span>
                         </div>
                     </div>
 
-                    <div class="text-[10px] text-gray-500 bg-white/5 px-2 py-1 rounded font-mono border border-white/10 shrink-0 hidden lg:block">EIA-310-D</div>
+                    <div class="text-[10px] text-theme-muted bg-theme/5 px-3 py-1.5 rounded font-black border border-theme shrink-0 hidden lg:block uppercase tracking-widest">EIA-310-D</div>
                 </div>
 
                 <!-- EL RACK REAL -->
-                <div class="flex-1 overflow-y-auto p-4 md:p-8 bg-[#0a0f18] flex justify-center items-start custom-scrollbar relative">
+                <div class="flex-1 overflow-y-auto p-4 md:p-8 bg-theme flex justify-center items-start custom-scrollbar relative transition-colors duration-500">
                     
                     <!-- Marco Metálico del Rack -->
                     <div class="relative bg-[#111] border-8 border-[#333] shadow-[inset_0_4px_30px_rgba(0,0,0,1)] flex flex-col w-full max-w-xl pb-2" style="box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,1);">
@@ -152,13 +161,12 @@
                         <div class="mx-8 flex flex-col bg-black/80 flex-1 relative z-10" id="rack-container">
                             <!-- Generamos las 42 (o X) unidades desde arriba hacia abajo -->
                             <template x-for="unit in rackUnits" :key="unit.number">
-                                <div class="relative group border-b border-[#222] min-h-[28px] flex" 
-                                     :style="unit.occupied ? 'height: ' + (28 * unit.size) + 'px;' : 'height: 28px;'"
-                                     x-show="!unit.hidden"
+                                <div class="relative group border-b border-[#222] h-[28px] flex" 
                                      @dragover.prevent="allowDrop($event, unit)"
                                      @dragleave="leaveDrop($event, unit)"
                                      @drop="drop($event, unit)"
                                      @click="placeEquipment(unit)"
+                                     :style="{ zIndex: unit.number }"
                                      :class="{'bg-tecsisa-yellow/10 border-2 border-tecsisa-yellow border-dashed': unit.dragHover && !unit.occupied, 'bg-red-500/10 border-2 border-red-500 border-dashed': unit.dragHover && unit.occupied, 'cursor-pointer hover:bg-white/10 transition': selectedItem && !unit.occupied}">
                                     
                                     <!-- Número de U (Regleta izq) -->
@@ -177,15 +185,16 @@
                                         <span class="text-xs text-white/30 tracking-widest uppercase font-mono" x-text="selectedItem ? 'Click aquí para instalar' : 'Espacio Libre'"></span>
                                     </div>
 
-                                     <!-- Slot Lleno (Equipo) -->
-                                    <div x-show="unit.occupied" class="flex-1 w-full h-full relative cursor-pointer group/equip transition-all"
-                                         draggable="true"
+                                      <!-- Slot Lleno (Equipo: Renderizado solo en la unidad base) -->
+                                     <div x-show="unit.occupied && unit.db_id" class="absolute top-0 left-0 right-0 w-full cursor-pointer group/equip transition-all"
+                                          :style="'height: ' + (unit.size * 28) + 'px;'"
+                                          draggable="true"
                                          @dragstart="startDrag($event, unit.db_id, unit.eq_id, unit.eq_name, unit.size, unit.system)"
                                          @click.stop="selectEquipment(unit.db_id, unit.eq_id, unit.eq_name, unit.size, unit.system)"
                                          :class="{'ring-2 ring-tecsisa-yellow ring-offset-2 ring-offset-[#0a0f18] z-20': selectedItem && selectedItem.db_id === unit.db_id}">
                                         
-                                        <!-- Diseño estilo Switch Realista -->
-                                        <div class="absolute inset-0 bg-[#1e2329] border-y border-gray-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.5)] flex items-center px-4 overflow-hidden">
+                                         <!-- Diseño estilo Switch Realista con alto dinámico -->
+                                         <div class="absolute inset-0 bg-[#1e2329] border-y border-gray-600 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),inset_0_-1px_0_rgba(0,0,0,0.5)] flex items-center px-4">
                                             
                                             <!-- Color System Indicator -->
                                             <div class="absolute top-0 bottom-0 left-2 w-1 opacity-60" :class="{
@@ -273,8 +282,8 @@
                 catalogSearch: '',
 
                 get occupancyStats() {
-                    const used = this.rackUnits.reduce((acc, u) => acc + (u.occupied && !u.hidden ? u.size : 0), 0);
-                    const count = this.rackUnits.filter(u => u.occupied && !u.hidden).length;
+                    const used = this.rackUnits.filter(u => u.occupied && u.db_id).reduce((sum, unit) => sum + unit.size, 0);
+                    const count = this.rackUnits.filter(u => u.occupied && u.db_id).length;
                     return {
                         used,
                         count,
@@ -304,7 +313,6 @@
                             number: i,
                             occupied: false,
                             size: 1, // Tamaño defenitivo si es un panel ocupado
-                            hidden: false, // Se usa si un equipo de 2U tapa la U de abajo
                             eq_id: null,
                             eq_name: null,
                             db_id: null,
@@ -318,6 +326,18 @@
                         this.existingUnits.forEach(exU => {
                             let unitIndex = this.rackUnits.findIndex(u => u.number === exU.unit_number);
                             if(unitIndex !== -1 && exU.equipment) {
+                                // Agregamos el equipo que YA está en el rack al catálogo local
+                                // para que si el usuario lo quita, aparezca en la lista de la izquierda
+                                if (!this.unassignedCatalog.some(e => e.id === exU.equipment.id)) {
+                                    this.unassignedCatalog.push({
+                                        id: exU.equipment.id,
+                                        internal_id: exU.equipment.internal_id,
+                                        name: exU.equipment.name,
+                                        u_height: exU.equipment.u_height || exU.position_size || 1,
+                                        system: exU.equipment.system || null
+                                    });
+                                }
+
                                 this.rackUnits[unitIndex].occupied = true;
                                 this.rackUnits[unitIndex].size = exU.position_size || 1;
                                 this.rackUnits[unitIndex].db_id = exU.equipment.id;
@@ -325,13 +345,12 @@
                                 this.rackUnits[unitIndex].eq_name = exU.equipment.name;
                                 this.rackUnits[unitIndex].system = exU.equipment.system ? exU.equipment.system.name : 'SC';
 
-                                // Hide slots below the top slot based on size (simulating rack constraints)
-                                for(let s = 1; s < exU.position_size; s++) {
-                                    if(this.rackUnits[unitIndex + s]) {
-                                        this.rackUnits[unitIndex + s].hidden = true;
-                                        this.rackUnits[unitIndex + s].occupied = true;
-                                    }
-                                }
+                                 // Mark sub-slots as occupied without metadata
+                                 for(let s = 1; s < exU.position_size; s++) {
+                                     if(this.rackUnits[unitIndex + s]) {
+                                         this.rackUnits[unitIndex + s].occupied = true;
+                                     }
+                                 }
                             }
                         });
                     }
@@ -448,10 +467,9 @@
                         targetUnit.db_id = this.draggedItem.db_id;
                         targetUnit.system = this.draggedItem.system;
 
-                        // Esconder las unidades inferiores que este equipo "tapa" fisicamente
+                        // Marcar las unidades inferiores que este equipo "tapa" físicamente para bloqueo
                         for(let i = 1; i < this.draggedItem.size; i++) {
-                            this.rackUnits[unitIndex + i].hidden = true;
-                            this.rackUnits[unitIndex + i].occupied = true; // Para bloquear futuras caidas
+                            this.rackUnits[unitIndex + i].occupied = true;
                         }
                     } else {
                         // Error visual (podríamos poner un Toast)
@@ -475,19 +493,18 @@
                 removeEquipment(unit, confirmRemoval = true) {
                     if(!unit.occupied || unit.hidden) return; 
 
-                    // Advertencia de integridad si el equipo ya existe en el sistema
+                    // Advertencia de integridad simplificada
                     if (confirmRemoval && unit.db_id) {
-                        if (!confirm("⚠️ ATENCIÓN: Al retirar este equipo del rack, se eliminarán permanentemente todos sus enlaces físicos y cables asociados. \n\n¿Estás seguro de que deseas quitar '" + unit.eq_name + "'?")) {
+                        if (!confirm("¿Estás seguro de que deseas retirar el equipo '" + unit.eq_name + "' del rack?")) {
                             return;
                         }
                     }
                     
                     const unitIndex = this.rackUnits.findIndex(u => u.number === unit.number);
                     
-                    // Restaurar unidades ocultadas
+                    // Liberar unidades bloqueadas
                     for(let i = 1; i < unit.size; i++) {
                         if(this.rackUnits[unitIndex + i]) {
-                            this.rackUnits[unitIndex + i].hidden = false;
                             this.rackUnits[unitIndex + i].occupied = false;
                         }
                     }
