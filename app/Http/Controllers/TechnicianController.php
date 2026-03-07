@@ -85,7 +85,7 @@ class TechnicianController extends Controller
 
         $task->save();
 
-        return redirect()->route('technician.dashboard')->with('success', $message);
+        return redirect()->route('tasks.index')->with('success', $message);
     }
 
     public function infrastructureHub()

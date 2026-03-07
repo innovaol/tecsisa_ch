@@ -36,7 +36,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                 @foreach($tasks as $task)
                     @php
-                        $route = $task->status !== 'completed' ? route('tasks.edit', $task->id) : route('technician.task.show', $task->id);
+                        $route = route('tasks.edit', $task->id);
                         $isDraft = $task->status === 'draft';
                     @endphp
                     

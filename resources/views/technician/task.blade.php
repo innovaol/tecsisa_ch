@@ -2,7 +2,7 @@
     <!-- Header Especial para la Tarea -->
     <div class="fixed top-0 inset-x-0 z-40 bg-theme-header backdrop-blur-xl border-b border-theme pt-safe transition-colors duration-500">
         <div class="px-4 py-3 flex items-center justify-between">
-            <a href="{{ route('technician.dashboard') }}" class="w-10 h-10 rounded-full bg-theme-card border border-theme flex items-center justify-center text-gray-400 transition shadow-lg" :class="theme === 'light' ? 'hover:text-slate-900' : 'hover:text-white'">
+            <a href="{{ route('tasks.index') }}" class="w-10 h-10 rounded-full bg-theme-card border border-theme flex items-center justify-center text-gray-400 transition shadow-lg" :class="theme === 'light' ? 'hover:text-slate-900' : 'hover:text-white'">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
             </a>
             <h1 class="text-xs font-black uppercase tracking-widest transition-colors duration-500" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">Detalle: TK-{{ str_pad($task->id, 4, '0', STR_PAD_LEFT) }}</h1>
