@@ -100,7 +100,7 @@
                     
                     <div class="space-y-4 relative z-10">
                         <!-- Botón Mantenimiento -->
-                        <form action="{{ route('tasks.store') }}" method="POST" onsubmit="return confirm('¿Iniciar reporte de MANTENIMIENTO?')">
+                        <form action="{{ route('tasks.store') }}" method="POST">
                             @csrf
                             <input type="hidden" name="equipment_id" value="{{ $equipment->id }}">
                             <input type="hidden" name="title" value="Mantenimiento de Equipo">
@@ -119,7 +119,7 @@
                         </form>
 
                         <!-- Botón Instalación -->
-                        <form action="{{ route('tasks.store') }}" method="POST" onsubmit="return confirm('¿Iniciar reporte de INSTALACIÓN?')">
+                        <form action="{{ route('tasks.store') }}" method="POST">
                             @csrf
                             <input type="hidden" name="equipment_id" value="{{ $equipment->id }}">
                             <input type="hidden" name="title" value="Instalación / Configuración">
@@ -138,7 +138,7 @@
                         </form>
 
                         <!-- Botón Reemplazo -->
-                        <form action="{{ route('tasks.store') }}" method="POST" onsubmit="return confirm('¿Iniciar reporte de REEMPLAZO?')">
+                        <form action="{{ route('tasks.store') }}" method="POST">
                             @csrf
                             <input type="hidden" name="equipment_id" value="{{ $equipment->id }}">
                             <input type="hidden" name="title" value="Sustitución / Reemplazo Físico">

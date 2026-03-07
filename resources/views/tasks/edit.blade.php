@@ -136,13 +136,21 @@
 
 
             <!-- 📸 SECCIÓN UNIVERSAL: EVIDENCIA VISUAL -->
+            @php
+                $hasBeforePhoto = !empty($task->form_data['photos']['before']);
+                $hasAfterPhoto = !empty($task->form_data['photos']['after']);
+                $showEvidencia = !$isReadOnly || $hasBeforePhoto || $hasAfterPhoto;
+            @endphp
+            
+            @if($showEvidencia)
             <h3 class="text-[10px] font-black text-theme-muted uppercase tracking-[0.3em] mb-4 px-1 flex items-center gap-2">
                 <svg class="w-4 h-4 text-tecsisa-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                Registro Fotográfico (Obligatorio)
+                Registro Fotográfico
             </h3>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
                 <!-- Foto Inicial -->
+                @if(!$isReadOnly || $hasBeforePhoto)
                 <div class="bg-theme-card border border-theme p-6 rounded-[2.5rem] flex flex-col items-center text-center shadow-2xl relative overflow-hidden transition-colors duration-500">
                     <span class="text-[9px] uppercase font-black text-theme-muted mb-4 tracking-[0.2em] flex items-center gap-2">
                         <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span> Situación Inicial
@@ -182,16 +190,18 @@
                                     <input type="file" name="photos[before]" class="hidden" accept="image/*" @change="previewPhoto($event, 'before')">
                                 </label>
                             </div>
-                                <div x-show="previews.before" class="flex gap-3">
-                                    <button type="button" @click="removePhoto('before')" class="flex-1 h-12 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-[10px] font-black uppercase tracking-widest active:scale-90 transition flex items-center justify-center gap-2">Quitar</button>
-                                    <button type="button" @click="removePhoto('before')" class="flex-1 h-12 bg-theme/5 border border-theme rounded-xl text-theme text-[10px] font-black uppercase tracking-widest active:scale-90 transition flex items-center justify-center gap-2">Repetir</button>
-                                </div>
+                            <div x-show="previews.before" class="flex gap-3">
+                                <button type="button" @click="removePhoto('before')" class="flex-1 h-12 bg-red-500/10 border border-red-500/20 rounded-xl text-red-500 text-[10px] font-black uppercase tracking-widest active:scale-90 transition flex items-center justify-center gap-2">Quitar</button>
+                                <button type="button" @click="removePhoto('before')" class="flex-1 h-12 bg-theme/5 border border-theme rounded-xl text-theme text-[10px] font-black uppercase tracking-widest active:scale-90 transition flex items-center justify-center gap-2">Repetir</button>
                             </div>
                             @endunless
                         </div>
                     </div>
+                </div>
+                @endif
 
                 <!-- Foto Final -->
+                @if(!$isReadOnly || $hasAfterPhoto)
                 <div class="bg-theme-card border border-theme p-6 rounded-[2.5rem] flex flex-col items-center text-center shadow-2xl relative overflow-hidden transition-colors duration-500">
                     <span class="text-[9px] uppercase font-black text-theme-muted mb-4 tracking-[0.2em] flex items-center gap-2">
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Trabajo Finalizado
@@ -239,7 +249,9 @@
                         </div>
                     </div>
                 </div>
+                @endif
             </div>
+            @endif
 
             <!-- 📸 SECCIÓN: GALERÍA DE HALLAZGOS (HALLAZGOS TÉCNICOS) -->
             @if(!$isReadOnly || count($task->form_data['findings'] ?? []) > 0)
@@ -644,14 +656,20 @@
                                 <span class="text-[10px] font-black text-blue-400 uppercase tracking-widest">Reporte en Revisión por el Administrador</span>
                             </div>
                         @else
-                            <a href="{{ Auth::user()->hasRole('Administrador') ? route('tasks.index') : route('technician.dashboard') }}" class="w-full sm:w-auto text-center text-[10px] font-black text-gray-500 hover:text-theme uppercase tracking-widest px-6 py-4 transition-colors order-last sm:order-first">
-                                Volver a Control
-                            </a>
+                            @if($isNewTask)
+                                <button type="button" @click="document.getElementById('cancel-form').submit();" class="w-full sm:w-auto text-[10px] font-black text-gray-500 hover:text-red-400 uppercase tracking-widest px-6 py-4 transition-colors order-last sm:order-first">
+                                    Cancelar
+                                </button>
+                            @else
+                                <a href="{{ route('tasks.index') }}" class="w-full sm:w-auto text-center text-[10px] font-black text-gray-500 hover:text-theme uppercase tracking-widest px-6 py-4 transition-colors order-last sm:order-first">
+                                    Volver a Tareas
+                                </a>
 
-                            @if($task->status === 'draft')
-                            <button type="button" @click="if(confirm('{{ $isNewTask ? '¿Deseas descartar y eliminar este nuevo reporte?' : '¿Deseas eliminar este borrador y su información?' }}')) document.getElementById('cancel-form').submit();" class="w-full sm:w-auto text-[10px] font-black text-gray-500 hover:text-red-400 uppercase tracking-widest px-6 py-4 transition-colors order-last sm:order-first">
-                                {{ $isNewTask ? 'Descartar y Eliminar' : 'Eliminar O.T.' }}
-                            </button>
+                                @if($task->status === 'draft')
+                                <button type="button" @click="if(confirm('¿Deseas eliminar este borrador y su información?')) document.getElementById('cancel-form').submit();" class="w-full sm:w-auto text-[10px] font-black text-gray-500 hover:text-red-400 uppercase tracking-widest px-6 py-4 transition-colors order-last sm:order-first">
+                                    Eliminar O.T.
+                                </button>
+                                @endif
                             @endif
 
                             <button type="button" @click="doSubmit('save_draft')" class="w-full sm:w-auto bg-theme/5 hover:bg-theme/10 border border-theme text-theme font-bold py-4 px-8 rounded-2xl text-[10px] uppercase tracking-[0.2em] transition" :class="{'opacity-50 cursor-not-allowed': isSubmitting}">
@@ -696,10 +714,15 @@
                                 <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                                 <span class="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Reporte Sellado Digitalmente</span>
                             </div>
-                            <a href="{{ route('tasks.pdf', $task) }}" class="w-full sm:w-auto bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-tecsisa-yellow/20 flex items-center justify-center gap-2 transition active:scale-95">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
-                                Descargar PDF
-                            </a>
+                            <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                                <a href="{{ route('tasks.index') }}" class="w-full sm:w-auto text-center text-[10px] font-black text-gray-500 hover:text-theme uppercase tracking-widest px-6 py-3 transition-colors">
+                                    Volver
+                                </a>
+                                <a href="{{ route('tasks.pdf', $task) }}" class="w-full sm:w-auto bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-tecsisa-yellow/20 flex items-center justify-center gap-2 transition active:scale-95">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                                    Descargar PDF
+                                </a>
+                            </div>
                         </div>
                     @endif
                 </div>
@@ -710,7 +733,6 @@
         <form id="cancel-form" action="{{ route('tasks.destroy', $task) }}" method="POST" class="hidden">
             @csrf
             @method('DELETE')
-            <input type="hidden" name="redirect_to_equipment" value="1">
         </form>
     </div>
 
