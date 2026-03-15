@@ -2,7 +2,7 @@
     <!-- Se personaliza el header incrustado dentro del contexto de Alpine para tener acceso al estado "saving" -->
 
     <!-- Implementación Drag and Drop con HTML5 API usando Alpine -->
-    <div x-data="rackBuilder(@js($unassignedEquipment))" class="flex flex-col h-[100dvh] lg:h-[calc(100vh-74px)] lg:overflow-hidden">
+    <div x-data="rackBuilder(@js($unassignedEquipment))" class="flex flex-col h-full lg:h-[calc(100vh-74px)] lg:overflow-hidden">
         
         <!-- Header con el Botón Guardar Topología -->
         <header class="bg-theme-header backdrop-blur-md border-b border-theme shrink-0 transition-colors duration-500 py-3">

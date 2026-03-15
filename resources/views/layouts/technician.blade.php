@@ -147,9 +147,11 @@
     @include('layouts.navigation', ['hideHeader' => $hideHeader ?? false])
 
     <!-- Contenido Principal -->
-    <main class="flex-1 md:overflow-visible overflow-y-auto no-scrollbar relative z-10 {{ ($hideNav ?? false) ? '' : 'pb-28 md:pb-0' }}">
+    <main class="flex-1 md:overflow-visible overflow-y-auto no-scrollbar relative z-10 {{ ($hideNav ?? false) ? '' : 'pb-32 pb-safe md:pb-0' }}">
         <div class="md:max-w-7xl md:mx-auto md:w-full md:px-6 lg:px-8">
             {{ $slot }}
+            <!-- Spacer for mobile stability -->
+            <div class="h-24 md:hidden"></div>
         </div>
     </main>
 

@@ -169,8 +169,10 @@
             @endif
 
             <!-- Page Content -->
-            <main class="flex-1 w-full relative md:overflow-visible overflow-y-auto no-scrollbar sm:pb-0 pb-[5.5rem] transition-all">
+            <main class="flex-1 w-full relative md:overflow-visible overflow-y-auto no-scrollbar sm:pb-0 pb-32 pb-safe transition-all mt-0">
                 {{ $slot }}
+                <!-- Spacer for mobile stability -->
+                <div class="h-20 md:hidden"></div>
             </main>
         </div>
 
