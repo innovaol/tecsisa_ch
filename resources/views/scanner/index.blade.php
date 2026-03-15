@@ -33,23 +33,24 @@
             <div class="lg:col-span-4 space-y-6">
                 <!-- Search Input -->
                 <div class="bg-theme-card border border-theme rounded-[2rem] p-6 shadow-2xl relative overflow-hidden transition-colors duration-500">
-                    <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-4 ml-1">Búsqueda Técnica</label>
-                    <div class="relative group">
+                    <div class="flex justify-between items-center mb-4 ml-1">
+                        <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest">Búsqueda Técnica</label>
+                        <!-- Mobile Scanner Button (Visible only on small screens) -->
+                        <button @click="toggleCamera()" type="button" 
+                                class="sm:hidden flex items-center justify-center p-2.5 bg-tecsisa-yellow text-black rounded-xl shadow-lg active:scale-90 transition-transform"
+                                :class="isScanning ? 'animate-pulse bg-red-500 text-white' : ''">
+                            <svg x-show="!isScanning" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                            <svg x-show="isScanning" style="display: none;" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
+                    <div class="relative group text-right">
                         <input type="text" x-model="search" placeholder="ID, Nombre o Serial..." 
-                               class="w-full bg-black/10 border border-theme rounded-2xl pl-5 pr-24 py-5 focus:ring-1 focus:ring-tecsisa-yellow text-md tracking-wider font-black shadow-inner uppercase transition-all duration-300 outline-none" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">
+                               class="w-full bg-black/10 border border-theme rounded-2xl pl-5 pr-12 py-5 focus:ring-1 focus:ring-tecsisa-yellow text-md tracking-wider font-black shadow-inner uppercase transition-all duration-300 outline-none" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">
                         
-                        <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                            <!-- Mobile Scanner Button -->
-                            <button @click="toggleCamera()" type="button" 
-                                    class="sm:hidden w-12 h-12 flex items-center justify-center bg-tecsisa-yellow text-black rounded-xl shadow-lg active:scale-90 transition-transform"
-                                    :class="isScanning ? 'animate-pulse bg-red-500 text-white' : ''">
-                                <svg x-show="!isScanning" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
-                                <svg x-show="isScanning" style="display: none;" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
-                            </button>
-
-                            <!-- Magnifying Glass (Visible on PC or when not scanning) -->
-                            <div class="w-10 h-10 flex items-center justify-center text-gray-500" :class="isScanning ? 'hidden' : ''">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        <div class="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                            <!-- Magnifying Glass -->
+                            <div class="w-6 h-6 flex items-center justify-center text-gray-500">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                             </div>
                         </div>
                     </div>
