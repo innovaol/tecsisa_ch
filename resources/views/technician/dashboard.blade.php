@@ -18,7 +18,7 @@
                             </div>
                         </div>
                     </h2>
-                    <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-2 px-1">Gestión de hoja de ruta técnica</p>
+                    <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-2 px-1">Hoja de ruta técnica</p>
                 </div>
                 
                 <div class="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">

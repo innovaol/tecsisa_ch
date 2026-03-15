@@ -2,12 +2,22 @@
     <div class="py-6 md:py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-6">
         
         <!-- Header -->
-        <div class="bg-theme-card border border-theme rounded-[2.5rem] p-8 transition-all duration-500 shadow-xl relative overflow-hidden">
-            <div class="absolute -right-10 -top-10 w-32 h-32 bg-tecsisa-yellow/10 rounded-full blur-2xl"></div>
-            <h2 class="text-3xl font-black transition-colors duration-500 leading-tight text-theme">
-                Central de <span class="text-tecsisa-yellow uppercase tracking-widest text-sm font-black">Reportes</span>
+        <div class="bg-theme-card border border-theme rounded-[2.5rem] p-8 transition-all duration-500 shadow-xl relative">
+             <!-- Decorative Orbs (Clipped) -->
+            <div class="absolute inset-0 overflow-hidden rounded-[2.5rem] pointer-events-none">
+                <div class="absolute -right-10 -top-10 w-32 h-32 bg-tecsisa-yellow/10 rounded-full blur-2xl"></div>
+            </div>
+            <h2 class="text-3xl font-black transition-colors duration-500 leading-tight text-theme relative z-10 flex items-center gap-2">
+                <span>Reportes</span>
+                <div class="group relative inline-block">
+                    <svg class="w-5 h-5 text-theme-muted cursor-help p-0.5 hover:text-tecsisa-yellow transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0114 0z"></path></svg>
+                    <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-64 p-4 bg-black/95 text-[11px] text-white rounded-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none z-[100] border border-theme shadow-2xl normal-case font-bold backdrop-blur-md">
+                        <div class="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-black/95 border-b border-r border-theme rotate-45"></div>
+                        Consulta y gestión de información operativa del sistema.
+                    </div>
+                </div>
             </h2>
-            <p class="text-xs text-theme-muted font-bold uppercase tracking-widest mt-2 px-1">Consulta y gestión de información operativa</p>
+            <p class="text-xs text-theme-muted font-bold uppercase tracking-widest mt-2 px-1 relative z-10">Gestión de información operativa</p>
         </div>
 
         <!-- Filtros de Búsqueda Ultra Compacto y Simétrico -->

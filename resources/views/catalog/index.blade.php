@@ -16,7 +16,7 @@
                     </div>
                 </div>
             </h2>
-            <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-2 px-1 relative z-10">Infraestructura y hardware técnico</p>
+            <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-2 px-1 relative z-10">Hardware e infraestructura técnica</p>
         </div>
 
         <!-- Flatpickr for Premium Date Selection -->
@@ -156,7 +156,7 @@
                     <div class="absolute -right-10 -top-10 w-32 h-32 bg-blue-500/5 rounded-full blur-2xl"></div>
                     <div>
                         <h3 class="text-2xl font-black uppercase tracking-wider transition-colors duration-500" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">Sistemas Técnicos</h3>
-                        <p class="text-gray-500 text-xs font-bold tracking-widest uppercase mt-1">Parámetros y configuraciones por especialidad</p>
+                        <p class="text-gray-500 text-xs font-bold tracking-widest uppercase mt-1">Configuración por especialidad</p>
                     </div>
                     @if(Auth::user()->hasRole('Administrador'))
                     <button @click="openSystemModal()" class="w-full md:w-auto flex justify-center items-center gap-2 bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl transition-all active:scale-95">
@@ -229,7 +229,7 @@
                         <div class="absolute -left-10 -bottom-10 w-32 h-32 bg-purple-500/5 rounded-full blur-2xl"></div>
                         <div>
                             <h3 class="text-2xl font-black uppercase tracking-wider transition-colors duration-500" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">Infraestructura Física</h3>
-                            <p class="text-gray-500 text-xs font-bold tracking-widest uppercase mt-1">Niveles jerárquicos y cuartos técnicos</p>
+                            <p class="text-gray-500 text-xs font-bold tracking-widest uppercase mt-1">Niveles y cuartos técnicos</p>
                         </div>
                         @if(Auth::user()->hasRole('Administrador'))
                         <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto relative z-10">

@@ -1,17 +1,27 @@
 <x-app-layout>
     <div class="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto" x-data="{ showCreateModal: false }">
         <!-- Header Section: Tarjeta Propia -->
-        <div class="bg-theme-card border border-theme rounded-[2.5rem] p-10 mb-10 transition-all duration-500 shadow-xl relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-8">
-            <div class="absolute -right-10 -top-10 w-40 h-40 bg-tecsisa-yellow/5 rounded-full blur-3xl"></div>
-            <div class="flex items-center gap-6">
+        <div class="bg-theme-card border border-theme rounded-[2.5rem] p-10 mb-10 transition-all duration-500 shadow-xl relative flex flex-col md:flex-row md:items-center justify-between gap-8">
+            <!-- Decorative Orbs (Clipped) -->
+            <div class="absolute inset-0 overflow-hidden rounded-[2.5rem] pointer-events-none">
+                <div class="absolute -right-10 -top-10 w-40 h-40 bg-tecsisa-yellow/5 rounded-full blur-3xl"></div>
+            </div>
+            <div class="flex items-center gap-6 relative z-10">
                 <a href="{{ route('dashboard') }}" class="p-3 bg-theme/5 border border-theme text-theme-muted hover:text-tecsisa-yellow rounded-2xl transition-all shadow-md active:scale-95 group">
                     <svg class="w-6 h-6 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 </a>
                 <div>
-                    <h2 class="text-4xl font-black transition-colors duration-500 leading-tight" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">
-                        Usuarios y <span class="text-tecsisa-yellow uppercase tracking-widest text-sm font-black">Accesos</span>
+                    <h2 class="text-3xl sm:text-4xl font-black transition-colors duration-500 leading-tight" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">
+                        Personal y <span class="text-tecsisa-yellow uppercase tracking-widest text-sm font-black">Accesos</span>
+                        <div class="group relative inline-block ml-1">
+                            <svg class="w-5 h-5 text-theme-muted cursor-help p-0.5 hover:text-tecsisa-yellow transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0114 0z"></path></svg>
+                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-64 p-4 bg-black/95 text-[11px] text-white rounded-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none z-[100] border border-theme shadow-2xl normal-case font-bold backdrop-blur-md">
+                                <div class="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-black/95 border-b border-r border-theme rotate-45"></div>
+                                Control maestro de roles, perfiles y credenciales del personal técnico.
+                            </div>
+                        </div>
                     </h2>
-                    <p class="text-xs text-theme-muted font-bold uppercase tracking-widest mt-2 px-1">Control maestro de roles, perfiles y credenciales del personal técnico</p>
+                    <p class="text-xs text-theme-muted font-bold uppercase tracking-widest mt-2 px-1">Gestión de perfiles y credenciales</p>
                 </div>
             </div>
             <button @click="showCreateModal = true" class="bg-tecsisa-yellow hover:bg-yellow-400 text-black font-black px-10 py-5 rounded-2xl text-[10px] uppercase tracking-[0.2em] transition-all duration-300 shadow-[0_15px_40px_rgba(255,209,0,0.3)] flex items-center gap-4 active:scale-95 whitespace-nowrap group">
