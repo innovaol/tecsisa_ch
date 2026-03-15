@@ -86,7 +86,7 @@
                      class="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center p-4">
                     
                     <!-- Scanner Header -->
-                    <div class="absolute top-0 inset-x-0 p-6 flex justify-between items-center z-20">
+                    <div class="absolute top-0 inset-x-0 p-6 pt-safe flex justify-between items-center z-20">
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 bg-tecsisa-yellow rounded-xl flex items-center justify-center text-black shadow-[0_0_20px_rgba(255,209,0,0.5)]">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
