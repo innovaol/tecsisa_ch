@@ -8,7 +8,7 @@
             <h1 class="text-xs font-black uppercase tracking-widest transition-colors duration-500 flex items-center gap-2" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">
                 <span>Detalle: TK-{{ str_pad($task->id, 4, '0', STR_PAD_LEFT) }}</span>
                 <div class="group relative inline-block">
-                    <svg class="w-5 h-5 text-theme-muted cursor-help p-0.5 hover:text-tecsisa-yellow transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0114 0z"></path></svg>
+                    <svg class="w-5 h-5 text-theme-muted cursor-help hover:text-tecsisa-yellow transition-colors overflow-visible" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     <div class="absolute top-full right-0 mt-3 w-64 p-4 bg-black/95 text-[11px] text-white rounded-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none z-[100] border border-theme shadow-2xl normal-case font-bold backdrop-blur-md origin-top-right">
                         <div class="absolute -top-1.5 right-4 w-3 h-3 bg-black/95 border-t border-l border-theme rotate-45"></div>
                         Formulario de reporte técnico para trazabilidad de mantenimiento.
