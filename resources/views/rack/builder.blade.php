@@ -2,36 +2,44 @@
     <!-- Se personaliza el header incrustado dentro del contexto de Alpine para tener acceso al estado "saving" -->
 
     <!-- Implementación Drag and Drop con HTML5 API usando Alpine -->
-    <div x-data="rackBuilder(@js($unassignedEquipment))" class="flex flex-col min-h-screen lg:h-[calc(100vh-74px)] lg:overflow-hidden">
-        
-        <!-- Header con el Botón Guardar Topología -->
-        <header class="bg-theme-header backdrop-blur-md border-b border-theme shrink-0 transition-colors duration-500 py-3">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap justify-between items-center gap-2">
-                <div class="flex items-center gap-2 sm:gap-4 flex-1">
-                    <a href="{{ route('catalog.index') }}" class="w-11 h-11 flex items-center justify-center bg-theme/5 border border-theme text-theme-muted hover:text-tecsisa-yellow rounded-2xl transition shadow-md active:scale-90 group shrink-0">
+    <div x-data="rackBuilder(@js($unassignedEquipment))" class="py-6 md:py-10 px-4 sm:px-6 lg:px-8 max-w-[95rem] mx-auto space-y-8">
+        <!-- Header: Tarjeta Propia (Section Branding) -->
+        <div class="bg-theme-card border border-theme rounded-[2.5rem] p-6 sm:p-10 mb-6 sm:mb-10 transition-all duration-500 shadow-xl relative">
+            <!-- Decorative Orbs (Clipped) -->
+            <div class="absolute inset-0 overflow-hidden rounded-[2.5rem] pointer-events-none">
+                <div class="absolute -right-10 -top-10 w-40 h-40 bg-tecsisa-yellow/5 rounded-full blur-3xl"></div>
+            </div>
+            
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+                <div class="flex items-center gap-4 sm:gap-6">
+                    <a href="{{ route('catalog.index') }}" class="w-11 h-11 flex items-center justify-center bg-theme/5 border border-theme text-theme-muted hover:text-tecsisa-yellow rounded-2xl transition-all shadow-md active:scale-95 group shrink-0">
                         <svg class="w-6 h-6 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                     </a>
-                    <h2 class="font-bold text-lg sm:text-2xl text-theme tracking-tight flex items-center gap-2">
-                        <span class="hidden sm:inline">Distribución de Racks</span>
-                        <span class="sm:hidden text-tecsisa-yellow">Racks</span>
-                        <div class="group relative inline-block">
-                            <svg class="w-5 h-5 text-theme-muted cursor-help p-0.5 hover:text-tecsisa-yellow transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0114 0z"></path></svg>
-                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-64 p-4 bg-black/95 text-[11px] text-white rounded-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none z-[100] border border-theme shadow-2xl normal-case font-bold backdrop-blur-md">
-                                <div class="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-black/95 border-b border-r border-theme rotate-45"></div>
-                                Gestiona la ubicación física de los activos en el gabinete EIA-310-D.
+                    <div>
+                        <h2 class="text-2xl sm:text-4xl font-black transition-colors duration-500 flex items-center gap-2" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">
+                            <span>Racks e Infraestructura</span>
+                            <div class="group relative inline-block">
+                                <svg class="w-5 h-5 text-theme-muted cursor-help p-0.5 hover:text-tecsisa-yellow transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0114 0z"></path></svg>
+                                <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-64 p-4 bg-black/95 text-[11px] text-white rounded-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none z-[100] border border-theme shadow-2xl normal-case font-bold backdrop-blur-md">
+                                    <div class="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-black/95 border-b border-r border-theme rotate-45"></div>
+                                    Gestión de ubicación física de activos en gabinetes EIA-310-D.
+                                </div>
                             </div>
-                        </div>
-                    </h2>
+                        </h2>
+                        <p class="text-[10px] sm:text-xs text-theme-muted font-bold uppercase tracking-widest mt-1 sm:mt-2 px-1">Distribución lógica de hardware</p>
+                    </div>
                 </div>
-                <button @click="saveTopology()" :disabled="saving" class="bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-black px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl shadow-xl shadow-tecsisa-yellow/20 transition transform flex justify-center items-center gap-2 whitespace-nowrap active:scale-95" :class="saving ? 'opacity-70 cursor-not-allowed' : 'hover:-translate-y-0.5'">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
-                    <span class="text-xs uppercase" x-text="saving ? 'Guardando' : 'Guardar'"></span>
-                </button>
-            </div>
-        </header>
 
-        <div class="flex-1 py-4 md:py-6 flex flex-col lg:overflow-hidden min-h-0">
-            <div class="max-w-[95rem] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row gap-6">
+                <div class="flex gap-3">
+                    <button @click="saveTopology()" :disabled="saving" class="bg-tecsisa-yellow hover:bg-yellow-400 text-black font-black px-6 py-4 rounded-2xl text-[10px] uppercase tracking-widest transition-all duration-300 shadow-[0_15px_40px_rgba(255,209,0,0.3)] flex items-center justify-center gap-3 active:scale-95 whitespace-nowrap group w-full md:w-auto" :class="saving ? 'opacity-70 cursor-not-allowed' : ''">
+                        <svg class="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+                        <span x-text="saving ? 'Guardando...' : 'Guardar Topología'"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-col md:flex-row gap-6">
                 
                 <!-- CONTROLES Y CATÁLOGO DE EQUIPACIÓN (LEFT PANEL) -->
                 <div class="w-full lg:w-96 flex flex-col gap-6 lg:h-full shrink-0">
