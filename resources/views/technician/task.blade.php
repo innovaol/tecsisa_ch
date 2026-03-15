@@ -5,7 +5,15 @@
             <a href="{{ route('tasks.index') }}" class="w-10 h-10 rounded-full bg-theme-card border border-theme flex items-center justify-center text-gray-400 transition shadow-lg" :class="theme === 'light' ? 'hover:text-slate-900' : 'hover:text-white'">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
             </a>
-            <h1 class="text-xs font-black uppercase tracking-widest transition-colors duration-500" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">Detalle: TK-{{ str_pad($task->id, 4, '0', STR_PAD_LEFT) }}</h1>
+            <h1 class="text-xs font-black uppercase tracking-widest transition-colors duration-500 flex items-center gap-2" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">
+                <span>Detalle: TK-{{ str_pad($task->id, 4, '0', STR_PAD_LEFT) }}</span>
+                <div class="group relative inline-block">
+                    <svg class="w-3.5 h-3.5 text-theme-muted cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0114 0z"></path></svg>
+                    <div class="absolute top-full right-0 mt-2 w-48 p-2 bg-black/95 text-[9px] text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 border border-theme shadow-2xl normal-case font-bold">
+                        Formulario de reporte técnico para trazabilidad de mantenimiento.
+                    </div>
+                </div>
+            </h1>
             <div class="w-10 h-10"></div> <!-- Placeholder for symmetry -->
         </div>
     </div>
@@ -228,7 +236,7 @@
 
                     
                     <button type="submit" @click="if(!confirming) { confirming = true; document.getElementById('statusInput').value='completed'; }" class="w-full bg-tecsisa-yellow hover:bg-yellow-400 text-black font-black py-4 rounded-2xl text-sm uppercase tracking-widest shadow-[0_10px_30px_rgba(255,209,0,0.3)] transition transform active:scale-95 flex items-center justify-center gap-3">
-                        <span x-text="confirming ? 'Firmar y Cerrar Tarea' : 'Completar Tarea Preventiva'"></span>
+                        <span x-text="confirming ? 'Firmar y Cerrar' : (window.innerWidth < 640 ? 'Completar' : 'Completar Tarea')"></span>
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     </button>
 
@@ -238,9 +246,10 @@
                     </button>
                     
                     @if($task->status == 'draft' || $task->status == 'pending')
-                    <button type="button" onclick="document.getElementById('statusInput').value='in_progress'; this.form.submit();" x-show="!confirming" class="w-full bg-transparent border-2 border-theme font-bold py-3.5 rounded-2xl text-xs uppercase tracking-widest transition flex justify-center items-center gap-2" :class="theme === 'light' ? 'text-slate-800 hover:bg-slate-100' : 'text-white hover:bg-white/5'">
+                    <button type="button" onclick="document.getElementById('statusInput').value='in_progress'; this.form.submit();" x-show="!confirming" class="w-full bg-transparent border-2 border-theme font-bold py-3.5 rounded-2xl text-xs uppercase tracking-widest transition flex justify-center items-center gap-2" :class="theme === 'light' ? 'text-slate-800' : 'hover:bg-slate-100' : 'text-white hover:bg-white/5'">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        Marcar En Progreso (Iniciar Trabajo)
+                        <span class="sm:hidden">Iniciar</span>
+                        <span class="hidden sm:inline">Iniciar Trabajo</span>
                     </button>
                     @endif
                 </div>

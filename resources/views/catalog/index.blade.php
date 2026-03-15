@@ -1,12 +1,18 @@
 <x-app-layout>
     <x-slot name="header">
         <!-- Header: Tarjeta Propia -->
-        <div class="bg-theme-card border border-theme rounded-[2.5rem] p-8 mb-6 transition-all duration-500 shadow-xl relative overflow-hidden">
+        <div class="bg-theme-card border border-theme rounded-[2rem] sm:rounded-[2.5rem] p-5 sm:p-8 mb-6 transition-all duration-500 shadow-xl relative overflow-hidden">
             <div class="absolute -right-10 -top-10 w-32 h-32 bg-tecsisa-yellow/5 rounded-full blur-2xl"></div>
-            <h2 class="text-3xl font-black transition-colors duration-500 leading-tight" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">
-                Gestión de <span class="text-tecsisa-yellow uppercase tracking-widest text-sm font-black">Catálogos y Activos</span>
+            <h2 class="text-xl sm:text-3xl font-black transition-colors duration-500 leading-tight flex items-center gap-2" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">
+                <span>Catálogos</span>
+                <div class="group relative inline-block">
+                    <svg class="w-4 h-4 text-theme-muted cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0114 0z"></path></svg>
+                    <div class="absolute top-full left-0 mt-2 w-56 p-3 bg-black/95 text-[10px] text-white rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 border border-theme shadow-2xl normal-case font-bold">
+                        Gestión técnica de activos, especialidades y niveles de ubicación del hospital.
+                    </div>
+                </div>
             </h2>
-            <p class="text-xs text-gray-500 font-bold uppercase tracking-widest mt-2 px-1">Control integral de infraestructura técnica y hardware</p>
+            <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-2 px-1">Infraestructura y hardware técnico</p>
         </div>
 
         <!-- Flatpickr for Premium Date Selection -->
@@ -60,18 +66,19 @@
                     </div>
                     <div class="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
                         <div class="relative w-full sm:w-auto flex items-center">
-                            <input type="text" placeholder="Buscar ID..." class="w-full bg-theme-border border border-theme text-[10px] font-bold text-gray-400 uppercase tracking-widest rounded-xl pl-10 pr-4 py-3 focus:border-tecsisa-yellow transition-all placeholder-gray-600 outline-none">
+                            <input type="text" placeholder="ID..." class="w-full bg-theme-border border border-theme text-[10px] font-bold text-gray-400 uppercase tracking-widest rounded-xl pl-10 pr-4 py-3 focus:border-tecsisa-yellow transition-all placeholder-gray-600 outline-none">
                             <svg class="w-4 h-4 text-gray-500 absolute left-3 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </div>
                         @if(Auth::user()->hasRole('Administrador'))
                         <button @click="openCreateModal()" class="w-full sm:w-auto flex justify-center items-center bg-tecsisa-yellow hover:bg-yellow-400 text-black px-6 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl transition-all active:scale-95">
-                            + Alta de Equipo
+                            <span class="sm:hidden">+ Alta</span>
+                            <span class="hidden sm:inline">+ Alta de Equipo</span>
                         </button>
                         @endif
                     </div>
                 </div>
 
-                <div class="bg-theme-card border border-theme rounded-[2.5rem] overflow-hidden shadow-2xl transition-all duration-500">
+                <div class="bg-theme-card border border-theme rounded-[2rem] sm:rounded-[2.5rem] overflow-x-auto shadow-2xl transition-all duration-500 no-scrollbar">
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-black/10 dark:bg-white/10 border-b border-theme text-[10px] font-black uppercase text-gray-500 tracking-[0.2em] transition-colors duration-500" :class="theme === 'light' ? 'bg-slate-50' : ''">
@@ -149,7 +156,8 @@
                     </div>
                     @if(Auth::user()->hasRole('Administrador'))
                     <button @click="openSystemModal()" class="w-full md:w-auto flex justify-center items-center bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl transition-all active:scale-95">
-                        + Nuevo Sistema
+                        <span class="sm:hidden">+ Sistema</span>
+                        <span class="hidden sm:inline">+ Nuevo Sistema</span>
                     </button>
                     @endif
                 </div>
@@ -222,10 +230,12 @@
                         @if(Auth::user()->hasRole('Administrador'))
                         <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto relative z-10">
                             <button @click="openCreateLocationModal()" class="w-full sm:w-auto flex justify-center items-center bg-theme-border border border-theme hover:bg-theme-table-row-hover text-gray-400 px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95" :class="theme === 'light' ? 'hover:text-slate-900' : 'hover:text-white'">
-                                + Nueva Ubicación
+                                <span class="sm:hidden">+ Ubicación</span>
+                                <span class="hidden sm:inline">+ Nueva Ubicación</span>
                             </button>
                             <button @click="openCreateRackModal()" class="w-full sm:w-auto flex justify-center items-center bg-tecsisa-yellow hover:bg-yellow-400 text-black px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-[0_10px_20px_rgba(255,191,0,0.2)] transition-all active:scale-95">
-                                + Registrar Rack
+                                <span class="sm:hidden">+ Rack</span>
+                                <span class="hidden sm:inline">+ Registrar Rack</span>
                             </button>
                         </div>
                         @endif

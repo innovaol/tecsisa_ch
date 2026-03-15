@@ -94,12 +94,30 @@
             overscroll-behavior-y: none;
             transition: background-color 0.3s ease, color 0.3s ease;
         }
+
+        @media (max-width: 768px) {
+            body {
+                position: fixed;
+                width: 100%;
+                height: 100dvh;
+                overflow: hidden;
+                overscroll-behavior-y: none;
+            }
+        }
+
         .text-theme { color: var(--theme-text); }
         .bg-theme { background-color: var(--theme-bg); }
         .bg-theme-card { background-color: var(--theme-card); }
         .border-theme { border-color: var(--theme-border); }
         .bg-theme-header { background-color: var(--theme-header); }
         .text-theme-muted { color: var(--theme-text-muted); }
+
+        /* Safe Area Utilities */
+        @supports (padding: env(safe-area-inset-top)) {
+            .pt-safe { padding-top: env(safe-area-inset-top); }
+            .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+            .pb-safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+        }
     </style>
 </head>
 <body x-data="{ 

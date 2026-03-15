@@ -110,6 +110,26 @@
             ::-webkit-scrollbar-thumb { background: #FFD100; border-radius: 4px; }
             
             [x-cloak] { display: none !important; }
+
+            /* Safe Area & Mobile Stability Utilities */
+            @supports (padding: env(safe-area-inset-top)) {
+                .pt-safe { padding-top: env(safe-area-inset-top); }
+                .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+                .pb-safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+            }
+            
+            .no-scrollbar::-webkit-scrollbar { display: none; }
+            .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+            
+            @media (max-width: 768px) {
+                body {
+                    position: fixed;
+                    width: 100%;
+                    height: 100dvh;
+                    overflow: hidden;
+                    overscroll-behavior-y: none;
+                }
+            }
         </style>
     </head>
     <body x-data="{ 
@@ -130,13 +150,13 @@
             }
         }"
         :class="theme" 
-        class="font-sans antialiased overflow-x-hidden min-h-screen">
+        class="font-sans antialiased overflow-x-hidden min-h-screen flex flex-col">
         
         <!-- Background Glowing Orbs -->
         <div class="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-tecsisa-yellow/5 blur-[120px] pointer-events-none z-0" :class="theme === 'light' ? 'opacity-20' : ''"></div>
         <div class="fixed bottom-[-10%] right-[-10%] w-[30%] h-[30%] rounded-full bg-blue-500/5 blur-[120px] pointer-events-none z-0" :class="theme === 'light' ? 'opacity-20' : ''"></div>
 
-        <div class="min-h-screen flex flex-col relative z-10">
+        <div class="flex-1 flex flex-col relative z-20 overflow-hidden h-full">
             @include('layouts.navigation')
 
             <!-- Page Heading -->
@@ -149,7 +169,7 @@
             @endif
 
             <!-- Page Content -->
-            <main class="flex-1 w-full relative sm:pb-0 pb-24">
+            <main class="flex-1 w-full relative md:overflow-visible overflow-y-auto no-scrollbar sm:pb-0 pb-[5.5rem] transition-all">
                 {{ $slot }}
             </main>
         </div>

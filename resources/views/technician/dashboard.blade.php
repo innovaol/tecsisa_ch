@@ -5,16 +5,23 @@
             <div class="absolute -right-10 -top-10 w-32 h-32 bg-tecsisa-yellow/5 rounded-full blur-2xl"></div>
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
                 <div>
-                    <h2 class="text-3xl font-black transition-colors duration-500 leading-tight" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">
-                        Control de <span class="text-tecsisa-yellow uppercase tracking-widest text-sm font-black">Tareas Asignadas</span>
+                    <h2 class="text-3xl font-black transition-colors duration-500 leading-tight flex items-center gap-2" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">
+                        <span>Tareas</span>
+                        <div class="group relative inline-block">
+                            <svg class="w-4 h-4 text-theme-muted cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0114 0z"></path></svg>
+                            <div class="absolute top-full left-0 mt-2 w-56 p-3 bg-black/95 text-[10px] text-white rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 border border-theme shadow-2xl normal-case font-bold">
+                                Control de órdenes de trabajo y mantenimiento técnico asignado a tu perfil.
+                            </div>
+                        </div>
                     </h2>
-                    <p class="text-xs text-gray-500 font-bold uppercase tracking-widest mt-2 px-1">Gestión de hoja de ruta y mantenimiento técnico avanzado</p>
+                    <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-2 px-1">Gestión de hoja de ruta técnica</p>
                 </div>
                 
                 <div class="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
                     <a href="{{ route('tasks.index') }}?showModal=1" class="flex items-center justify-center gap-2 bg-tecsisa-yellow hover:bg-yellow-400 text-black font-black w-full sm:w-auto px-6 py-4 rounded-2xl text-xs uppercase tracking-widest shadow-xl transition-all active:scale-95 shrink-0">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
-                        Nueva Tarea
+                        <span class="sm:hidden">+ Tarea</span>
+                        <span class="hidden sm:inline">Nueva Tarea</span>
                     </a>
                     <div class="bg-black/10 border border-theme px-8 py-4 rounded-[1.5rem] text-center shadow-inner backdrop-blur-md transition-all duration-500 w-full sm:w-auto shrink-0">
                         <span class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">En Proceso</span>

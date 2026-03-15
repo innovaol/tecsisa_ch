@@ -10,21 +10,25 @@
         }
     }">
         <!-- Header: Tarjeta Propia -->
-        <div class="bg-theme-card border border-theme rounded-[2.5rem] p-8 mb-6 transition-all duration-500 shadow-xl relative overflow-hidden">
-            <div class="absolute -right-10 -top-10 w-32 h-32 bg-tecsisa-yellow/5 rounded-full blur-2xl"></div>
+        <div class="bg-theme-card border border-theme rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 mb-8 transition-all duration-500 shadow-xl relative overflow-hidden">
+            <div class="absolute -right-10 -top-10 w-40 h-40 bg-tecsisa-yellow/5 rounded-full blur-3xl"></div>
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div>
-                    <h2 class="text-3xl font-black transition-colors duration-500 leading-tight" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">
-                        Gestión de <span class="text-tecsisa-yellow uppercase tracking-widest text-sm font-black">Operaciones</span>
+                <div class="relative z-10">
+                    <h2 class="text-2xl sm:text-4xl font-black transition-colors duration-500 flex items-center gap-3" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">
+                        Panel de <span class="text-tecsisa-yellow uppercase tracking-[0.2em] text-xs sm:text-sm font-black">Actividades</span>
+                        <div class="group relative inline-block">
+                            <svg class="w-4 h-4 text-theme-muted cursor-help" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0114 0z"></path></svg>
+                            <div class="absolute top-full left-0 mt-2 w-56 p-3 bg-black/95 text-[10px] text-white rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 border border-theme shadow-2xl normal-case font-bold">
+                                Listado de servicios de mantenimiento preventivo y correctivo programados.
+                            </div>
+                        </div>
                     </h2>
-                    <p class="text-xs text-gray-500 font-bold uppercase tracking-widest mt-2 px-1">
-                        {{ Auth::user()->hasRole('Administrador') ? 'Asignación, seguimiento y trazabilidad técnica' : 'Hoja de ruta y reportes asignados' }}
-                    </p>
                 </div>
                 <div class="flex gap-3">
-                    <button @click="showCreateModal = true" class="bg-tecsisa-yellow hover:bg-yellow-400 text-black font-black px-8 py-3.5 rounded-2xl text-xs uppercase tracking-widest transition shadow-xl active:scale-95 flex items-center gap-2">
+                    <button @click="showCreateModal = true" class="bg-tecsisa-yellow hover:bg-yellow-400 text-black font-black px-6 sm:px-8 py-3.5 rounded-2xl text-[10px] uppercase tracking-widest transition shadow-xl active:scale-95 flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
-                        {{ Auth::user()->hasRole('Administrador') ? 'Asignar Tarea' : 'Nueva Tarea' }}
+                        <span class="sm:hidden">Orden</span>
+                        <span class="hidden sm:inline">{{ Auth::user()->hasRole('Administrador') ? 'Asignar Tarea' : 'Nueva Tarea' }}</span>
                     </button>
                 </div>
             </div>
@@ -32,7 +36,7 @@
 
         @if(!empty($stats))
         <!-- Stats Summary -->
-        <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             <div class="bg-theme-card border border-theme p-6 rounded-[2rem] transition-all duration-500 shadow-lg">
                 <p class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2" :class="theme === 'light' ? 'text-slate-500' : 'text-gray-500'">Total Tareas</p>
                 <p class="text-3xl font-black transition-colors duration-500" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">{{ $stats['total'] }}</p>
@@ -47,7 +51,7 @@
                 <p class="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-2">Aprobación</p>
                 <p class="text-3xl font-black text-blue-400">{{ $stats['in_review'] }}</p>
             </div>
-            <div class="bg-theme-card border border-theme p-6 rounded-[2rem] transition-all duration-500 shadow-lg relative overflow-hidden col-span-2 lg:col-span-1">
+            <div class="bg-theme-card border border-theme p-6 rounded-[2rem] transition-all duration-500 shadow-lg relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-16 h-16 bg-emerald-500/5 rounded-bl-full translate-x-4 -translate-y-4"></div>
                 <p class="text-[10px] font-black text-emerald-400 uppercase tracking-widest mb-2">Completadas</p>
                 <p class="text-3xl font-black text-emerald-400">{{ $stats['completed'] }}</p>
