@@ -816,9 +816,9 @@
                                         @click="doSubmit('submit')" 
                                         class="w-full sm:w-auto font-black py-4 px-10 rounded-2xl text-xs uppercase tracking-[0.2em] transition active:scale-90 flex items-center justify-center gap-2" 
                                         :class="canFinalize && !isSubmitting ? 'bg-tecsisa-yellow hover:bg-yellow-400 text-black shadow-[0_15px_40px_rgba(255,209,0,0.3)]' : 'bg-gray-300 dark:bg-gray-800 text-gray-500 cursor-not-allowed opacity-50'">
-                                    <span x-show="!isSubmitting">Enviar</span>
-                                    <span x-show="isSubmitting">Enviando...</span>
-                                    <svg x-show="!isSubmitting" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                                    <span x-show="!isSubmitting">Finalizar</span>
+                                    <span x-show="isSubmitting">Finalizando...</span>
+                                    <svg x-show="!isSubmitting" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
                                 </button>
                                 
                                 <!-- Tooltip de Requisitos -->

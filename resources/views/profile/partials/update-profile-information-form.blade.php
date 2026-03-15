@@ -31,7 +31,7 @@
 
         <div class="flex items-center gap-4 pt-2">
             <button type="submit" class="bg-tecsisa-yellow hover:bg-yellow-400 text-black font-black py-4 px-8 rounded-2xl text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-tecsisa-yellow/10 transition active:scale-95">
-                Guardar Cambios
+                Guardar
             </button>
 
             @if (session('status') === 'profile-updated')

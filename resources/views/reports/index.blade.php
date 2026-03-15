@@ -107,7 +107,7 @@
 
         <!-- Vista Previa de Tabla -->
         <div class="bg-theme-card border border-theme rounded-[2.5rem] overflow-hidden shadow-2xl transition-all duration-500">
-            <div class="px-8 py-6 border-b border-theme bg-theme/5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="px-8 py-6 border-b border-theme bg-theme/5 flex flex-col md:flex-row items-center justify-between gap-6">
                 <div class="flex items-center gap-4">
                     <div class="w-10 h-10 bg-emerald-500/20 rounded-full flex items-center justify-center">
                         <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
@@ -119,8 +119,8 @@
                 </div>
                 
                 <!-- Acciones de Reporte (PDF/Excel) -->
-                <div class="flex items-center gap-2">
-                    <form action="{{ route('reports.weekly.generate') }}" method="POST" target="_blank">
+                <div class="flex items-center justify-center gap-3 w-full md:w-auto">
+                    <form action="{{ route('reports.weekly.generate') }}" method="POST" target="_blank" class="flex-1 sm:flex-none">
                         @csrf
                         <input type="hidden" name="system_id" value="{{ request('system_id') }}">
                         <input type="hidden" name="status" value="{{ request('status') }}">
@@ -129,13 +129,13 @@
                         <input type="hidden" name="start_date" value="{{ date('d/m/Y', strtotime($startDate)) }}">
                         <input type="hidden" name="end_date" value="{{ date('d/m/Y', strtotime($endDate)) }}">
                         
-                        <button type="submit" class="h-10 px-4 bg-red-600 hover:bg-red-500 text-white font-black rounded-xl text-[9px] uppercase tracking-widest transition flex items-center gap-2 shadow-lg shadow-red-600/20 active:scale-95">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                            <span>Exportar</span>
+                        <button type="submit" class="w-full h-11 px-5 bg-red-600 hover:bg-red-500 text-white font-black rounded-xl text-[9px] uppercase tracking-widest transition flex items-center justify-center gap-2 shadow-lg shadow-red-600/20 active:scale-95">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                            <span>Exportar PDF</span>
                         </button>
                     </form>
 
-                    <form action="{{ route('reports.export.internal') }}" method="POST">
+                    <form action="{{ route('reports.export.internal') }}" method="POST" class="flex-1 sm:flex-none">
                         @csrf
                         <input type="hidden" name="system_id" value="{{ request('system_id') }}">
                         <input type="hidden" name="status" value="{{ request('status') }}">
@@ -144,9 +144,9 @@
                         <input type="hidden" name="start_date" value="{{ date('d/m/Y', strtotime($startDate)) }}">
                         <input type="hidden" name="end_date" value="{{ date('d/m/Y', strtotime($endDate)) }}">
                         
-                        <button type="submit" class="h-10 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-xl text-[9px] uppercase tracking-widest transition flex items-center gap-2 shadow-lg shadow-emerald-600/20 active:scale-95">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                            <span>Exportar</span>
+                        <button type="submit" class="w-full h-11 px-5 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-xl text-[9px] uppercase tracking-widest transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 active:scale-95">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                            <span>Exportar xlsx</span>
                         </button>
                     </form>
                 </div>

@@ -71,8 +71,7 @@
                         </div>
                         @if(Auth::user()->hasRole('Administrador'))
                         <button @click="openCreateModal()" class="w-full sm:w-auto flex justify-center items-center bg-tecsisa-yellow hover:bg-yellow-400 text-black px-6 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl transition-all active:scale-95">
-                            <span class="sm:hidden">+ Nuevo</span>
-                            <span class="hidden sm:inline">+ Alta de Equipo</span>
+                            + Nuevo
                         </button>
                         @endif
                     </div>
@@ -104,7 +103,7 @@
                                 </td>
                                 <td class="py-5 px-4">
                                     @if($eq->form_factor === 'rackmount')
-                                        <span class="text-[8px] bg-blue-500/10 text-blue-400 px-2 py-1 rounded-lg border border-blue-500/20 uppercase font-black tracking-widest">Rackmount ({{ $eq->u_height }}U)</span>
+                                        <span class="text-[8px] bg-blue-500/10 text-blue-400 px-2 py-1 rounded-lg border border-blue-500/20 uppercase font-black tracking-widest whitespace-nowrap">Rack {{ $eq->u_height }}U</span>
                                     @elseif($eq->form_factor === 'peripheral')
                                         <span class="text-[8px] bg-purple-500/10 text-purple-400 px-2 py-1 rounded-lg border border-purple-500/20 uppercase font-black tracking-widest">Periférico</span>
                                     @else
@@ -156,8 +155,7 @@
                     </div>
                     @if(Auth::user()->hasRole('Administrador'))
                     <button @click="openSystemModal()" class="w-full md:w-auto flex justify-center items-center bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl transition-all active:scale-95">
-                        <span class="sm:hidden">+ Nuevo</span>
-                        <span class="hidden sm:inline">+ Nuevo Sistema</span>
+                        + Nuevo
                     </button>
                     @endif
                 </div>
@@ -230,12 +228,10 @@
                         @if(Auth::user()->hasRole('Administrador'))
                         <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto relative z-10">
                             <button @click="openCreateLocationModal()" class="w-full sm:w-auto flex justify-center items-center bg-theme-border border border-theme hover:bg-theme-table-row-hover text-gray-400 px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95" :class="theme === 'light' ? 'hover:text-slate-900' : 'hover:text-white'">
-                                <span class="sm:hidden">+ Nueva</span>
-                                <span class="hidden sm:inline">+ Nueva Ubicación</span>
+                                + Nueva
                             </button>
                             <button @click="openCreateRackModal()" class="w-full sm:w-auto flex justify-center items-center bg-tecsisa-yellow hover:bg-yellow-400 text-black px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-[0_10px_20px_rgba(255,191,0,0.2)] transition-all active:scale-95">
-                                <span class="sm:hidden">+ Nuevo</span>
-                                <span class="hidden sm:inline">+ Registrar Rack</span>
+                                + Nuevo
                             </button>
                         </div>
                         @endif
@@ -289,7 +285,7 @@
                         </div>
                         <div class="mt-8 flex justify-end gap-3">
                             <button type="button" @click="showLocationModal = false" class="px-6 py-2.5 rounded-xl text-theme-muted font-black uppercase text-[10px] tracking-widest hover:text-theme transition">Cancelar</button>
-                            <button type="submit" class="bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-black px-8 py-2.5 rounded-xl transition shadow-xl shadow-tecsisa-yellow/20 uppercase text-[10px] tracking-widest" x-text="locationEditMode ? 'Actualizar' : 'Crear'"></button>
+                            <button type="submit" class="bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-black px-8 py-2.5 rounded-xl transition shadow-xl shadow-tecsisa-yellow/20 uppercase text-[10px] tracking-widest" x-text="'Guardar'"></button>
                         </div>
                     </form>
                 </div>
@@ -343,7 +339,7 @@
                         </div>
                         <div class="mt-8 flex justify-end gap-3">
                             <button type="button" @click="showRackModal = false" class="px-6 py-2.5 rounded-xl text-theme-muted font-black uppercase text-[10px] tracking-widest hover:text-theme transition">Cancelar</button>
-                            <button type="submit" class="bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-black px-8 py-2.5 rounded-xl transition shadow-xl shadow-tecsisa-yellow/20 uppercase text-[10px] tracking-widest" x-text="rackEditMode ? 'Guardar' : 'Registrar'"></button>
+                            <button type="submit" class="bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-black px-8 py-2.5 rounded-xl transition shadow-xl shadow-tecsisa-yellow/20 uppercase text-[10px] tracking-widest" x-text="'Guardar'"></button>
                         </div>
                     </form>
                 </div>
@@ -483,8 +479,8 @@
                                 Cancelar
                             </button>
 
-                            <button type="submit" class="bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-black px-8 py-2.5 rounded-xl transition shadow-xl shadow-tecsisa-yellow/20 uppercase text-[10px] tracking-widest">
-                                <span x-text="systemEditMode ? 'Actualizar Sistema' : 'Crear Sistema'"></span>
+                             <button type="submit" class="bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-black px-8 py-2.5 rounded-xl transition shadow-xl shadow-tecsisa-yellow/20 uppercase text-[10px] tracking-widest">
+                                <span>Guardar</span>
                             </button>
                         </div>
                     </form>
@@ -682,8 +678,8 @@
                                 Cancelar
                             </button>
 
-                            <button type="submit" class="bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-black px-8 py-2 rounded-xl transition shadow-xl shadow-yellow-400/10">
-                                <span x-text="editMode ? 'Actualizar Cambios' : 'Guardar en Catálogo'"></span>
+                             <button type="submit" class="bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-black px-8 py-2 rounded-xl transition shadow-xl shadow-yellow-400/10">
+                                <span>Guardar</span>
                             </button>
                         </div>
                     </form>

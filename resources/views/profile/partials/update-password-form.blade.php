@@ -37,7 +37,7 @@
 
         <div class="flex items-center gap-4 pt-2">
             <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white font-black py-4 px-8 rounded-2xl text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-blue-500/10 transition active:scale-95">
-                Actualizar Contraseña
+                Guardar
             </button>
 
             @if (session('status') === 'password-updated')

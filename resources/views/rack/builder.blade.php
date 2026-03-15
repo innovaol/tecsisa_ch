@@ -2,7 +2,7 @@
     <!-- Se personaliza el header incrustado dentro del contexto de Alpine para tener acceso al estado "saving" -->
 
     <!-- Implementación Drag and Drop con HTML5 API usando Alpine -->
-    <div x-data="rackBuilder(@js($unassignedEquipment))" class="flex flex-col h-full lg:h-[calc(100vh-74px)] lg:overflow-hidden">
+    <div x-data="rackBuilder(@js($unassignedEquipment))" class="flex flex-col min-h-screen lg:h-[calc(100vh-74px)] lg:overflow-hidden">
         
         <!-- Header con el Botón Guardar Topología -->
         <header class="bg-theme-header backdrop-blur-md border-b border-theme shrink-0 transition-colors duration-500 py-3">
@@ -29,8 +29,8 @@
             </div>
         </header>
 
-        <div class="flex-1 py-4 md:py-6 flex flex-col lg:overflow-hidden">
-            <div class="max-w-[95rem] mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col md:flex-row gap-6">
+        <div class="flex-1 py-4 md:py-6 flex flex-col lg:overflow-hidden min-h-0">
+            <div class="max-w-[95rem] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row gap-6">
                 
                 <!-- CONTROLES Y CATÁLOGO DE EQUIPACIÓN (LEFT PANEL) -->
                 <div class="w-full lg:w-96 flex flex-col gap-6 lg:h-full shrink-0">
@@ -108,7 +108,7 @@
             </div>
 
             <!-- VISUALIZADOR PIXEL-PERFECT DEL RACK (RIGHT PANEL) -->
-            <div class="w-full flex-1 min-h-[600px] lg:min-h-0 lg:h-full flex flex-col bg-theme-card backdrop-blur-md rounded-2xl shadow-2xl border border-theme overflow-hidden relative transition-colors duration-500">
+            <div class="w-full flex-1 min-h-[500px] sm:min-h-[600px] lg:min-h-0 lg:h-full flex flex-col bg-theme-card backdrop-blur-md rounded-2xl shadow-2xl border border-theme overflow-hidden relative transition-colors duration-500">
                 
                 <div class="p-4 border-b border-theme bg-theme/5 flex flex-col md:flex-row justify-between items-center gap-4 z-20">
                     <div class="flex items-center gap-3">

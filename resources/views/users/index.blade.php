@@ -16,7 +16,7 @@
             </div>
             <button @click="showCreateModal = true" class="bg-tecsisa-yellow hover:bg-yellow-400 text-black font-black px-10 py-5 rounded-2xl text-[10px] uppercase tracking-[0.2em] transition-all duration-300 shadow-[0_15px_40px_rgba(255,209,0,0.3)] flex items-center gap-4 active:scale-95 whitespace-nowrap group">
                 <svg class="w-6 h-6 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
-                Registrar Colaborador
+                + Nuevo
             </button>
         </div>
 
@@ -101,7 +101,7 @@
                     </button>
 
                     <h3 class="text-3xl font-black text-theme mb-12 pr-16 flex items-center gap-4 leading-tight uppercase tracking-tight">
-                        Registrar Nuevo<br>
+                        Nuevo<br>
                         <span class="text-tecsisa-yellow uppercase tracking-widest text-sm font-black underline decoration-2 underline-offset-8">Colaborador</span>
                     </h3>
                     
@@ -145,7 +145,7 @@
                         </div>
 
                         <div class="pt-6 flex flex-col sm:flex-row gap-4">
-                            <button type="submit" class="w-full bg-tecsisa-yellow text-black font-black px-6 py-4 rounded-2xl text-xs uppercase tracking-[0.2em] shadow-xl hover:bg-yellow-400 transition transform active:scale-95 order-1 sm:order-2">Guardar Acceso</button>
+                            <button type="submit" class="w-full bg-tecsisa-yellow text-black font-black px-6 py-4 rounded-2xl text-xs uppercase tracking-[0.2em] shadow-xl hover:bg-yellow-400 transition transform active:scale-95 order-1 sm:order-2">Guardar</button>
                             <button type="button" @click="showCreateModal = false" class="w-full px-6 py-4 border border-white/10 rounded-2xl text-gray-400 font-bold uppercase tracking-widest text-xs hover:bg-white/5 transition order-2 sm:order-1 text-center">Cancelar</button>
                         </div>
                     </form>

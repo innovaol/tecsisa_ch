@@ -375,8 +375,7 @@
                             <button type="submit" 
                                     :disabled="!canCreate"
                                     class="bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-black px-8 py-2.5 rounded-xl transition shadow-xl shadow-yellow-400/20 uppercase text-[10px] tracking-widest disabled:opacity-50 disabled:cursor-not-allowed">
-                                <span class="sm:hidden">Crear</span>
-                                <span class="hidden sm:inline">Crear Tarea</span>
+                                Guardar
                             </button>
 
                             <!-- Tooltip de Requisitos -->

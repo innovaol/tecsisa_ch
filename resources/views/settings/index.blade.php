@@ -117,7 +117,7 @@
                 <div class="flex justify-end pt-6 border-t border-theme">
                     <button type="submit" class="bg-tecsisa-yellow hover:bg-yellow-400 text-black font-black px-10 py-4 rounded-3xl text-xs uppercase tracking-[0.2em] shadow-xl shadow-tecsisa-yellow/20 transition-all active:scale-95 flex items-center gap-3">
                         <span class="w-2 h-2 rounded-full bg-black/20"></span>
-                        Guardar Cambios
+                        Guardar
                     </button>
                 </div>
             </form>
