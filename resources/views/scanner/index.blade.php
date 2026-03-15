@@ -305,14 +305,35 @@
                 },
 
                 toggleFlash() {
-                    if (this.html5QrCode && this.isScanning) {
+                    if (!this.isScanning) return;
+                    
+                    try {
+                        // Attempt 1: Using html5-qrcode's built-in method
                         this.flashOn = !this.flashOn;
                         this.html5QrCode.applyVideoConstraints({
                             advanced: [{ torch: this.flashOn }]
+                        }).then(() => {
+                            console.log("Torch toggled via library");
                         }).catch(err => {
-                            console.warn("Flash not supported or failed:", err);
-                            this.flashOn = false;
+                            // Attempt 2: Direct track access if library method fails
+                            console.warn("Library torch failed, trying direct track access:", err);
+                            const videoElement = document.querySelector('#reader video');
+                            if (videoElement && videoElement.srcObject) {
+                                const track = videoElement.srcObject.getVideoTracks()[0];
+                                if (track) {
+                                    track.applyConstraints({
+                                        advanced: [{ torch: this.flashOn }]
+                                    }).catch(e => {
+                                        console.error("Direct torch failed:", e);
+                                        this.flashOn = false;
+                                        alert("La linterna no es compatible con este navegador/celular.");
+                                    });
+                                }
+                            }
                         });
+                    } catch (err) {
+                        this.flashOn = false;
+                        console.error("General torch error:", err);
                     }
                 }
             }));
