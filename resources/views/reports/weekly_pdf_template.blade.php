@@ -325,8 +325,8 @@ body { font-family: 'DejaVu Sans', Arial, sans-serif; font-size: 8.5pt; color: #
         'pending'     => 'Pendiente',
         'in_progress' => 'Activa',
         'active'      => 'Activa',
-        'in_review'   => 'Aprobación',
-        'approval'    => 'Aprobación',
+        'in_review'   => 'Pendiente',
+        'approval'    => 'Pendiente',
         'completed'   => 'Completada',
         'verified'    => 'Verificada',
     ];

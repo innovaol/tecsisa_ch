@@ -37,7 +37,7 @@
                 <span class="px-2 py-1 rounded text-[10px] font-black uppercase {{ $task->status === 'draft' ? 'bg-gray-800 text-gray-400' : (in_array($task->status, ['pending', 'in_progress']) ? 'bg-tecsisa-yellow/20 text-tecsisa-yellow' : ($task->status === 'in_review' ? 'bg-blue-500/20 text-blue-400' : 'bg-green-500/20 text-green-400')) }}">
                     @if($task->status === 'draft') Borrador
                     @elseif(in_array($task->status, ['pending', 'in_progress'])) Activa
-                    @elseif($task->status === 'in_review') Aprobación
+                    @elseif($task->status === 'in_review') Pendiente
                     @elseif($task->status === 'completed') Finalizada
                     @else {{ $task->status }} @endif
                 </span>

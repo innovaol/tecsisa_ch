@@ -57,7 +57,7 @@
             </div>
             <div class="bg-theme-card border border-theme p-6 rounded-[2rem] transition-all duration-500 shadow-lg relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-16 h-16 bg-blue-500/5 rounded-bl-full translate-x-4 -translate-y-4"></div>
-                <p class="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-2">Aprobación</p>
+                <p class="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-2">Pendiente</p>
                 <p class="text-3xl font-black text-blue-400">{{ $stats['in_review'] }}</p>
             </div>
             <div class="bg-theme-card border border-theme p-6 rounded-[2rem] transition-all duration-500 shadow-lg relative overflow-hidden">
@@ -75,7 +75,7 @@
             <a href="{{ route('tasks.index', ['status' => 'pending']) }}" 
                class="flex-1 px-2 sm:px-6 py-3 rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-wider sm:tracking-widest transition-all whitespace-nowrap text-center" :class="@js(request('status')) == 'pending' ? 'bg-tecsisa-yellow text-black shadow-md' : 'text-gray-500 hover:text-slate-800 dark:hover:text-white'">Activa</a>
             <a href="{{ route('tasks.index', ['status' => 'in_review']) }}" 
-               class="flex-1 px-2 sm:px-6 py-3 rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-wider sm:tracking-widest transition-all whitespace-nowrap text-center" :class="@js(request('status')) == 'in_review' ? 'bg-tecsisa-yellow text-black shadow-md' : 'text-gray-500 hover:text-slate-800 dark:hover:text-white'">Aprobación</a>
+               class="flex-1 px-2 sm:px-6 py-3 rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-wider sm:tracking-widest transition-all whitespace-nowrap text-center" :class="@js(request('status')) == 'in_review' ? 'bg-tecsisa-yellow text-black shadow-md' : 'text-gray-500 hover:text-slate-800 dark:hover:text-white'">Pendiente</a>
             <a href="{{ route('tasks.index', ['status' => 'completed']) }}" 
                class="flex-1 px-2 sm:px-6 py-3 rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-wider sm:tracking-widest transition-all whitespace-nowrap text-center" :class="@js(request('status')) == 'completed' ? 'bg-tecsisa-yellow text-black shadow-md' : 'text-gray-500 hover:text-slate-800 dark:hover:text-white'">Completadas</a>
         </div>
@@ -139,7 +139,7 @@
                                     {{ $task->status == 'draft' ? 'bg-gray-500/10 text-gray-400 border-theme' : '' }}">
                                     @if($task->status === 'draft') Borrador
                                     @elseif($task->status === 'pending') Activa
-                                    @elseif($task->status === 'in_review') Aprobación
+                                    @elseif($task->status === 'in_review') Pendiente
                                     @elseif($task->status === 'completed') Finalizada
                                     @else {{ $task->status }} @endif
                                 </span>
@@ -215,7 +215,7 @@
                         {{ $task->status == 'draft' ? 'bg-gray-500/10 text-gray-400 border-theme' : '' }}">
                         @if($task->status === 'draft') Borrador
                         @elseif($task->status === 'pending') Activa
-                        @elseif($task->status === 'in_review') Aprobación
+                        @elseif($task->status === 'in_review') Pendiente
                         @elseif($task->status === 'completed') Finalizada
                         @else {{ $task->status }} @endif
                     </span>

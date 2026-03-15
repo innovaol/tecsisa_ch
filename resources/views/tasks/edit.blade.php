@@ -786,7 +786,7 @@
                         @elseif($task->status === 'in_review')
                             <div class="w-full bg-blue-500/5 border border-blue-500/10 rounded-2xl p-4 flex items-center justify-center gap-3">
                                 <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
-                                <span class="text-[10px] font-black text-blue-400 uppercase tracking-widest">Reporte en Aprobación por el Administrador</span>
+                                <span class="text-[10px] font-black text-blue-400 uppercase tracking-widest">Reporte Pendiente de Aprobación por el Administrador</span>
                             </div>
                         @else
                             @if($isNewTask)

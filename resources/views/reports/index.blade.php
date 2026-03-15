@@ -95,7 +95,7 @@
                         <select name="status" class="bg-theme/5 border border-theme rounded-xl text-[10px] font-bold h-11 px-3 text-theme focus:bg-theme-card focus:border-tecsisa-yellow focus:ring-0 transition-all appearance-none cursor-pointer">
                             <option value="">Todos los Estados</option>
                             <option value="in_progress" {{ request('status') == 'in_progress' ? 'selected' : '' }}>Activa</option>
-                            <option value="in_review" {{ request('status') == 'in_review' ? 'selected' : '' }}>Aprobación</option>
+                            <option value="in_review" {{ request('status') == 'in_review' ? 'selected' : '' }}>Pendiente</option>
                             <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Finalizado</option>
                             <option value="verified" {{ request('status') == 'verified' ? 'selected' : '' }}>Verificado</option>
                         </select>
@@ -219,7 +219,7 @@
                                     @elseif($task->status === 'in_progress')
                                         <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-black bg-yellow-500/20 text-yellow-400 uppercase tracking-tighter border border-yellow-500/30">Activa</span>
                                     @elseif($task->status === 'in_review')
-                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-black bg-tecsisa-yellow/20 text-tecsisa-yellow uppercase tracking-tighter border border-tecsisa-yellow/30">Aprobación</span>
+                                        <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-black bg-tecsisa-yellow/20 text-tecsisa-yellow uppercase tracking-tighter border border-tecsisa-yellow/30">Pendiente</span>
                                     @else
                                         <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[8px] font-black bg-theme/10 text-theme-muted uppercase tracking-tighter border border-theme">Borrador</span>
                                     @endif
