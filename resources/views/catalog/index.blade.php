@@ -12,7 +12,7 @@
                 </a>
                 <div>
                     <h2 class="text-2xl sm:text-3xl font-black transition-colors duration-500 leading-tight flex items-center gap-2" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">
-                        <span>Catálogos</span>
+                        <span>Inventario</span>
                         <div class="group relative inline-block">
                             <svg class="w-5 h-5 text-theme-muted cursor-help p-0.5 hover:text-tecsisa-yellow transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0114 0z"></path></svg>
                             <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-64 p-4 bg-black/95 text-[11px] text-white rounded-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none z-[100] border border-theme shadow-2xl normal-case font-bold backdrop-blur-md">
@@ -21,7 +21,7 @@
                             </div>
                         </div>
                     </h2>
-                    <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1 sm:mt-2 px-1">Hardware e infraestructura técnica</p>
+                    <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1 sm:mt-2 px-1">Equipos y sistemas</p>
                 </div>
             </div>
         </div>
@@ -69,8 +69,8 @@
                 <div class="bg-theme-card border border-theme rounded-[2.5rem] p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-xl transition-all duration-500 relative overflow-hidden">
                     <div class="absolute -right-10 -top-10 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl"></div>
                     <div>
-                        <h3 class="text-2xl font-black uppercase tracking-wider transition-colors duration-500" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">Inventario Maestro de Activos</h3>
-                        <p class="text-gray-500 text-xs font-bold tracking-widest uppercase mt-1">Hardware, periféricos y puntos de red</p>
+                        <h3 class="text-2xl font-black uppercase tracking-wider transition-colors duration-500" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">Activos</h3>
+                        <p class="text-gray-500 text-[10px] font-bold tracking-widest uppercase mt-1">Activos y hardware técnica</p>
                     </div>
                     <div class="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
                         <div class="relative w-full sm:w-auto flex items-center">
@@ -159,8 +159,8 @@
                 <div class="bg-theme-card border border-theme rounded-[2.5rem] p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-xl transition-all duration-500 relative overflow-hidden">
                     <div class="absolute -right-10 -top-10 w-32 h-32 bg-blue-500/5 rounded-full blur-2xl"></div>
                     <div>
-                        <h3 class="text-2xl font-black uppercase tracking-wider transition-colors duration-500" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">Sistemas Técnicos</h3>
-                        <p class="text-gray-500 text-xs font-bold tracking-widest uppercase mt-1">Configuración por especialidad</p>
+                        <h3 class="text-2xl font-black uppercase tracking-wider transition-colors duration-500" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">Sistemas</h3>
+                        <p class="text-gray-500 text-[10px] font-bold tracking-widest uppercase mt-1">Categorías de activos</p>
                     </div>
                     @if(Auth::user()->hasRole('Administrador'))
                     <button @click="openSystemModal()" class="w-full md:w-auto flex justify-center items-center gap-3 bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl transition-all active:scale-95 group">
@@ -232,8 +232,8 @@
                     <div class="bg-theme-card border border-theme rounded-[2.5rem] p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-xl transition-all duration-500 relative overflow-hidden">
                         <div class="absolute -left-10 -bottom-10 w-32 h-32 bg-purple-500/5 rounded-full blur-2xl"></div>
                         <div>
-                            <h3 class="text-2xl font-black uppercase tracking-wider transition-colors duration-500" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">Infraestructura Física</h3>
-                            <p class="text-gray-500 text-xs font-bold tracking-widest uppercase mt-1">Niveles y cuartos técnicos</p>
+                            <h3 class="text-2xl font-black uppercase tracking-wider transition-colors duration-500" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">Ubicaciones</h3>
+                            <p class="text-gray-500 text-[10px] font-bold tracking-widest uppercase mt-1">Niveles y áreas técnicas</p>
                         </div>
                         @if(Auth::user()->hasRole('Administrador'))
                         <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto relative z-10">

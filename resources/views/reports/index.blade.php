@@ -22,7 +22,7 @@
                             </div>
                         </div>
                     </h2>
-                    <p class="text-[10px] sm:text-xs text-theme-muted font-bold uppercase tracking-widest mt-1 sm:mt-2 px-1">Gestión de información operativa</p>
+                    <p class="text-[10px] sm:text-xs text-theme-muted font-bold uppercase tracking-widest mt-1 sm:mt-2 px-1">Información técnica</p>
                 </div>
             </div>
         </div>

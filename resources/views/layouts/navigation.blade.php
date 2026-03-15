@@ -20,7 +20,7 @@
                         @if(Auth::user()->hasRole('Administrador'))
                         <x-nav-link :href="route('catalog.index')" :active="request()->routeIs('catalog.*')" class="h-full flex items-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
-                            {{ __('Catálogos') }}
+                            {{ __('Inventario') }}
                         </x-nav-link>
 
                         <x-nav-link :href="route('rack.builder')" :active="request()->routeIs('rack.*')" class="h-full flex items-center gap-2">
@@ -162,10 +162,10 @@
                 </a>
 
                 @if(Auth::user()->hasRole('Administrador'))
-                    <!-- Item 2: Catálogos para Admins -->
+                    <!-- Item 2: Inventario para Admins -->
                     <a href="{{ route('catalog.index') }}" class="flex flex-col items-center gap-1 {{ request()->routeIs('catalog.*') ? 'text-tecsisa-yellow' : '' }} transition-colors text-center" style="color: {{ request()->routeIs('catalog.*') ? '#FFD100' : 'var(--theme-nav-inactive)' }}">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
-                        <span class="text-[9px] font-black uppercase tracking-tighter">Catálogos</span>
+                        <span class="text-[9px] font-black uppercase tracking-tighter">Inventario</span>
                     </a>
 
                     <!-- Item Racks para Admins (Mobile) -->
