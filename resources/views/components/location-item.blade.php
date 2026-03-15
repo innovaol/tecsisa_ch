@@ -25,14 +25,14 @@
             </div>
         </div>
 
-        <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button @click="openEditLocationModal(@js($location))" class="text-gray-500 transition p-1" :class="theme === 'light' ? 'hover:text-slate-900' : 'hover:text-white'">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+        <div class="flex gap-2 relative z-10 transition-colors">
+            <button @click="openEditLocationModal(@js($location))" class="text-theme-muted hover:text-tecsisa-yellow transition p-1.5 bg-theme/5 rounded-lg border border-theme/20">
+                <svg class="w-5 h-5 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
             </button>
             <form action="{{ route('catalog.locations.destroy', $location) }}" method="POST" onsubmit="return confirm('¿Eliminar esta ubicación?')">
                 @csrf @method('DELETE')
-                <button class="text-gray-500 hover:text-red-400 transition p-1">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                <button class="text-theme-muted hover:text-red-400 transition p-1.5 bg-theme/5 rounded-lg border border-theme/20">
+                    <svg class="w-5 h-5 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                 </button>
             </form>
         </div>
