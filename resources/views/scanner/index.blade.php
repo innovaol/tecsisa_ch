@@ -1,5 +1,24 @@
 <x-technician-layout>
     <script src="https://unpkg.com/html5-qrcode"></script>
+    <style>
+        #reader video {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            border-radius: 2.5rem !important;
+        }
+        #reader img {
+            display: none !important;
+        }
+        @keyframes scan {
+            0% { transform: translateY(0); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(320px); opacity: 0; }
+        }
+        .animate-scan {
+            animation: scan 2.5s ease-in-out infinite;
+        }
+    </style>
     
     <div class="py-12 px-4 md:py-16 max-w-7xl mx-auto" x-data="discoveryApp(@js($equipments))">
         <!-- Header Section -->
@@ -56,11 +75,64 @@
                     </div>
                 </div>
 
-                <!-- Scanner Overlay logic moved to top or mid for better focus -->
-                <div x-show="isScanning" x-transition class="bg-black rounded-[2rem] overflow-hidden relative border-2 border-tecsisa-yellow/50 shadow-2xl aspect-square mb-6">
-                    <div id="reader" class="w-full h-full"></div>
-                    <!-- Scanner Laser Animation -->
-                    <div class="absolute top-0 inset-x-0 h-1 bg-tecsisa-yellow/50 shadow-[0_0_15px_rgba(255,209,0,0.8)] animate-scan z-10"></div>
+                <!-- Full Screen Scanner Overlay -->
+                <div x-show="isScanning" 
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0 scale-95"
+                     x-transition:enter-end="opacity-100 scale-100"
+                     x-transition:leave="transition ease-in duration-200"
+                     x-transition:leave-start="opacity-100 scale-100"
+                     x-transition:leave-end="opacity-0 scale-95"
+                     class="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center p-4">
+                    
+                    <!-- Scanner Header -->
+                    <div class="absolute top-0 inset-x-0 p-6 flex justify-between items-center z-20">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-tecsisa-yellow rounded-xl flex items-center justify-center text-black shadow-[0_0_20px_rgba(255,209,0,0.5)]">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                            </div>
+                            <div>
+                                <span class="block text-xs font-black text-tecsisa-yellow uppercase tracking-[0.2em]">Visión QR</span>
+                                <span class="block text-[8px] font-bold text-gray-500 uppercase tracking-widest">Escaneando Infraestructura</span>
+                            </div>
+                        </div>
+                        <button @click="toggleCamera()" class="w-12 h-12 flex items-center justify-center bg-white/10 hover:bg-white/20 border border-white/20 rounded-2xl text-white transition-all backdrop-blur-md">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
+
+                    <!-- Main Scanner Area -->
+                    <div class="relative w-full aspect-square max-w-sm rounded-[3rem] overflow-hidden border-2 border-tecsisa-yellow/30 shadow-[0_0_50px_rgba(255,209,0,0.1)]">
+                        <div id="reader" class="w-full h-full bg-slate-900"></div>
+                        
+                        <!-- Scanner Overlay UI -->
+                        <div class="absolute inset-0 pointer-events-none flex items-center justify-center">
+                            <!-- Corner Frames -->
+                            <div class="absolute top-10 left-10 w-12 h-12 border-t-4 border-l-4 border-tecsisa-yellow rounded-tl-lg opacity-80"></div>
+                            <div class="absolute top-10 right-10 w-12 h-12 border-t-4 border-r-4 border-tecsisa-yellow rounded-tr-lg opacity-80"></div>
+                            <div class="absolute bottom-10 left-10 w-12 h-12 border-b-4 border-l-4 border-tecsisa-yellow rounded-bl-lg opacity-80"></div>
+                            <div class="absolute bottom-10 right-10 w-12 h-12 border-b-4 border-r-4 border-tecsisa-yellow rounded-br-lg opacity-80"></div>
+                            
+                            <!-- Scanning Laser -->
+                            <div class="w-full h-1 bg-gradient-to-r from-transparent via-tecsisa-yellow to-transparent shadow-[0_0_20px_rgba(255,209,0,1)] animate-scan opacity-60"></div>
+                        </div>
+                    </div>
+
+                    <!-- Instructions Footer -->
+                    <div class="mt-12 text-center max-w-xs">
+                        <p class="text-[10px] font-black text-white/40 uppercase tracking-[0.3em] leading-relaxed">
+                            Alinee el código dentro del recuadro para su identificación automática
+                        </p>
+                    </div>
+
+                    <!-- Decorative Tech Elements -->
+                    <div class="absolute bottom-8 left-8 hidden sm:block">
+                        <div class="text-[8px] font-mono text-tecsisa-yellow opacity-30 flex flex-col gap-1 uppercase tracking-widest">
+                            <span>Sys.Status: Active</span>
+                            <span>Cam.Index: Env-01</span>
+                            <span>Buffer: Optimized</span>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Filters -->
@@ -169,28 +241,44 @@
                     if (this.isScanning) {
                         this.html5QrCode.stop().then(() => {
                             this.isScanning = false;
+                        }).catch(err => {
+                            this.isScanning = false;
                         });
                     } else {
-                        if (!this.html5QrCode) this.html5QrCode = new Html5Qrcode("reader");
+                        // Ensure reader is visible before initializing
+                        this.isScanning = true;
                         
-                        let config = { fps: 10, qrbox: { width: 250, height: 250 } };
-                        this.html5QrCode.start(
-                            { facingMode: "environment" }, 
-                            config,
-                            (decodedText) => {
-                                if (navigator.vibrate) window.navigator.vibrate(200);
-                                this.html5QrCode.stop().then(() => {
-                                    this.isScanning = false;
-                                    this.search = decodedText;
-                                });
-                            },
-                            (err) => {})
-                        .then(() => {
-                            this.isScanning = true;
-                        })
-                        .catch((err) => {
-                            alert("No se pudo iniciar la cámara.");
-                        });
+                        // Small delay to let Alpine render the div
+                        setTimeout(() => {
+                            if (!this.html5QrCode) this.html5QrCode = new Html5Qrcode("reader");
+                            
+                            const qrConfig = { 
+                                fps: 20, 
+                                qrbox: (viewWidth, viewHeight) => {
+                                    const minEdge = Math.min(viewWidth, viewHeight);
+                                    const size = Math.floor(minEdge * 0.7);
+                                    return { width: size, height: size };
+                                },
+                                aspectRatio: 1.0
+                            };
+
+                            this.html5QrCode.start(
+                                { facingMode: "environment" }, 
+                                qrConfig,
+                                (decodedText) => {
+                                    if (navigator.vibrate) window.navigator.vibrate(200);
+                                    this.html5QrCode.stop().then(() => {
+                                        this.isScanning = false;
+                                        this.search = decodedText;
+                                    });
+                                },
+                                (err) => {}
+                            ).catch((err) => {
+                                console.error(err);
+                                this.isScanning = false;
+                                alert("Error al acceder a la cámara. Verifique los permisos.");
+                            });
+                        }, 100);
                     }
                 }
             }));
