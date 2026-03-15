@@ -776,11 +776,11 @@
                             </div>
 
                             <button type="button" @click="doSubmit('reject')" class="w-full sm:w-auto bg-red-500/10 border border-red-500/20 text-red-500 font-bold py-4 px-8 rounded-2xl text-[10px] uppercase tracking-widest transition hover:bg-red-500/20 hover:scale-[1.02] active:scale-95">
-                                Rechazar Reporte
+                                Rechazar
                             </button>
 
                             <button type="button" @click="doSubmit('approve')" class="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-white font-black py-4 px-10 rounded-2xl text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-emerald-500/20 transition active:scale-95 flex items-center justify-center gap-2">
-                                Aprobar Reporte
+                                Aprobar
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
                             </button>
                         @elseif($task->status === 'in_review')
@@ -800,13 +800,13 @@
 
                                 @if($task->status === 'draft')
                                 <button type="button" @click="if(confirm('¿Deseas eliminar este borrador y su información?')) document.getElementById('cancel-form').submit();" class="w-full sm:w-auto text-[10px] font-black text-gray-500 hover:text-red-400 uppercase tracking-widest px-6 py-4 transition-colors order-last sm:order-first">
-                                    Eliminar O.T.
+                                    Eliminar
                                 </button>
                                 @endif
                             @endif
 
                             <button type="button" @click="doSubmit('save_draft')" class="w-full sm:w-auto bg-gray-100 dark:bg-theme/10 hover:bg-gray-200 dark:hover:bg-theme/20 border border-theme text-gray-800 dark:text-theme font-bold py-4 px-8 rounded-2xl text-[10px] uppercase tracking-[0.2em] transition" :class="{'opacity-50 cursor-not-allowed': isSubmitting}">
-                                <span x-show="!isSubmitting">Guardar Borrador</span>
+                                <span x-show="!isSubmitting">Guardar</span>
                                 <span x-show="isSubmitting">Guardando...</span>
                             </button>
                             
@@ -816,7 +816,7 @@
                                         @click="doSubmit('submit')" 
                                         class="w-full sm:w-auto font-black py-4 px-10 rounded-2xl text-xs uppercase tracking-[0.2em] transition active:scale-90 flex items-center justify-center gap-2" 
                                         :class="canFinalize && !isSubmitting ? 'bg-tecsisa-yellow hover:bg-yellow-400 text-black shadow-[0_15px_40px_rgba(255,209,0,0.3)]' : 'bg-gray-300 dark:bg-gray-800 text-gray-500 cursor-not-allowed opacity-50'">
-                                    <span x-show="!isSubmitting">Finalizar Reporte</span>
+                                    <span x-show="!isSubmitting">Enviar</span>
                                     <span x-show="isSubmitting">Enviando...</span>
                                     <svg x-show="!isSubmitting" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                                 </button>
@@ -853,7 +853,7 @@
                                 </a>
                                 <a href="{{ route('tasks.pdf', $task) }}" target="_blank" class="w-full sm:w-auto bg-tecsisa-yellow hover:bg-yellow-400 text-black px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-tecsisa-yellow/20 flex items-center justify-center gap-2 transition active:scale-95">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
-                                    Descargar PDF
+                                    PDF
                                 </a>
                             </div>
                         </div>

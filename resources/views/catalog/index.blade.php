@@ -71,7 +71,7 @@
                         </div>
                         @if(Auth::user()->hasRole('Administrador'))
                         <button @click="openCreateModal()" class="w-full sm:w-auto flex justify-center items-center bg-tecsisa-yellow hover:bg-yellow-400 text-black px-6 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl transition-all active:scale-95">
-                            <span class="sm:hidden">+ Alta</span>
+                            <span class="sm:hidden">+ Nuevo</span>
                             <span class="hidden sm:inline">+ Alta de Equipo</span>
                         </button>
                         @endif
@@ -156,7 +156,7 @@
                     </div>
                     @if(Auth::user()->hasRole('Administrador'))
                     <button @click="openSystemModal()" class="w-full md:w-auto flex justify-center items-center bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl transition-all active:scale-95">
-                        <span class="sm:hidden">+ Sistema</span>
+                        <span class="sm:hidden">+ Nuevo</span>
                         <span class="hidden sm:inline">+ Nuevo Sistema</span>
                     </button>
                     @endif
@@ -230,11 +230,11 @@
                         @if(Auth::user()->hasRole('Administrador'))
                         <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto relative z-10">
                             <button @click="openCreateLocationModal()" class="w-full sm:w-auto flex justify-center items-center bg-theme-border border border-theme hover:bg-theme-table-row-hover text-gray-400 px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95" :class="theme === 'light' ? 'hover:text-slate-900' : 'hover:text-white'">
-                                <span class="sm:hidden">+ Ubicación</span>
+                                <span class="sm:hidden">+ Nueva</span>
                                 <span class="hidden sm:inline">+ Nueva Ubicación</span>
                             </button>
                             <button @click="openCreateRackModal()" class="w-full sm:w-auto flex justify-center items-center bg-tecsisa-yellow hover:bg-yellow-400 text-black px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-[0_10px_20px_rgba(255,191,0,0.2)] transition-all active:scale-95">
-                                <span class="sm:hidden">+ Rack</span>
+                                <span class="sm:hidden">+ Nuevo</span>
                                 <span class="hidden sm:inline">+ Registrar Rack</span>
                             </button>
                         </div>

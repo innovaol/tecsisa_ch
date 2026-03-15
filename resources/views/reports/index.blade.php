@@ -99,7 +99,7 @@
                     <!-- Botón Filtrar -->
                     <button type="submit" class="h-11 bg-tecsisa-yellow text-black font-black uppercase text-[10px] tracking-[0.15em] px-8 rounded-xl hover:bg-yellow-400 transition transform active:scale-95 shadow-lg flex items-center justify-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                        <span>Filtrar</span>
+                        <span>Buscar</span>
                     </button>
                 </div>
             </form>
@@ -119,7 +119,7 @@
                 </div>
                 
                 <!-- Acciones de Reporte (PDF/Excel) -->
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2">
                     <form action="{{ route('reports.weekly.generate') }}" method="POST" target="_blank">
                         @csrf
                         <input type="hidden" name="system_id" value="{{ request('system_id') }}">
@@ -129,9 +129,9 @@
                         <input type="hidden" name="start_date" value="{{ date('d/m/Y', strtotime($startDate)) }}">
                         <input type="hidden" name="end_date" value="{{ date('d/m/Y', strtotime($endDate)) }}">
                         
-                        <button type="submit" class="h-10 px-6 bg-blue-600 hover:bg-blue-500 text-white font-black rounded-xl text-[9px] uppercase tracking-widest transition flex items-center gap-2 shadow-lg shadow-blue-600/20 active:scale-95">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                            Generar PDF
+                        <button type="submit" class="h-10 px-4 bg-red-600 hover:bg-red-500 text-white font-black rounded-xl text-[9px] uppercase tracking-widest transition flex items-center gap-2 shadow-lg shadow-red-600/20 active:scale-95">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            <span>Exportar</span>
                         </button>
                     </form>
 
@@ -144,9 +144,9 @@
                         <input type="hidden" name="start_date" value="{{ date('d/m/Y', strtotime($startDate)) }}">
                         <input type="hidden" name="end_date" value="{{ date('d/m/Y', strtotime($endDate)) }}">
                         
-                        <button type="submit" class="h-10 px-6 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-xl text-[9px] uppercase tracking-widest transition flex items-center gap-2 shadow-lg shadow-emerald-600/20 active:scale-95">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                            Exportar Excel
+                        <button type="submit" class="h-10 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-xl text-[9px] uppercase tracking-widest transition flex items-center gap-2 shadow-lg shadow-emerald-600/20 active:scale-95">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            <span>Exportar</span>
                         </button>
                     </form>
                 </div>

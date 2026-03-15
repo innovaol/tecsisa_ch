@@ -27,7 +27,7 @@
                 <div class="flex gap-3">
                     <button @click="showCreateModal = true" class="bg-tecsisa-yellow hover:bg-yellow-400 text-black font-black px-6 sm:px-8 py-3.5 rounded-2xl text-[10px] uppercase tracking-widest transition shadow-xl active:scale-95 flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
-                        <span class="sm:hidden">Orden</span>
+                        <span class="sm:hidden">+ Nueva</span>
                         <span class="hidden sm:inline">{{ Auth::user()->hasRole('Administrador') ? 'Asignar Tarea' : 'Nueva Tarea' }}</span>
                     </button>
                 </div>
@@ -375,7 +375,8 @@
                             <button type="submit" 
                                     :disabled="!canCreate"
                                     class="bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-black px-8 py-2.5 rounded-xl transition shadow-xl shadow-yellow-400/20 uppercase text-[10px] tracking-widest disabled:opacity-50 disabled:cursor-not-allowed">
-                                Crear Tarea
+                                <span class="sm:hidden">Crear</span>
+                                <span class="hidden sm:inline">Crear Tarea</span>
                             </button>
 
                             <!-- Tooltip de Requisitos -->
