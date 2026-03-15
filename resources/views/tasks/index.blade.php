@@ -25,8 +25,8 @@
                             <span>Tareas</span>
                             <div class="group relative inline-block">
                                 <svg class="w-5 h-5 text-theme-muted cursor-help p-0.5 hover:text-tecsisa-yellow transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0114 0z"></path></svg>
-                                <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-64 p-4 bg-black/95 text-[11px] text-white rounded-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none z-[100] border border-theme shadow-2xl normal-case font-bold backdrop-blur-md">
-                                    <div class="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-black/95 border-b border-r border-theme rotate-45"></div>
+                                <div class="absolute sm:bottom-full top-full sm:top-auto left-1/2 -translate-x-1/2 sm:mb-3 mt-3 sm:mt-0 w-64 p-4 bg-black/95 text-[11px] text-white rounded-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none z-[100] border border-theme shadow-2xl normal-case font-bold backdrop-blur-md">
+                                    <div class="absolute sm:-bottom-1.5 -top-1.5 sm:top-auto left-1/2 -translate-x-1/2 w-3 h-3 bg-black/95 border-b sm:border-b border-r sm:border-r border-t sm:border-t-0 border-l sm:border-l-0 border-theme rotate-45"></div>
                                     Registro y control de servicios técnicos.
                                 </div>
                             </div>
