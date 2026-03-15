@@ -56,6 +56,13 @@
                     </div>
                 </div>
 
+                <!-- Scanner Overlay logic moved to top or mid for better focus -->
+                <div x-show="isScanning" x-transition class="bg-black rounded-[2rem] overflow-hidden relative border-2 border-tecsisa-yellow/50 shadow-2xl aspect-square mb-6">
+                    <div id="reader" class="w-full h-full"></div>
+                    <!-- Scanner Laser Animation -->
+                    <div class="absolute top-0 inset-x-0 h-1 bg-tecsisa-yellow/50 shadow-[0_0_15px_rgba(255,209,0,0.8)] animate-scan z-10"></div>
+                </div>
+
                 <!-- Filters -->
                 <div class="bg-theme-card border border-theme rounded-[2rem] p-6 shadow-2xl transition-colors duration-500 space-y-4">
                     <div>
@@ -82,13 +89,6 @@
                         Limpiar
                     </button>
                 </div>
-
-                <!-- Camera Scanner Overlay -->
-                <div x-show="isScanning" x-transition class="bg-black rounded-[2rem] overflow-hidden relative border-2 border-tecsisa-yellow/50 shadow-2xl aspect-square">
-                    <div id="reader" class="w-full h-full object-cover"></div>
-                    <div class="absolute inset-0 pointer-events-none border-[40px] border-black/50"></div>
-                </div>
-            </div>
 
             <!-- RESULTS LIST (8/12) -->
             <div class="lg:col-span-8 space-y-4">
