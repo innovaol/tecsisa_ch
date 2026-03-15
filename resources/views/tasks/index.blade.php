@@ -10,30 +10,35 @@
         }
     }">
         <!-- Header: Tarjeta Propia -->
-        <div class="bg-theme-card border border-theme rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-8 mb-8 transition-all duration-500 shadow-xl relative">
+        <div class="bg-theme-card border border-theme rounded-[2.5rem] p-6 sm:p-10 mb-6 sm:mb-10 transition-all duration-500 shadow-xl relative">
             <!-- Decorative Orbs (Clipped) -->
-            <div class="absolute inset-0 overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] pointer-events-none">
+            <div class="absolute inset-0 overflow-hidden rounded-[2.5rem] pointer-events-none">
                 <div class="absolute -right-10 -top-10 w-40 h-40 bg-tecsisa-yellow/5 rounded-full blur-3xl"></div>
             </div>
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div class="relative z-10">
-                    <h2 class="text-2xl sm:text-4xl font-black transition-colors duration-500 flex items-center gap-3" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">
-                        <span>Actividades</span>
-                        <div class="group relative inline-block ml-1">
-                            <svg class="w-5 h-5 text-theme-muted cursor-help p-0.5 hover:text-tecsisa-yellow transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0114 0z"></path></svg>
-                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-64 p-4 bg-black/95 text-[11px] text-white rounded-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none z-[100] border border-theme shadow-2xl normal-case font-bold backdrop-blur-md">
-                                <div class="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-black/95 border-b border-r border-theme rotate-45"></div>
-                                Listado de servicios de mantenimiento preventivo y correctivo programados.
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+                <div class="flex items-center gap-4 sm:gap-6">
+                    <a href="{{ route('dashboard') }}" class="w-11 h-11 flex items-center justify-center bg-theme/5 border border-theme text-theme-muted hover:text-tecsisa-yellow rounded-2xl transition-all shadow-md active:scale-95 group shrink-0">
+                        <svg class="w-6 h-6 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    </a>
+                    <div>
+                        <h2 class="text-2xl sm:text-4xl font-black transition-colors duration-500 flex items-center gap-2" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">
+                            <span>Actividades</span>
+                            <div class="group relative inline-block">
+                                <svg class="w-5 h-5 text-theme-muted cursor-help p-0.5 hover:text-tecsisa-yellow transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0114 0z"></path></svg>
+                                <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-64 p-4 bg-black/95 text-[11px] text-white rounded-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none z-[100] border border-theme shadow-2xl normal-case font-bold backdrop-blur-md">
+                                    <div class="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-black/95 border-b border-r border-theme rotate-45"></div>
+                                    Registro y control de servicios técnicos.
+                                </div>
                             </div>
-                        </div>
-                    </h2>
+                        </h2>
+                        <p class="text-[10px] sm:text-xs text-theme-muted font-bold uppercase tracking-widest mt-1 sm:mt-2 px-1">Control de servicios técnicos</p>
+                    </div>
                 </div>
                 <div class="flex gap-3">
-                    <button @click="showCreateModal = true" class="bg-tecsisa-yellow hover:bg-yellow-400 text-black font-black px-6 sm:px-8 py-3.5 rounded-2xl text-[10px] uppercase tracking-widest transition shadow-xl active:scale-95 flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
-                        <span class="sm:hidden">Nueva</span>
-                        <span class="hidden sm:inline">{{ Auth::user()->hasRole('Administrador') ? 'Asignar Tarea' : 'Nueva Tarea' }}</span>
-                    </button>
+                    <button @click="showCreateModal = true" class="bg-tecsisa-yellow hover:bg-yellow-400 text-black font-black px-6 py-4 rounded-2xl text-[10px] uppercase tracking-widest transition-all duration-300 shadow-[0_15px_40px_rgba(255,209,0,0.3)] flex items-center justify-center gap-3 active:scale-95 whitespace-nowrap group w-full md:w-auto">
+                    <svg class="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
+                    <span>{{ Auth::user()->hasRole('Administrador') ? 'Asignar Tarea' : 'Nueva Tarea' }}</span>
+                </button>
                 </div>
             </div>
         </div>
@@ -370,17 +375,16 @@
 
                     </div>
 
-                    <div class="mt-8 flex justify-end gap-3 pt-6 border-t border-theme">
-                        <button type="button" @click="showCreateModal = false" class="px-6 py-2.5 rounded-xl text-gray-400 transition font-bold uppercase text-[10px] tracking-widest" :class="theme === 'light' ? 'hover:text-slate-900' : 'hover:text-white'">
+                    <div class="mt-8 flex flex-col sm:flex-row gap-3 pt-6 border-t border-theme">
+                        <button type="submit" 
+                                :disabled="!canCreate"
+                                class="w-full bg-tecsisa-yellow text-black font-black px-6 py-4 rounded-2xl text-[10px] uppercase tracking-widest shadow-xl hover:bg-yellow-400 transition transform active:scale-95 order-1 sm:order-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                            Guardar
+                        </button>
+                        <button type="button" @click="showCreateModal = false" class="w-full px-6 py-4 border border-theme rounded-2xl text-theme-muted font-bold uppercase tracking-widest text-[10px] hover:bg-theme/5 transition order-2 sm:order-1 text-center font-black">
                             Cancelar
                         </button>
-
-                        <div class="relative group">
-                            <button type="submit" 
-                                    :disabled="!canCreate"
-                                    class="bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-black px-8 py-2.5 rounded-xl transition shadow-xl shadow-yellow-400/20 uppercase text-[10px] tracking-widest disabled:opacity-50 disabled:cursor-not-allowed">
-                                Guardar
-                            </button>
+                    </div>
 
                             <!-- Tooltip de Requisitos -->
                             <div x-show="!canCreate" 

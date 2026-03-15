@@ -1,22 +1,29 @@
 <x-app-layout>
-    <x-slot name="header">
+    <div class="py-6 md:py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8" x-data="inventoryManager(@js($locationsFlat), @js($systems), @js($racks))">
         <!-- Header: Tarjeta Propia -->
-        <div class="bg-theme-card border border-theme rounded-[2rem] sm:rounded-[2.5rem] p-5 sm:p-8 mb-6 transition-all duration-500 shadow-xl relative">
+        <div class="bg-theme-card border border-theme rounded-[2.5rem] p-6 sm:p-8 mb-6 transition-all duration-500 shadow-xl relative">
             <!-- Decorative Orbs (Clipped) -->
-            <div class="absolute inset-0 overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] pointer-events-none">
+            <div class="absolute inset-0 overflow-hidden rounded-[2.5rem] pointer-events-none">
                 <div class="absolute -right-10 -top-10 w-32 h-32 bg-tecsisa-yellow/5 rounded-full blur-2xl"></div>
             </div>
-            <h2 class="text-xl sm:text-3xl font-black transition-colors duration-500 leading-tight flex items-center gap-2 relative z-10" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">
-                <span>Catálogos</span>
-                <div class="group relative inline-block">
-                    <svg class="w-5 h-5 text-theme-muted cursor-help p-0.5 hover:text-tecsisa-yellow transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0114 0z"></path></svg>
-                    <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-64 p-4 bg-black/95 text-[11px] text-white rounded-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none z-[100] border border-theme shadow-2xl normal-case font-bold backdrop-blur-md">
-                        <div class="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-black/95 border-b border-r border-theme rotate-45"></div>
-                        Gestión técnica de activos, especialidades y niveles de ubicación del hospital.
-                    </div>
+            <div class="flex items-center gap-4 sm:gap-6 relative z-10">
+                <a href="{{ route('dashboard') }}" class="w-11 h-11 flex items-center justify-center bg-theme/5 border border-theme text-theme-muted hover:text-tecsisa-yellow rounded-2xl transition-all shadow-md active:scale-95 group shrink-0">
+                    <svg class="w-6 h-6 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                </a>
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-black transition-colors duration-500 leading-tight flex items-center gap-2" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">
+                        <span>Catálogos</span>
+                        <div class="group relative inline-block">
+                            <svg class="w-5 h-5 text-theme-muted cursor-help p-0.5 hover:text-tecsisa-yellow transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0114 0z"></path></svg>
+                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-64 p-4 bg-black/95 text-[11px] text-white rounded-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none z-[100] border border-theme shadow-2xl normal-case font-bold backdrop-blur-md">
+                                <div class="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-black/95 border-b border-r border-theme rotate-45"></div>
+                                Gestión técnica de activos, especialidades y niveles de ubicación del hospital.
+                            </div>
+                        </div>
+                    </h2>
+                    <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1 sm:mt-2 px-1">Hardware e infraestructura técnica</p>
                 </div>
-            </h2>
-            <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-2 px-1 relative z-10">Hardware e infraestructura técnica</p>
+            </div>
         </div>
 
         <!-- Flatpickr for Premium Date Selection -->
@@ -35,10 +42,7 @@
                 cursor: pointer;
             }
         </style>
-    </x-slot>
 
-    <div class="py-12" x-data="inventoryManager(@js($locationsFlat), @js($systems), @js($racks))">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             
             <!-- Tabs Navigation -->
             <!-- Tabs Navigation: Tarjeta Propia -->
@@ -159,9 +163,9 @@
                         <p class="text-gray-500 text-xs font-bold tracking-widest uppercase mt-1">Configuración por especialidad</p>
                     </div>
                     @if(Auth::user()->hasRole('Administrador'))
-                    <button @click="openSystemModal()" class="w-full md:w-auto flex justify-center items-center gap-2 bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl transition-all active:scale-95">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
-                        Nuevo
+                    <button @click="openSystemModal()" class="w-full md:w-auto flex justify-center items-center gap-3 bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl transition-all active:scale-95 group">
+                        <svg class="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
+                        <span>Nuevo</span>
                     </button>
                     @endif
                 </div>
@@ -483,11 +487,11 @@
                         </div>
 
                         <div class="mt-8 flex justify-end gap-3">
-                            <button type="button" @click="showSystemModal = false" class="px-6 py-2.5 rounded-xl text-theme-muted font-black uppercase text-[10px] tracking-widest hover:text-theme transition">
+                            <button type="button" @click="showSystemModal = false" class="px-6 py-4 border border-theme rounded-2xl text-theme-muted font-bold uppercase tracking-widest text-[10px] hover:bg-theme/5 transition">
                                 Cancelar
                             </button>
 
-                             <button type="submit" class="bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-black px-8 py-2.5 rounded-xl transition shadow-xl shadow-tecsisa-yellow/20 uppercase text-[10px] tracking-widest">
+                             <button type="submit" class="bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-black px-8 py-4 rounded-2xl transition shadow-xl shadow-tecsisa-yellow/20 uppercase text-[10px] tracking-widest active:scale-95">
                                 <span>Guardar</span>
                             </button>
                         </div>

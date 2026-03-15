@@ -8,8 +8,8 @@
         <header class="bg-theme-header backdrop-blur-md border-b border-theme shrink-0 transition-colors duration-500 py-3">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap justify-between items-center gap-2">
                 <div class="flex items-center gap-2 sm:gap-4 flex-1">
-                    <a href="{{ route('catalog.index') }}" class="p-2 text-theme-muted hover:text-tecsisa-yellow transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    <a href="{{ route('catalog.index') }}" class="w-11 h-11 flex items-center justify-center bg-theme/5 border border-theme text-theme-muted hover:text-tecsisa-yellow rounded-2xl transition shadow-md active:scale-90 group shrink-0">
+                        <svg class="w-6 h-6 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                     </a>
                     <h2 class="font-bold text-lg sm:text-2xl text-theme tracking-tight flex items-center gap-2">
                         <span class="hidden sm:inline">Distribución de Racks</span>

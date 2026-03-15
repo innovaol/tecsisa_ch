@@ -2,8 +2,8 @@
     <!-- Header Especial para la Tarea -->
     <div class="fixed top-0 inset-x-0 z-40 bg-theme-header backdrop-blur-xl border-b border-theme pt-safe transition-colors duration-500">
         <div class="px-4 py-3 flex items-center justify-between">
-            <a href="{{ route('tasks.index') }}" class="w-10 h-10 rounded-full bg-theme-card border border-theme flex items-center justify-center text-gray-400 transition shadow-lg" :class="theme === 'light' ? 'hover:text-slate-900' : 'hover:text-white'">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            <a href="{{ route('tasks.index') }}" class="w-11 h-11 flex items-center justify-center bg-theme/5 border border-theme text-theme-muted hover:text-tecsisa-yellow rounded-2xl transition shadow-md active:scale-90 group shrink-0">
+                <svg class="w-6 h-6 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
             </a>
             <h1 class="text-xs font-black uppercase tracking-widest transition-colors duration-500 flex items-center gap-2" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">
                 <span>Detalle: TK-{{ str_pad($task->id, 4, '0', STR_PAD_LEFT) }}</span>
@@ -236,8 +236,8 @@
                     <input type="hidden" name="status" x-bind:value="confirming ? 'completed' : 'in_progress'" id="statusInput">
 
                     
-                    <button type="submit" @click="if(!confirming) { confirming = true; document.getElementById('statusInput').value='completed'; }" class="w-full bg-tecsisa-yellow hover:bg-yellow-400 text-black font-black py-4 rounded-2xl text-sm uppercase tracking-widest shadow-[0_10px_30px_rgba(255,209,0,0.3)] transition transform active:scale-95 flex items-center justify-center gap-3">
-                        <span x-text="confirming ? 'Firmar y Cerrar' : (window.innerWidth < 640 ? 'Completar' : 'Completar Tarea')"></span>
+                    <button type="submit" @click="if(!confirming) { confirming = true; document.getElementById('statusInput').value='completed'; }" class="w-full bg-tecsisa-yellow hover:bg-yellow-400 text-black font-black py-4 rounded-2xl text-[10px] uppercase tracking-widest shadow-[0_10px_30px_rgba(255,209,0,0.3)] transition transform active:scale-95 flex items-center justify-center gap-3">
+                        <span x-text="confirming ? 'Firmar y Cerrar' : 'Guardar y Finalizar'"></span>
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     </button>
 

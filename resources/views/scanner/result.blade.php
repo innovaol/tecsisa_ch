@@ -4,8 +4,8 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="h-16 flex items-center justify-between">
                 <div class="flex items-center gap-4">
-                    <a href="{{ route('technician.scanner') }}" class="w-9 h-9 rounded-xl bg-black/5 border border-theme flex items-center justify-center text-gray-400 hover:text-tecsisa-yellow hover:border-tecsisa-yellow/30 transition shadow-lg group active:scale-90">
-                        <svg class="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+                    <a href="{{ route('technician.scanner') }}" class="w-11 h-11 flex items-center justify-center bg-theme/5 border border-theme text-theme-muted hover:text-tecsisa-yellow rounded-2xl transition shadow-md active:scale-90 group shrink-0">
+                        <svg class="w-6 h-6 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                     </a>
                     <div class="flex flex-col">
                         <span class="text-[8px] font-black text-tecsisa-yellow uppercase tracking-[0.3em] leading-none mb-1">Identificar Activo</span>

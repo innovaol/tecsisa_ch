@@ -1,7 +1,7 @@
 <x-technician-layout>
     <div class="px-5 pt-6 max-w-7xl mx-auto md:py-10 md:px-8 lg:px-12">
         <!-- Header Section: Tarjeta Propia -->
-        <div class="bg-theme-card border border-theme rounded-[2.5rem] p-8 mb-8 transition-all duration-500 shadow-xl relative">
+        <div class="bg-theme-card border border-theme rounded-[2.5rem] p-6 sm:p-10 mb-6 sm:mb-10 transition-all duration-500 shadow-xl relative">
             <!-- Decorative Orbs (Clipped) -->
             <div class="absolute inset-0 overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] pointer-events-none">
                 <div class="absolute -right-10 -top-10 w-32 h-32 bg-tecsisa-yellow/5 rounded-full blur-2xl"></div>
@@ -22,10 +22,9 @@
                 </div>
                 
                 <div class="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
-                    <a href="{{ route('tasks.index') }}?showModal=1" class="flex items-center justify-center gap-2 bg-tecsisa-yellow hover:bg-yellow-400 text-black font-black w-full sm:w-auto px-6 py-4 rounded-2xl text-xs uppercase tracking-widest shadow-xl transition-all active:scale-95 shrink-0">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
-                        <span class="sm:hidden">Nueva</span>
-                        <span class="hidden sm:inline">Nueva Tarea</span>
+                    <a href="{{ route('tasks.index') }}?showModal=1" class="flex items-center justify-center gap-3 bg-tecsisa-yellow hover:bg-yellow-400 text-black font-black w-full sm:w-auto px-6 py-4 rounded-2xl text-[10px] uppercase tracking-widest shadow-xl transition-all active:scale-95 group shrink-0 shadow-[0_15px_40px_rgba(255,209,0,0.3)]">
+                        <svg class="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
+                        <span>Nueva Tarea</span>
                     </a>
                     <div class="bg-black/10 border border-theme px-8 py-4 rounded-[1.5rem] text-center shadow-inner backdrop-blur-md transition-all duration-500 w-full sm:w-auto shrink-0">
                         <span class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">En Proceso</span>

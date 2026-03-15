@@ -12,8 +12,8 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="h-16 flex items-center justify-between">
                 <div class="flex items-center gap-4">
-                    <a href="{{ route('tasks.index') }}" class="w-9 h-9 rounded-xl bg-theme/10 border border-theme flex items-center justify-center text-theme-muted hover:text-tecsisa-yellow transition active:scale-90">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+                    <a href="{{ route('tasks.index') }}" class="w-11 h-11 flex items-center justify-center bg-theme/5 border border-theme text-theme-muted hover:text-tecsisa-yellow rounded-2xl transition shadow-md active:scale-90 group shrink-0">
+                        <svg class="w-6 h-6 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                     </a>
                     <h1 class="text-xs font-black text-theme uppercase tracking-widest flex items-center gap-2">
                         <span class="w-2 h-2 rounded-full bg-tecsisa-yellow animate-pulse"></span> 
@@ -814,10 +814,10 @@
                                 <button type="button" 
                                         :disabled="!canFinalize || isSubmitting"
                                         @click="doSubmit('submit')" 
-                                        class="w-full sm:w-auto font-black py-4 px-10 rounded-2xl text-xs uppercase tracking-[0.2em] transition active:scale-90 flex items-center justify-center gap-2" 
+                                        class="w-full sm:w-auto font-black py-4 px-10 rounded-2xl text-[10px] uppercase tracking-widest transition active:scale-90 flex items-center justify-center gap-2" 
                                         :class="canFinalize && !isSubmitting ? 'bg-tecsisa-yellow hover:bg-yellow-400 text-black shadow-[0_15px_40px_rgba(255,209,0,0.3)]' : 'bg-gray-300 dark:bg-gray-800 text-gray-500 cursor-not-allowed opacity-50'">
-                                    <span x-show="!isSubmitting">Finalizar</span>
-                                    <span x-show="isSubmitting">Finalizando...</span>
+                                    <span x-show="!isSubmitting">Guardar y Finalizar</span>
+                                    <span x-show="isSubmitting">Procesando...</span>
                                     <svg x-show="!isSubmitting" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
                                 </button>
                                 
