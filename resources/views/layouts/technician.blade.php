@@ -95,13 +95,15 @@
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
+        html, body {
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
         @media (max-width: 768px) {
             body {
-                position: fixed;
                 width: 100%;
-                height: 100dvh;
-                overflow: hidden;
-                overscroll-behavior-y: none;
+                overscroll-behavior-y: auto;
             }
         }
 

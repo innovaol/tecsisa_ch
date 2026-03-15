@@ -2,7 +2,7 @@
     <!-- Se personaliza el header incrustado dentro del contexto de Alpine para tener acceso al estado "saving" -->
 
     <!-- Implementación Drag and Drop con HTML5 API usando Alpine -->
-    <div x-data="rackBuilder(@js($unassignedEquipment))" class="py-6 md:py-10 px-4 sm:px-6 lg:px-8 max-w-[95rem] mx-auto space-y-8">
+    <div x-data="rackBuilder(@js($unassignedEquipment))" class="py-6 md:py-10 px-4 sm:px-6 lg:px-8 max-w-[95rem] mx-auto space-y-8 overflow-x-hidden relative">
         <!-- Header: Tarjeta Propia (Section Branding) -->
         <div class="bg-theme-card border border-theme rounded-[2.5rem] p-6 sm:p-10 mb-6 sm:mb-10 transition-all duration-500 shadow-xl relative">
             <!-- Decorative Orbs (Clipped) -->
@@ -146,10 +146,10 @@
                 </div>
 
                 <!-- EL RACK REAL -->
-                <div class="flex-1 overflow-y-auto p-4 md:p-8 bg-theme flex justify-center items-start custom-scrollbar relative transition-colors duration-500">
+                <div class="flex-1 overflow-y-auto overflow-x-auto p-4 md:p-8 bg-theme flex justify-center items-start custom-scrollbar relative transition-colors duration-500">
                     
                     <!-- Marco Metálico del Rack -->
-                    <div class="relative bg-[#111] border-8 border-[#333] shadow-[inset_0_4px_30px_rgba(0,0,0,1)] flex flex-col w-full max-w-xl pb-2" style="box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,1);">
+                    <div class="relative bg-[#111] border-8 border-[#333] shadow-[inset_0_4px_30px_rgba(0,0,0,1)] flex flex-col w-full max-w-[280px] xs:max-w-xs sm:max-w-xl pb-2 shrink-0 md:shrink" style="box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,1);">
                         
                         <!-- Rieles Izquierdo y Derecho simulados -->
                         <div class="absolute top-0 bottom-0 left-0 w-8 bg-gradient-to-r from-gray-700 to-gray-900 border-r border-black flex flex-col pt-1">

@@ -121,13 +121,16 @@
             .no-scrollbar::-webkit-scrollbar { display: none; }
             .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
             
+            html, body {
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+            
             @media (max-width: 768px) {
                 body {
-                    position: fixed;
+                    /* Removed fixed positioning to allow natural scroll while preventing horizontal shift */
                     width: 100%;
-                    height: 100dvh;
-                    overflow: hidden;
-                    overscroll-behavior-y: none;
+                    overscroll-behavior-y: auto;
                 }
             }
         </style>
