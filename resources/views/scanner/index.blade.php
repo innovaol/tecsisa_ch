@@ -96,9 +96,19 @@
                                 <span class="block text-[8px] font-bold text-gray-500 uppercase tracking-widest">Escaneando Infraestructura</span>
                             </div>
                         </div>
-                        <button @click="toggleCamera()" class="w-12 h-12 flex items-center justify-center bg-white/10 hover:bg-white/20 border border-white/20 rounded-2xl text-white transition-all backdrop-blur-md">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
-                        </button>
+                        <div class="flex items-center gap-3">
+                            <!-- Flash Toggle (Mobile Only) -->
+                            <button @click="toggleFlash()" x-show="hasFlash" 
+                                    class="w-12 h-12 flex items-center justify-center bg-white/10 hover:bg-white/20 border border-white/20 rounded-2xl text-white transition-all backdrop-blur-md active:scale-90"
+                                    :class="flashOn ? 'bg-tecsisa-yellow/20 border-tecsisa-yellow/50' : ''">
+                                <svg x-show="!flashOn" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                <svg x-show="flashOn" style="display: none;" class="w-5 h-5 text-tecsisa-yellow" fill="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            </button>
+                            
+                            <button @click="toggleCamera()" class="w-12 h-12 flex items-center justify-center bg-white/10 hover:bg-white/20 border border-white/20 rounded-2xl text-white transition-all backdrop-blur-md">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Main Scanner Area -->
@@ -215,6 +225,8 @@
                 filterLocation: '',
                 filterSystem: '',
                 isScanning: false,
+                flashOn: false,
+                hasFlash: false,
                 html5QrCode: null,
 
                 resetFilters() {
@@ -269,16 +281,37 @@
                                     if (navigator.vibrate) window.navigator.vibrate(200);
                                     this.html5QrCode.stop().then(() => {
                                         this.isScanning = false;
+                                        this.flashOn = false;
                                         this.search = decodedText;
                                     });
                                 },
                                 (err) => {}
-                            ).catch((err) => {
+                            ).then(() => {
+                                // Check for torch capability
+                                try {
+                                    const capabilities = this.html5QrCode.getRunningTrackCapabilities();
+                                    this.hasFlash = !!capabilities.torch;
+                                } catch (e) {
+                                    this.hasFlash = false;
+                                }
+                            }).catch((err) => {
                                 console.error(err);
                                 this.isScanning = false;
                                 alert("Error al acceder a la cámara. Verifique los permisos.");
                             });
                         }, 100);
+                    }
+                },
+
+                toggleFlash() {
+                    if (this.html5QrCode && this.isScanning) {
+                        this.flashOn = !this.flashOn;
+                        this.html5QrCode.applyVideoConstraints({
+                            advanced: [{ torch: this.flashOn }]
+                        }).catch(err => {
+                            console.warn("Flash not supported or failed:", err);
+                            this.flashOn = false;
+                        });
                     }
                 }
             }));
