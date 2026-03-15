@@ -69,15 +69,15 @@
         @endif
 
         <!-- Tabs / Filters: Tarjeta Propia -->
-        <div class="bg-theme-card border border-theme rounded-3xl p-2 mb-8 transition-all duration-500 shadow-lg flex items-center gap-2 overflow-x-auto no-scrollbar">
+        <div class="bg-theme-card border border-theme rounded-3xl p-2 mb-8 transition-all duration-500 shadow-lg flex items-center gap-1 sm:gap-2 no-scrollbar">
             <a href="{{ route('tasks.index') }}" 
-               class="px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap" :class="!@js(request('status')) ? 'bg-tecsisa-yellow text-black' : 'text-gray-500 hover:text-slate-800 dark:hover:text-white'">Todos</a>
+               class="flex-1 px-2 sm:px-6 py-3 rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-wider sm:tracking-widest transition-all whitespace-nowrap text-center" :class="!@js(request('status')) ? 'bg-tecsisa-yellow text-black shadow-md' : 'text-gray-500 hover:text-slate-800 dark:hover:text-white'">Todos</a>
             <a href="{{ route('tasks.index', ['status' => 'pending']) }}" 
-               class="px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap" :class="@js(request('status')) == 'pending' ? 'bg-tecsisa-yellow text-black' : 'text-gray-500 hover:text-slate-800 dark:hover:text-white'">Activa</a>
+               class="flex-1 px-2 sm:px-6 py-3 rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-wider sm:tracking-widest transition-all whitespace-nowrap text-center" :class="@js(request('status')) == 'pending' ? 'bg-tecsisa-yellow text-black shadow-md' : 'text-gray-500 hover:text-slate-800 dark:hover:text-white'">Activa</a>
             <a href="{{ route('tasks.index', ['status' => 'in_review']) }}" 
-               class="px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap" :class="@js(request('status')) == 'in_review' ? 'bg-tecsisa-yellow text-black' : 'text-gray-500 hover:text-slate-800 dark:hover:text-white'">Aprobación</a>
+               class="flex-1 px-2 sm:px-6 py-3 rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-wider sm:tracking-widest transition-all whitespace-nowrap text-center" :class="@js(request('status')) == 'in_review' ? 'bg-tecsisa-yellow text-black shadow-md' : 'text-gray-500 hover:text-slate-800 dark:hover:text-white'">Aprobación</a>
             <a href="{{ route('tasks.index', ['status' => 'completed']) }}" 
-               class="px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap" :class="@js(request('status')) == 'completed' ? 'bg-tecsisa-yellow text-black' : 'text-gray-500 hover:text-slate-800 dark:hover:text-white'">Completadas</a>
+               class="flex-1 px-2 sm:px-6 py-3 rounded-2xl text-[9px] sm:text-[10px] font-black uppercase tracking-wider sm:tracking-widest transition-all whitespace-nowrap text-center" :class="@js(request('status')) == 'completed' ? 'bg-tecsisa-yellow text-black shadow-md' : 'text-gray-500 hover:text-slate-800 dark:hover:text-white'">Completadas</a>
         </div>
 
         <!-- Tasks Table (Desktop): Tarjeta Propia -->

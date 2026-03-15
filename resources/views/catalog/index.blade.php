@@ -45,21 +45,20 @@
 
             
             <!-- Tabs Navigation -->
-            <!-- Tabs Navigation: Tarjeta Propia -->
-            <div class="bg-theme-card border border-theme rounded-3xl p-2 mb-8 transition-all duration-500 shadow-lg flex overflow-x-auto no-scrollbar gap-2">
+            <div class="bg-theme-card border border-theme rounded-3xl p-2 mb-8 transition-all duration-500 shadow-lg flex gap-1 sm:gap-2">
                 <button @click="activeTab = 'equipment'" 
                         :class="activeTab === 'equipment' ? 'bg-tecsisa-yellow text-black' : 'text-gray-500 hover:text-slate-800 dark:hover:text-white'"
-                        class="px-6 py-3 font-black transition-all rounded-2xl uppercase text-[10px] tracking-widest whitespace-nowrap">
+                        class="flex-1 px-3 sm:px-6 py-3 font-black transition-all rounded-2xl uppercase text-[9px] sm:text-[10px] tracking-wider sm:tracking-widest whitespace-nowrap text-center">
                     Inventario
                 </button>
                 <button @click="activeTab = 'systems'" 
                         :class="activeTab === 'systems' ? 'bg-tecsisa-yellow text-black' : 'text-gray-500 hover:text-slate-800 dark:hover:text-white'"
-                        class="px-6 py-3 font-black transition-all rounded-2xl uppercase text-[10px] tracking-widest whitespace-nowrap">
+                        class="flex-1 px-3 sm:px-6 py-3 font-black transition-all rounded-2xl uppercase text-[9px] sm:text-[10px] tracking-wider sm:tracking-widest whitespace-nowrap text-center">
                     Sistemas
                 </button>
                 <button @click="activeTab = 'locations'" 
                         :class="activeTab === 'locations' ? 'bg-tecsisa-yellow text-black' : 'text-gray-500 hover:text-slate-800 dark:hover:text-white'"
-                        class="px-6 py-3 font-black transition-all rounded-2xl uppercase text-[10px] tracking-widest whitespace-nowrap">
+                        class="flex-1 px-3 sm:px-6 py-3 font-black transition-all rounded-2xl uppercase text-[9px] sm:text-[10px] tracking-wider sm:tracking-widest whitespace-nowrap text-center">
                     Ubicaciones
                 </button>
             </div>
