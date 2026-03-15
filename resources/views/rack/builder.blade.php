@@ -47,7 +47,7 @@
                 <!-- Equipos Sin Asignar (Catálogo Arrastrable) -->
                 <div class="bg-theme-card backdrop-blur-md rounded-2xl shadow-xl border border-theme flex-1 flex flex-col overflow-hidden transition-colors duration-500">
                     <div class="p-4 border-b border-theme bg-theme/5 flex justify-between items-center">
-                        <h3 class="text-xs font-black text-theme uppercase tracking-widest">Activos en BDR (Sin Enrackar)</h3>
+                        <h3 class="text-xs font-black text-theme uppercase tracking-widest">Equipos Libres</h3>
                         <span class="text-[10px] font-black text-tecsisa-yellow uppercase tracking-widest"><span x-text="filteredCount"></span> Items</span>
                     </div>
                     
