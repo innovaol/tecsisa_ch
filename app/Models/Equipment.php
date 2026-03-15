@@ -41,4 +41,14 @@ class Equipment extends Model
     {
         return $this->belongsTo(Location::class);
     }
+
+    public function rackUnits()
+    {
+        return $this->hasMany(RackUnit::class);
+    }
+
+    public function rack()
+    {
+        return $this->hasOneThrough(Rack::class, RackUnit::class, 'equipment_id', 'id', 'id', 'rack_id');
+    }
 }

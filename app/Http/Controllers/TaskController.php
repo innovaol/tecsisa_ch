@@ -92,6 +92,7 @@ class TaskController extends Controller
 
         $task = Task::create([
             'equipment_id' => $validated['equipment_id'],
+            'system_id' => $equipment->system_id,
             'location_snapshot' => $locationPath,
             'title' => $validated['title'],
             'description' => $validated['description'],
@@ -103,6 +104,14 @@ class TaskController extends Controller
         ]);
 
         return redirect()->route('tasks.edit', $task)->with('success', 'Reporte de ' . $task->title . ' iniciado correctamente.');
+    }
+
+    /**
+     * Display the specified task (Redirects to edit which handles viewing).
+     */
+    public function show(Task $task)
+    {
+        return $this->edit($task);
     }
 
     /**
@@ -118,10 +127,19 @@ class TaskController extends Controller
         $task->load('equipment.system', 'equipment.location');
         $users = Auth::user()->hasRole('Administrador') ? \App\Models\User::all(['id', 'name']) : [];
 
-        // This is where the magic happens: Getting the JSON schema from the System
-        $formSchema = $task->equipment->system->form_schema ?? [];
+        // Obtener el esquema del sistema — soporte para formato viejo (array plano) y nuevo ({specs, checklist})
+        $rawSchema = $task->equipment->system->form_schema ?? [];
+        if (isset($rawSchema['specs'])) {
+            // Nuevo formato estructurado
+            $formSchema = $rawSchema['specs'] ?? [];
+            $checklist  = $rawSchema['checklist'] ?? [];
+        } else {
+            // Formato viejo: array plano de campos de specs
+            $formSchema = is_array($rawSchema) ? $rawSchema : [];
+            $checklist  = [];
+        }
 
-        return view('tasks.edit', compact('task', 'formSchema', 'users'));
+        return view('tasks.edit', compact('task', 'formSchema', 'checklist', 'users'));
     }
 
     /**
@@ -140,6 +158,11 @@ class TaskController extends Controller
             'assigned_to' => 'nullable|exists:users,id',
             'review_comment' => 'nullable|string',
             'photos.*' => 'nullable|image|max:5120', // Max 5MB per photo
+            'is_additional' => 'nullable|boolean',
+            'has_new_cable' => 'nullable|boolean',
+            'has_new_jack' => 'nullable|boolean',
+            'has_new_faceplate' => 'nullable|boolean',
+            'is_certified' => 'nullable|boolean',
         ]);
 
         $isAdmin = Auth::user()->hasRole('Administrador');
@@ -167,6 +190,35 @@ class TaskController extends Controller
             }
         }
         $mergedData['photos'] = $photoPaths;
+        
+        // HANDLE ANNEX FILES
+        $filePaths = $mergedData['files'] ?? ['plans' => [], 'certs' => []];
+        
+        // Ensure structure is correct
+        if (!isset($filePaths['plans'])) $filePaths['plans'] = [];
+        if (!isset($filePaths['certs'])) $filePaths['certs'] = [];
+
+        // REMOVE FILES MARKED BY USER
+        $plansToRemove = $request->input('plans_to_remove', []);
+        $certsToRemove = $request->input('certs_to_remove', []);
+        
+        $filePaths['plans'] = array_values(array_diff($filePaths['plans'], $plansToRemove));
+        $filePaths['certs'] = array_values(array_diff($filePaths['certs'], $certsToRemove));
+
+        if ($request->hasFile('annex_file_plans')) {
+            $files = is_array($request->file('annex_file_plans')) ? $request->file('annex_file_plans') : [$request->file('annex_file_plans')];
+            foreach ($files as $file) {
+                $filePaths['plans'][] = $file->store('tasks/' . $task->id . '/annexes/plans', 'public');
+            }
+        }
+        
+        if ($request->hasFile('annex_file_cert')) {
+            $files = is_array($request->file('annex_file_cert')) ? $request->file('annex_file_cert') : [$request->file('annex_file_cert')];
+            foreach ($files as $file) {
+                $filePaths['certs'][] = $file->store('tasks/' . $task->id . '/annexes/certs', 'public');
+            }
+        }
+        $mergedData['files'] = $filePaths;
 
         // HANDLE FINDINGS GALLERY (HALLAZGOS)
         $findings = [];
@@ -201,6 +253,15 @@ class TaskController extends Controller
         // Update task model
         $task->description = $validated['description'] ?? $task->description;
         $task->form_data = $mergedData;
+        $task->is_additional = $request->input('is_additional', 0);
+        $task->has_new_cable = $request->boolean('has_new_cable');
+        $task->has_new_jack = $request->boolean('has_new_jack');
+        $task->has_new_faceplate = $request->boolean('has_new_faceplate');
+        $task->is_certified = $request->boolean('is_certified');
+
+        if (!$task->system_id && $task->equipment) {
+            $task->system_id = $task->equipment->system_id;
+        }
 
         // Auto-set started_at
         if (!$task->started_at && $validated['action'] !== 'reassign') {
@@ -211,6 +272,14 @@ class TaskController extends Controller
         if ($validated['action'] === 'submit') {
             // If tech submits, goes to review. If admin submits, it's completed immediately.
             $task->status = $isAdmin ? 'completed' : 'in_review';
+            
+            // Clear previous rejection comment if technician is re-submitting
+            if (!$isAdmin) {
+                $data = $task->form_data;
+                unset($data['review_comment']);
+                $task->form_data = $data;
+            }
+
             if ($isAdmin) $task->completed_at = now();
             $message = $isAdmin ? 'Tarea finalizada directamente.' : 'Reporte enviado a revisión.';
         } 
@@ -220,7 +289,10 @@ class TaskController extends Controller
             $message = 'Tarea aprobada y finalizada.';
         }
         elseif ($validated['action'] === 'reject' && $isAdmin) {
-            $task->status = 'pending'; // Or 'draft'? Technician needs to edit it again.
+            if (!$request->filled('review_comment')) {
+                return back()->withErrors(['review_comment' => 'El motivo del rechazo es obligatorio.'])->withInput();
+            }
+            $task->status = 'pending'; 
             $message = 'Tarea rechazada. Se ha notificado al técnico para correcciones.';
         }
         elseif ($validated['action'] === 'save_draft') {
@@ -289,9 +361,14 @@ class TaskController extends Controller
         $task->load('equipment.system', 'equipment.location', 'assignee');
 
         $formData = $task->form_data;
+        
+        // Get company settings for the PDF header
+        $company_name = \App\Models\Setting::getValue('company_name', 'Tecsisa');
+        $company_logo = \App\Models\Setting::getValue('company_logo');
+        $company_footer = \App\Models\Setting::getValue('company_footer', 'Sistema de Gestión de Infraestructura Hospitalaria');
 
         // DomPDF options for image resolution and remote paths if needed
-        $pdf = Pdf::loadView('tasks.pdf_template', compact('task', 'formData'))
+        $pdf = Pdf::loadView('tasks.pdf_template', compact('task', 'formData', 'company_name', 'company_logo', 'company_footer'))
             ->setPaper('a4', 'portrait');
 
         $filename = 'Reporte-' . $task->equipment->internal_id . '-' . date('Ymd_His') . '.pdf';

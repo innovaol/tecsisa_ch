@@ -25,8 +25,12 @@
                     {{ $task->equipment->system->name ?? 'Activo General' }}
                 </span>
                 
-                <span class="px-2 py-1 rounded text-[10px] font-black uppercase {{ $task->status === 'draft' ? 'bg-gray-800 text-gray-400' : ($task->status === 'in_progress' ? 'bg-tecsisa-yellow/20 text-tecsisa-yellow' : 'bg-green-500/20 text-green-400') }}">
-                    {{ str_replace('_', ' ', $task->status) }}
+                <span class="px-2 py-1 rounded text-[10px] font-black uppercase {{ $task->status === 'draft' ? 'bg-gray-800 text-gray-400' : (in_array($task->status, ['pending', 'in_progress']) ? 'bg-tecsisa-yellow/20 text-tecsisa-yellow' : ($task->status === 'in_review' ? 'bg-blue-500/20 text-blue-400' : 'bg-green-500/20 text-green-400')) }}">
+                    @if($task->status === 'draft') Borrador
+                    @elseif(in_array($task->status, ['pending', 'in_progress'])) Activa
+                    @elseif($task->status === 'in_review') Aprobación
+                    @elseif($task->status === 'completed') Finalizada
+                    @else {{ $task->status }} @endif
                 </span>
             </div>
 
@@ -60,6 +64,59 @@
             
             <!-- Checklists o Data entry Dinámico -->
             @if($task->status !== 'completed')
+
+                {{-- ✅ EVALUACIÓN TÉCNICA (CHECKLIST) — solo si el sistema tiene ítems definidos --}}
+                @if(count($checklist) > 0)
+                <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                    <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                    Evaluación Técnica de Actividades
+                </h3>
+                <div class="bg-theme-card rounded-2xl border border-theme mb-8 overflow-hidden shadow-lg transition-colors duration-500"
+                     x-data="{
+                        evaluations: {!! json_encode(collect($task->form_data['evaluation'] ?? [])->mapWithKeys(fn($e,$i) => [$i => $e['status'] ?? ''])) !!}
+                     }">
+                    @foreach($checklist as $idx => $item)
+                    <div class="flex flex-col gap-2 px-5 py-4 {{ $idx > 0 ? 'border-t border-theme' : '' }}">
+                        {{-- Texto de la actividad --}}
+                        <p class="text-[10px] font-bold text-theme-muted uppercase leading-tight">{{ $idx + 1 }}. {{ $item }}</p>
+
+                        <input type="hidden" name="form_data[evaluation][{{ $idx }}][item]" value="{{ $item }}">
+
+                        {{-- Botones SI / NO --}}
+                        <div class="flex items-center gap-3">
+                            <label class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border cursor-pointer transition-all active:scale-95"
+                                   :class="evaluations[{{ $idx }}] === 'SI'
+                                       ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400'
+                                       : 'bg-theme/5 border-theme text-gray-500'">
+                                <input type="radio" name="form_data[evaluation][{{ $idx }}][status]" value="SI"
+                                       x-model="evaluations[{{ $idx }}]" class="hidden">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                <span class="text-[10px] font-black uppercase tracking-widest">SI</span>
+                            </label>
+                            <label class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border cursor-pointer transition-all active:scale-95"
+                                   :class="evaluations[{{ $idx }}] === 'NO'
+                                       ? 'bg-red-500/20 border-red-500/40 text-red-400'
+                                       : 'bg-theme/5 border-theme text-gray-500'">
+                                <input type="radio" name="form_data[evaluation][{{ $idx }}][status]" value="NO"
+                                       x-model="evaluations[{{ $idx }}]" class="hidden">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                <span class="text-[10px] font-black uppercase tracking-widest">NO</span>
+                            </label>
+                        </div>
+
+                        {{-- Campo de comentario (solo visible si marcó algo) --}}
+                        <div x-show="evaluations[{{ $idx }}] !== undefined && evaluations[{{ $idx }}] !== ''" x-transition>
+                            <input type="text"
+                                   name="form_data[evaluation][{{ $idx }}][comment]"
+                                   value="{{ $task->form_data['evaluation'][$idx]['comment'] ?? '' }}"
+                                   placeholder="Comentario opcional..."
+                                   class="w-full border-b border-theme bg-transparent text-xs text-theme-muted placeholder-gray-600 focus:text-theme focus:border-tecsisa-yellow outline-none py-1.5 transition">
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+                @endif
+
                 <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Reporte Técnico (Formulario)</h3>
                 <div class="bg-theme-card rounded-2xl p-5 border border-theme mb-8 space-y-4 transition-colors duration-500">
                     
@@ -84,6 +141,82 @@
                  <div class="bg-green-500/10 border border-green-500/20 text-green-400 font-bold p-4 rounded-xl text-sm flex items-center justify-center gap-2 mb-8 uppercase tracking-widest text-center">
                     <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                     Tarea Finalizada
+                </div>
+
+                <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Resumen de Resultados</h3>
+                <div class="bg-theme-card rounded-2xl p-5 border border-theme mb-8 space-y-6 transition-colors duration-500">
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-3 bg-black/20 rounded-xl border border-white/5">
+                            <span class="block text-[10px] text-gray-500 font-bold uppercase mb-1">Estado Final</span>
+                            <span class="text-sm font-bold text-white uppercase">{{ str_replace('_', ' ', $task->form_data['equipment_condition'] ?? 'N/A') }}</span>
+                        </div>
+                        <div class="p-3 bg-black/20 rounded-xl border border-white/5">
+                            <span class="block text-[10px] text-gray-500 font-bold uppercase mb-1">Fecha Cierre</span>
+                            <span class="text-sm font-bold text-white">{{ $task->completed_at ? $task->completed_at->format('d/m/Y H:i') : 'N/A' }}</span>
+                        </div>
+                    </div>
+
+                    @if(!empty($task->form_data['technician_notes']))
+                    <div>
+                        <span class="block text-[10px] text-gray-500 font-bold uppercase mb-2">Notas del Técnico</span>
+                        <div class="text-sm text-gray-300 bg-black/20 p-4 rounded-xl border border-white/5 leading-relaxed">
+                            {{ $task->form_data['technician_notes'] }}
+                        </div>
+                    </div>
+                    @endif
+
+                    @if(!empty($task->form_data['materials']))
+                    <div>
+                        <span class="block text-[10px] text-gray-500 font-bold uppercase mb-2">Materiales Utilizados</span>
+                        <div class="space-y-2">
+                            @foreach($task->form_data['materials'] as $material)
+                                <div class="flex justify-between items-center bg-black/20 p-2.5 rounded-lg border border-white/5">
+                                    <span class="text-xs text-gray-300 font-bold">{{ $material['name'] }}</span>
+                                    <span class="bg-tecsisa-yellow/20 text-tecsisa-yellow px-2 py-0.5 rounded text-[10px] font-black">{{ $material['qty'] }}</span>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
+
+                    @if(!empty($task->form_data['photos']))
+                    <div>
+                        <span class="block text-[10px] text-gray-500 font-bold uppercase mb-3">Evidencia Fotográfica</span>
+                        <div class="grid grid-cols-2 gap-3">
+                            @if(isset($task->form_data['photos']['before']))
+                                <div class="relative group">
+                                    <img src="{{ asset('storage/' . $task->form_data['photos']['before']) }}" class="w-full h-32 object-cover rounded-xl border border-white/10">
+                                    <span class="absolute bottom-2 left-2 bg-black/60 backdrop-blur px-2 py-0.5 rounded text-[9px] font-bold text-white uppercase">Antes</span>
+                                </div>
+                            @endif
+                            @if(isset($task->form_data['photos']['after']))
+                                <div class="relative group">
+                                    <img src="{{ asset('storage/' . $task->form_data['photos']['after']) }}" class="w-full h-32 object-cover rounded-xl border border-white/10">
+                                    <span class="absolute bottom-2 left-2 bg-black/60 backdrop-blur px-2 py-0.5 rounded text-[9px] font-bold text-white uppercase">Después</span>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                    @endif
+
+                    @if(!empty($task->form_data['findings']))
+                    <div>
+                        <span class="block text-[10px] text-gray-500 font-bold uppercase mb-3">Hallazgos Registrados</span>
+                        <div class="space-y-4">
+                            @foreach($task->form_data['findings'] as $finding)
+                                <div class="bg-black/20 rounded-xl overflow-hidden border border-white/5">
+                                    @if(isset($finding['photo']))
+                                        <img src="{{ asset('storage/' . $finding['photo']) }}" class="w-full h-40 object-cover">
+                                    @endif
+                                    <div class="p-3">
+                                        <p class="text-xs text-gray-400 italic">{{ $finding['caption'] ?? 'Sin descripción' }}</p>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
                 </div>
             @endif
 

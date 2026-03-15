@@ -70,6 +70,50 @@
                     </div>
                 </div>
 
+                <!-- Separador -->
+                <div class="border-t border-theme pt-8">
+                    <h4 class="text-[10px] font-black text-tecsisa-yellow uppercase tracking-widest mb-6 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                        Ingeniero Responsable (Reporte PDF)
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-3">
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest px-1">Nombre Completo</label>
+                            <input type="text" name="engineer_name" value="{{ old('engineer_name', $settings['engineer_name']) }}"
+                                   class="w-full bg-theme/5 border border-theme rounded-2xl text-theme focus:ring-2 focus:ring-tecsisa-yellow transition h-12 px-5 font-bold shadow-inner"
+                                   placeholder="Ej: Luis Gálvez">
+                        </div>
+                        <div class="space-y-3">
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest px-1">Cargo</label>
+                            <input type="text" name="engineer_cargo" value="{{ old('engineer_cargo', $settings['engineer_cargo']) }}"
+                                   class="w-full bg-theme/5 border border-theme rounded-2xl text-theme focus:ring-2 focus:ring-tecsisa-yellow transition h-12 px-5 font-bold shadow-inner"
+                                   placeholder="Ej: Ing. Supervisor de Obra">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Datos del Proyecto -->
+                <div class="border-t border-theme pt-8">
+                    <h4 class="text-[10px] font-black text-tecsisa-yellow uppercase tracking-widest mb-6 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        Datos del Proyecto (encabezado de fotos en PDF)
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-3">
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest px-1">Nombre del Proyecto</label>
+                            <input type="text" name="project_name" value="{{ old('project_name', $settings['project_name']) }}"
+                                   class="w-full bg-theme/5 border border-theme rounded-2xl text-theme focus:ring-2 focus:ring-tecsisa-yellow transition h-12 px-5 font-bold shadow-inner"
+                                   placeholder="Ej: Hospital Anita Moreno — Sistemas Especiales">
+                        </div>
+                        <div class="space-y-3">
+                            <label class="block text-[10px] font-black text-gray-500 uppercase tracking-widest px-1">N° de Contrato</label>
+                            <input type="text" name="contract_number" value="{{ old('contract_number', $settings['contract_number']) }}"
+                                   class="w-full bg-theme/5 border border-theme rounded-2xl text-theme focus:ring-2 focus:ring-tecsisa-yellow transition h-12 px-5 font-bold shadow-inner"
+                                   placeholder="Ej: N° 183 (2010)">
+                        </div>
+                    </div>
+                </div>
+
                 <div class="flex justify-end pt-6 border-t border-theme">
                     <button type="submit" class="bg-tecsisa-yellow hover:bg-yellow-400 text-black font-black px-10 py-4 rounded-3xl text-xs uppercase tracking-[0.2em] shadow-xl shadow-tecsisa-yellow/20 transition-all active:scale-95 flex items-center gap-3">
                         <span class="w-2 h-2 rounded-full bg-black/20"></span>

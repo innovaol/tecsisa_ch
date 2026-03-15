@@ -53,25 +53,28 @@
     <div class="section-name">Informacion del Area</div>
     <table>
         <tr>
-            <td colspan="4" class="label" style="text-align: center; background-color: #D9D9D9;">TIPO DE MANTENIMIENTO: 
-                <span class="check-box" style="margin-left: 20pt">{{ $task->task_type == 'maintenance' ? 'X' : '' }}</span> PREVENTIVO
-                <span class="check-box" style="margin-left: 20pt">{{ $task->task_type != 'maintenance' ? 'X' : '' }}</span> CORRECTIVO
+            <td colspan="4" class="label" style="text-align: center; background-color: #DDEBF7;">
+                <div style="text-align: center;">
+                    TIPO DE MANTENIMIENTO: 
+                    <span class="check-box">{{ $task->task_type == 'maintenance' ? 'X' : '' }}</span> PREV.
+                    <span class="check-box">{{ $task->task_type != 'maintenance' ? 'X' : '' }}</span> CORR.
+                </div>
             </td>
         </tr>
         <tr>
-            <td class="label">Edificio o Bloque</td><td class="value">{{ $task->form_data['building'] ?? 'N/A' }}</td>
+            <td class="label">Edificio o Bloque</td><td class="value">{{ $task->form_data['building'] ?? ($task->equipment->location->parent->name ?? ($task->equipment->location->name ?? 'N/A')) }}</td>
             <td class="label">Fecha</td><td class="value">{{ $task->completed_at ? $task->completed_at->format('d/m/Y') : now()->format('d/m/Y') }}</td>
         </tr>
         <tr>
-            <td class="label">Nivel o Piso</td><td class="value">{{ $task->form_data['floor'] ?? 'N/A' }}</td>
-            <td class="label">Hora</td><td class="value">{{ $task->form_data['start_time'] ?? '--:--' }} - {{ $task->form_data['end_time'] ?? '--:--' }}</td>
+            <td class="label">Nivel o Piso</td><td class="value">{{ $task->form_data['floor'] ?? ($task->equipment->location->name ?? 'N/A') }}</td>
+            <td class="label">Hora</td><td class="value">{{ $task->form_data['start_time'] ?? ($task->started_at ? $task->started_at->format('H:i') : '--:--') }} - {{ $task->form_data['end_time'] ?? ($task->completed_at ? $task->completed_at->format('H:i') : '--:--') }}</td>
         </tr>
         <tr>
-            <td class="label">Área</td><td class="value">{{ $task->form_data['specific_area'] ?? 'N/A' }}</td>
-            <td class="label">Estatus Inicial</td><td class="value">Operativo</td>
+            <td class="label">Activo / ID</td><td class="value">{{ $task->equipment->name }} ({{ $task->equipment->internal_id }})</td>
+            <td class="label">Estatus Final</td><td class="value">{{ strtoupper(str_replace('_', ' ', $task->form_data['equipment_condition'] ?? 'OPERATIVO')) }}</td>
         </tr>
         <tr>
-            <td class="label">Sección</td><td class="value">{{ $task->form_data['section'] ?? 'N/A' }}</td>
+            <td class="label">Sección / Sistema</td><td class="value">{{ $task->equipment->system->name ?? 'N/A' }}</td>
             <td class="label">Técnico Responsable</td><td class="value">{{ $task->assignee->name ?? 'N/A' }}</td>
         </tr>
     </table>
@@ -82,11 +85,33 @@
         {{ $task->form_data['required_installations'] ?? 'No se requiere personal o material adicional.' }}
     </div>
 
-    <!-- COMENTARIOS DEL INSPECTOR -->
-    <div class="section-name">Comentarios del Inspector</div>
-    <div class="border-all" style="min-height: 30pt; padding: 5pt; margin-bottom: 5pt;">
-        {{ $task->description ?? 'Sin observaciones.' }}
+    <!-- COMENTARIOS DEL TECNICO -->
+    <div class="section-name">Descripción de Actividades / Hallazgos</div>
+    <div class="border-all" style="min-height: 40pt; padding: 5pt; margin-bottom: 5pt;">
+        <strong>Situación detectada:</strong> {{ $task->description ?? 'Sin observaciones iniciales.' }}<br><br>
+        <strong>Acciones realizadas:</strong> {{ $task->form_data['technician_notes'] ?? 'Se procedió con la revisión según protocolo.' }}
     </div>
+
+    @if(!empty($task->form_data['materials']))
+    <!-- MATERIALES UTILIZADOS -->
+    <div class="section-name">Materiales y Repuestos Utilizados</div>
+    <table>
+        <thead style="background-color: #F2F2F2;">
+            <tr>
+                <th style="width: 80%;">Descripción del Material</th>
+                <th style="width: 20%; text-align: center;">Cantidad</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($task->form_data['materials'] as $material)
+            <tr>
+                <td>{{ $material['name'] }}</td>
+                <td style="text-align: center;">{{ $material['qty'] }}</td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+    @endif
 
     <!-- ANEXOS -->
     <div class="section-name">Anexos al Informe</div>
@@ -188,6 +213,20 @@
         </table>
         @endif
 
+        @if(isset($task->form_data['photos']['fluke_screen']))
+        <table>
+            <tr>
+                <td style="width: 100%; border: none; text-align: center;">
+                    <div class="photo-box">
+                        <div class="photo-title">Fotografía: Certificación Fluke Networks</div>
+                        <img src="{{ public_path('storage/' . $task->form_data['photos']['fluke_screen']) }}" class="photo-img" style="max-height: 250pt; width: auto; margin: 0 auto;">
+                        <div style="font-size: 7pt; padding: 2pt;"><strong>Margen:</strong> {{ $task->form_data['fluke_margin'] ?? 'N/A' }} dB</div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        @endif
+
         @php $findings = $task->form_data['findings'] ?? []; @endphp
         @for($i = 0; $i < count($findings); $i += 2)
         <table>
@@ -215,7 +254,40 @@
             </tr>
         </table>
         @endfor
-    </div>
+    <!-- ANEXOS ADICIONALES (PLANOS Y CERTIFICACIONES) -->
+    @php 
+        $plans = $task->form_data['files']['plans'] ?? []; 
+        $certs = $task->form_data['files']['certs'] ?? [];
+    @endphp
+
+    @if(count($plans) > 0 || count($certs) > 0)
+    <div style="page-break-before: always; margin-top: 20pt;"></div>
+    <div class="section-name">Archivo de Anexos (Planos y Certificaciones)</div>
+    
+    @foreach($plans as $index => $file)
+        @php $ext = pathinfo($file, PATHINFO_EXTENSION); @endphp
+        @if(in_array(strtolower($ext), ['jpg', 'jpeg', 'png', 'webp']))
+        <div class="photo-box" style="margin-top: 10pt;">
+            <div class="photo-title">Anexo: Plano de Red #{{ $index + 1 }}</div>
+            <div style="text-align: center; padding: 5pt; background: white;">
+                <img src="{{ public_path('storage/' . $file) }}" style="max-width: 100%; max-height: 480pt; width: auto; height: auto; display: block; margin: 0 auto;">
+            </div>
+        </div>
+        @endif
+    @endforeach
+
+    @foreach($certs as $index => $file)
+        @php $ext = pathinfo($file, PATHINFO_EXTENSION); @endphp
+        @if(in_array(strtolower($ext), ['jpg', 'jpeg', 'png', 'webp']))
+        <div class="photo-box" style="margin-top: 10pt;">
+            <div class="photo-title">Anexo: Certificación #{{ $index + 1 }}</div>
+            <div style="text-align: center; padding: 5pt; background: white;">
+                <img src="{{ public_path('storage/' . $file) }}" style="max-width: 100%; max-height: 480pt; width: auto; height: auto; display: block; margin: 0 auto;">
+            </div>
+        </div>
+        @endif
+    @endforeach
+    @endif
 
 </body>
 </html>

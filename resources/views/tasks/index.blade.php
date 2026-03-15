@@ -1,6 +1,6 @@
 <x-app-layout>
     <div class="py-6 md:py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8" x-data="{ 
-        showCreateModal: false,
+        showCreateModal: new URLSearchParams(window.location.search).has('showModal'),
         newTask: {
             title: '',
             equipment: ''
@@ -22,12 +22,10 @@
                     </p>
                 </div>
                 <div class="flex gap-3">
-                    @if(Auth::user()->hasRole('Administrador'))
-                    <button @click="showCreateModal = true" class="bg-tecsisa-yellow hover:bg-yellow-400 text-black font-black px-8 py-3.5 rounded-2xl text-[10px] uppercase tracking-widest transition shadow-xl active:scale-95 flex items-center gap-2">
+                    <button @click="showCreateModal = true" class="bg-tecsisa-yellow hover:bg-yellow-400 text-black font-black px-8 py-3.5 rounded-2xl text-xs uppercase tracking-widest transition shadow-xl active:scale-95 flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
-                        Asignar Tarea
+                        {{ Auth::user()->hasRole('Administrador') ? 'Asignar Tarea' : 'Nueva Tarea' }}
                     </button>
-                    @endif
                 </div>
             </div>
         </div>
@@ -41,12 +39,12 @@
             </div>
             <div class="bg-theme-card border border-theme p-6 rounded-[2rem] transition-all duration-500 shadow-lg relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-16 h-16 bg-tecsisa-yellow/5 rounded-bl-full translate-x-4 -translate-y-4"></div>
-                <p class="text-[10px] font-black text-tecsisa-yellow uppercase tracking-widest mb-2">En Proceso</p>
+                <p class="text-[10px] font-black text-tecsisa-yellow uppercase tracking-widest mb-2">Activa</p>
                 <p class="text-3xl font-black text-tecsisa-yellow">{{ $stats['pending'] }}</p>
             </div>
             <div class="bg-theme-card border border-theme p-6 rounded-[2rem] transition-all duration-500 shadow-lg relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-16 h-16 bg-blue-500/5 rounded-bl-full translate-x-4 -translate-y-4"></div>
-                <p class="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-2">En Revisión</p>
+                <p class="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-2">Aprobación</p>
                 <p class="text-3xl font-black text-blue-400">{{ $stats['in_review'] }}</p>
             </div>
             <div class="bg-theme-card border border-theme p-6 rounded-[2rem] transition-all duration-500 shadow-lg relative overflow-hidden col-span-2 lg:col-span-1">
@@ -62,9 +60,9 @@
             <a href="{{ route('tasks.index') }}" 
                class="px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap" :class="!@js(request('status')) ? 'bg-tecsisa-yellow text-black' : 'text-gray-500 hover:text-slate-800 dark:hover:text-white'">Todos</a>
             <a href="{{ route('tasks.index', ['status' => 'pending']) }}" 
-               class="px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap" :class="@js(request('status')) == 'pending' ? 'bg-tecsisa-yellow text-black' : 'text-gray-500 hover:text-slate-800 dark:hover:text-white'">En Proceso</a>
+               class="px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap" :class="@js(request('status')) == 'pending' ? 'bg-tecsisa-yellow text-black' : 'text-gray-500 hover:text-slate-800 dark:hover:text-white'">Activa</a>
             <a href="{{ route('tasks.index', ['status' => 'in_review']) }}" 
-               class="px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap" :class="@js(request('status')) == 'in_review' ? 'bg-tecsisa-yellow text-black' : 'text-gray-500 hover:text-slate-800 dark:hover:text-white'">En Revisión</a>
+               class="px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap" :class="@js(request('status')) == 'in_review' ? 'bg-tecsisa-yellow text-black' : 'text-gray-500 hover:text-slate-800 dark:hover:text-white'">Aprobación</a>
             <a href="{{ route('tasks.index', ['status' => 'completed']) }}" 
                class="px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap" :class="@js(request('status')) == 'completed' ? 'bg-tecsisa-yellow text-black' : 'text-gray-500 hover:text-slate-800 dark:hover:text-white'">Completadas</a>
         </div>
@@ -127,8 +125,8 @@
                                     {{ $task->status == 'in_review' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20 shadow-[0_0_10px_rgba(59,130,246,0.1)]' : '' }}
                                     {{ $task->status == 'draft' ? 'bg-gray-500/10 text-gray-400 border-theme' : '' }}">
                                     @if($task->status === 'draft') Borrador
-                                    @elseif($task->status === 'pending') En Proceso
-                                    @elseif($task->status === 'in_review') En Revisión
+                                    @elseif($task->status === 'pending') Activa
+                                    @elseif($task->status === 'in_review') Aprobación
                                     @elseif($task->status === 'completed') Finalizada
                                     @else {{ $task->status }} @endif
                                 </span>
@@ -143,7 +141,7 @@
                                     @php
                                         $taskIsReadOnly = (in_array($task->status, ['completed', 'verified', 'in_review']) && !Auth::user()->hasRole('Administrador')) || in_array($task->status, ['completed', 'verified']);
                                     @endphp
-                                     <a href="{{ route('tasks.edit', $task) }}" class="p-2.5 bg-theme-border border border-theme rounded-xl text-gray-400 transition-all shadow-md active:scale-90" :class="theme === 'light' ? 'hover:text-slate-900' : 'hover:text-white'" title="{{ $taskIsReadOnly ? 'Ver Reporte' : 'Gestionar Tarea' }}">
+                                     <a href="{{ route('tasks.edit', $task) }}" class="p-2.5 bg-theme/10 border border-theme rounded-xl text-theme hover:text-tecsisa-yellow transition-all shadow-md active:scale-90" title="{{ $taskIsReadOnly ? 'Ver Reporte' : 'Gestionar Tarea' }}">
                                         @if($taskIsReadOnly)
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                                         @else
@@ -203,8 +201,8 @@
                         {{ $task->status == 'in_review' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' : '' }}
                         {{ $task->status == 'draft' ? 'bg-gray-500/10 text-gray-400 border-theme' : '' }}">
                         @if($task->status === 'draft') Borrador
-                        @elseif($task->status === 'pending') En Proceso
-                        @elseif($task->status === 'in_review') En Revisión
+                        @elseif($task->status === 'pending') Activa
+                        @elseif($task->status === 'in_review') Aprobación
                         @elseif($task->status === 'completed') Finalizada
                         @else {{ $task->status }} @endif
                     </span>
@@ -262,12 +260,11 @@
             @empty
             <div class="py-12 flex flex-col items-center opacity-40">
                 <svg class="w-10 h-10 text-gray-500 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
-                <p class="text-xs font-black uppercase tracking-widest" :class="theme === 'light' ? 'text-slate-600' : 'text-white'">Sin tareas en proceso</p>
+                <p class="text-xs font-black uppercase tracking-widest" :class="theme === 'light' ? 'text-slate-600' : 'text-white'">Sin tareas activas</p>
             </div>
             @endforelse
         </div>
 
-        @if(Auth::user()->hasRole('Administrador'))
         <!-- Create Task Modal -->
     <div x-show="showCreateModal" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="showCreateModal = false" x-transition.opacity></div>
@@ -331,8 +328,8 @@
                             </select>
                         </div>
                         
-                        <!-- Responsable -->
                         <div class="grid grid-cols-2 gap-4">
+                            @if(Auth::user()->hasRole('Administrador'))
                             <div>
                                 <label class="block text-gray-500 text-[10px] font-black uppercase tracking-widest mb-1.5 ml-1">Responsable</label>
                                 <select name="assigned_to" class="w-full bg-theme/5 border border-theme rounded-xl text-sm focus:border-tecsisa-yellow focus:ring-tecsisa-yellow transition h-11 px-4 font-bold text-theme">
@@ -344,11 +341,15 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div>
+                            @else
+                                <input type="hidden" name="assigned_to" value="{{ Auth::id() }}">
+                            @endif
+
+                            <div class="{{ !Auth::user()->hasRole('Administrador') ? 'col-span-2' : '' }}">
                                 <label class="block text-gray-500 text-[10px] font-black uppercase tracking-widest mb-1.5 ml-1">Estado</label>
                                 <select name="status" required class="w-full bg-theme/5 border border-theme rounded-xl text-sm focus:border-tecsisa-yellow focus:ring-tecsisa-yellow transition h-11 px-4 font-bold text-theme">
                                     <option value="draft">Borrador</option>
-                                    <option value="pending" selected>En Proceso</option>
+                                    <option value="pending" selected>Activa</option>
                                 </select>
                             </div>
                         </div>
@@ -403,6 +404,5 @@
             </div>
         </div>
     </div>
-    @endif
     </div>
 </x-app-layout>

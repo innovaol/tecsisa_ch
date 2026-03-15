@@ -11,9 +11,15 @@
                     <p class="text-xs text-gray-500 font-bold uppercase tracking-widest mt-2 px-1">Gestión de hoja de ruta y mantenimiento técnico avanzado</p>
                 </div>
                 
-                <div class="bg-black/10 border border-theme px-8 py-4 rounded-[1.5rem] text-center shadow-inner backdrop-blur-md transition-all duration-500">
-                    <span class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">En Proceso</span>
-                    <span class="text-3xl font-black transition-colors duration-500 leading-none" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">{{ count($tasks) }}</span>
+                <div class="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+                    <a href="{{ route('tasks.index') }}?showModal=1" class="flex items-center justify-center gap-2 bg-tecsisa-yellow hover:bg-yellow-400 text-black font-black w-full sm:w-auto px-6 py-4 rounded-2xl text-xs uppercase tracking-widest shadow-xl transition-all active:scale-95 shrink-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
+                        Nueva Tarea
+                    </a>
+                    <div class="bg-black/10 border border-theme px-8 py-4 rounded-[1.5rem] text-center shadow-inner backdrop-blur-md transition-all duration-500 w-full sm:w-auto shrink-0">
+                        <span class="block text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">En Proceso</span>
+                        <span class="text-3xl font-black transition-colors duration-500 leading-none" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">{{ count($tasks) }}</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -120,7 +126,7 @@
                 </div>
                 <h3 class="font-black text-xl uppercase tracking-widest transition-colors duration-500" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">Día Productivo</h3>
                 <p class="text-sm text-gray-500 mt-2 leading-relaxed max-w-sm transition-colors duration-500">No tienes tareas en proceso asignadas. Todo el equipo está funcionando según los parámetros.</p>
-                <button @click="showScannerMenu = true" class="mt-8 bg-tecsisa-yellow text-black font-black px-8 py-4 rounded-2xl text-[10px] uppercase tracking-widest shadow-xl shadow-yellow-400/20 active:scale-95 transition">Escanear Nuevo Equipo</button>
+                <button @click="showScannerMenu = true" class="mt-8 bg-tecsisa-yellow text-black font-black px-8 py-4 rounded-2xl text-xs uppercase tracking-widest shadow-xl shadow-yellow-400/20 active:scale-95 transition">Identificar o Buscar Activo</button>
             </div>
         @endif
     </div>

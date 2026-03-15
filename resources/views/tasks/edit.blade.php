@@ -2,7 +2,8 @@
     $isAdmin = Auth::user()->hasRole('Administrador');
     $isReadOnly = (in_array($task->status, ['completed', 'verified', 'in_review']) && !$isAdmin) 
                   || in_array($task->status, ['completed', 'verified']);
-    $checklist = $task->equipment->system->form_schema['checklist'] ?? [];
+    // $checklist is now injected by TaskController (supports old flat array + new {specs,checklist} format)
+    $checklist = $checklist ?? [];
 @endphp
 
 <x-technician-layout :hideHeader="true" :hideNav="false">
@@ -69,70 +70,126 @@
     <div class="pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative z-10">
         <!-- Resumen del Equipo -->
         <div class="bg-theme-card rounded-3xl border border-theme p-5 mb-6 shadow-xl transition-colors duration-500">
-            <div class="flex items-start gap-4">
-                <div class="w-12 h-12 bg-theme/10 rounded-full border border-theme flex items-center justify-center shrink-0">
-                    <svg class="w-6 h-6 text-tecsisa-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="flex items-start gap-4 flex-1">
+                    <div class="w-12 h-12 bg-theme/10 rounded-full border border-theme flex items-center justify-center shrink-0">
+                        <svg class="w-6 h-6 text-tecsisa-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </div>
+                    <div>
+                        <p class="text-tecsisa-yellow font-mono text-[10px] uppercase font-bold tracking-widest mb-1">{{ $task->equipment->internal_id }}</p>
+                        <h2 class="text-sm font-bold text-theme leading-tight mb-1">{{ $task->equipment->name }}</h2>
+                        <p class="text-xs text-theme-muted">{{ $task->title }}</p>
+                    </div>
                 </div>
-                <div class="flex-1">
-                    <p class="text-tecsisa-yellow font-mono text-[10px] uppercase font-bold tracking-widest mb-1">{{ $task->equipment->internal_id }}</p>
-                    <h2 class="text-sm font-bold text-theme leading-tight mb-1">{{ $task->equipment->name }}</h2>
-                    <p class="text-xs text-theme-muted">{{ $task->title }}</p>
-                </div>
-                @if($isAdmin)
-                <div class="hidden md:block w-48">
-                    <label class="block text-[8px] font-black text-theme-muted uppercase mb-1.5 tracking-widest">Reasignar Técnico</label>
-                    <select name="assigned_to" @change="doSubmit('reassign')" class="w-full bg-theme/5 border border-theme rounded-xl text-[10px] text-theme font-bold h-9 px-3 focus:ring-1 focus:ring-tecsisa-yellow/30">
-                        @foreach($users as $user)
-                            <option value="{{ $user->id }}" {{ $task->assigned_to == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
-                        @endforeach
-                    </select>
+
+                @if($isAdmin && !in_array($task->status, ['completed', 'verified']))
+                <div class="flex flex-col items-start md:items-end gap-1.5 min-w-[220px]">
+                    <label class="text-[8px] font-black text-theme-muted uppercase tracking-[0.2em] opacity-60">Reasignar Responsable</label>
+                    <div class="relative w-full group">
+                        <select name="assigned_to" @change="doSubmit('reassign')" class="w-full bg-theme/5 border-[1.5px] border-theme-muted/20 rounded-2xl text-[12px] font-black h-12 px-5 appearance-none focus:ring-2 focus:ring-tecsisa-yellow/30 text-theme cursor-pointer pr-12 transition-all hover:border-tecsisa-yellow/40">
+                            @foreach($users as $user)
+                                <option value="{{ $user->id }}" {{ $task->assigned_to == $user->id ? 'selected' : '' }} class="bg-theme-card text-theme">{{ $user->name }}</option>
+                            @endforeach
+                        </select>
+                        <div class="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-theme-muted">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </div>
                 </div>
                 @endif
             </div>
-            @if($isAdmin)
-            <div class="md:hidden mt-4 pt-4 border-t border-theme">
-                <label class="block text-[8px] font-black text-theme-muted uppercase mb-1.5 tracking-widest">Reasignar Técnico</label>
-                <select name="assigned_to" @change="doSubmit('reassign')" class="w-full bg-theme/5 border border-theme rounded-xl text-[10px] text-theme font-bold h-10 px-3 focus:ring-1 focus:ring-tecsisa-yellow/30">
-                    @foreach($users as $user)
-                        <option value="{{ $user->id }}" {{ $task->assigned_to == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-            @endif
         </div>
 
-        @if(isset($task->form_data['review_comment']))
-        <div class="bg-red-500/10 border border-red-500/20 rounded-2xl p-4 mb-6">
-            <h4 class="text-[9px] font-black text-red-400 uppercase tracking-widest mb-1 flex items-center gap-2">
-                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                Notas del Administrador / Correcciones
+        @if($isReadOnly)
+        <!-- 📝 RESUMEN EJECUTIVO (SOLO LECTURA) -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-theme-card border border-theme p-4 rounded-3xl shadow-lg transition-colors duration-500">
+                <p class="text-[8px] font-black text-theme-muted uppercase tracking-widest mb-1">Edificio / Bloque</p>
+                <p class="text-xs font-bold text-theme">{{ $task->form_data['building'] ?? 'N/A' }}</p>
+            </div>
+            <div class="bg-theme-card border border-theme p-4 rounded-3xl shadow-lg transition-colors duration-500">
+                <p class="text-[8px] font-black text-theme-muted uppercase tracking-widest mb-1">Piso / Nivel</p>
+                <p class="text-xs font-bold text-theme">{{ $task->form_data['floor'] ?? 'N/A' }}</p>
+            </div>
+            <div class="bg-theme-card border border-theme p-4 rounded-3xl shadow-lg transition-colors duration-500">
+                <p class="text-[8px] font-black text-theme-muted uppercase tracking-widest mb-1">Área Específica</p>
+                <p class="text-xs font-bold text-theme">{{ $task->form_data['specific_area'] ?? 'N/A' }}</p>
+            </div>
+            <div class="bg-theme-card border border-theme p-4 rounded-3xl shadow-lg transition-colors duration-500">
+                <p class="text-[8px] font-black text-theme-muted uppercase tracking-widest mb-1">Horario Laboral</p>
+                <p class="text-xs font-bold text-theme">{{ $task->form_data['start_time'] ?? '--' }} - {{ $task->form_data['end_time'] ?? '--' }}</p>
+            </div>
+        </div>
+        @endif
+
+        @if(isset($task->form_data['review_comment']) && $task->status === 'pending')
+        <div class="bg-red-500/10 border border-red-500/20 rounded-[2rem] p-6 mb-8 relative overflow-hidden group">
+            <div class="absolute -right-4 -top-4 w-16 h-16 bg-red-500/5 rounded-full blur-xl group-hover:bg-red-500/10 transition-all duration-700"></div>
+            <h4 class="text-[10px] font-black text-red-500 uppercase tracking-[0.2em] mb-3 flex items-center gap-2.5">
+                <div class="w-6 h-6 rounded-lg bg-red-500/20 flex items-center justify-center">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                </div>
+                Motivo del Rechazo / Correcciones Pendientes
             </h4>
-            <p class="text-[11px] text-theme font-bold">{{ $task->form_data['review_comment'] }}</p>
+            <div class="bg-white/50 dark:bg-black/20 rounded-2xl p-4 border border-red-500/10">
+                <p class="text-[11px] font-bold text-red-600 dark:text-red-400 leading-relaxed">{{ $task->form_data['review_comment'] }}</p>
+            </div>
         </div>
         @endif
 
         <form action="{{ route('tasks.update', $task) }}" method="POST" enctype="multipart/form-data" 
               x-data="technicianForm({
                   status: '{{ $task->status }}',
-                  findings: {{ json_encode($task->form_data['findings'] ?? []) }},
-                  materials: {{ json_encode($task->form_data['materials'] ?? []) }},
+                  findings: {{ json_encode(array_values($task->form_data['findings'] ?? [])) }},
+                  materials: {{ json_encode(array_values($task->form_data['materials'] ?? [])) }},
                   previews: {
                       before: '{{ isset($task->form_data['photos']['before']) ? asset('storage/' . $task->form_data['photos']['before']) : '' }}',
                       after: '{{ isset($task->form_data['photos']['after']) ? asset('storage/' . $task->form_data['photos']['after']) : '' }}',
                       fluke_screen: '{{ isset($task->form_data['photos']['fluke_screen']) ? asset('storage/' . $task->form_data['photos']['fluke_screen']) : '' }}'
                   },
-                  building: '{{ $task->form_data['building'] ?? '' }}',
-                  floor: '{{ $task->form_data['floor'] ?? '' }}',
-                  specific_area: '{{ $task->form_data['specific_area'] ?? '' }}',
-                  section: '{{ $task->form_data['section'] ?? '' }}',
-                  start_time: '{{ $task->form_data['start_time'] ?? '' }}',
-                  end_time: '{{ $task->form_data['end_time'] ?? '' }}',
+                  building: '{{ addslashes($task->form_data['building'] ?? "") }}',
+                  floor: '{{ addslashes($task->form_data['floor'] ?? "") }}',
+                  specific_area: '{{ addslashes($task->form_data['specific_area'] ?? "") }}',
+                  section: '{{ addslashes($task->form_data['section'] ?? "") }}',
+                  start_time: '{{ $task->form_data['start_time'] ?? "" }}',
+                  end_time: '{{ $task->form_data['end_time'] ?? "" }}',
                   storagePath: '{{ asset('storage') }}/'
               })" 
-              x-ref="form" id="tech-form">
+              x-ref="form" id="tech-form" @change="hasChanges = true" @input="hasChanges = true">
             @csrf
             @method('PUT')
             <input type="hidden" name="action" value="save_draft" x-ref="actionField">
+
+            <!-- 📊 SECCIÓN: CONFIGURACIÓN PARA REPORTE SEMANAL (CUADRO DE PRODUCCIÓN) -->
+            <h3 class="text-[10px] font-black text-tecsisa-yellow uppercase tracking-[0.3em] mb-4 px-1 flex items-center gap-2">
+                <svg class="w-4 h-4 text-tecsisa-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                Control de Producción / Reporting
+            </h3>
+            
+            <div class="bg-theme-card border border-theme rounded-[2.5rem] p-6 mb-10 shadow-2xl transition-colors duration-500">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+
+                    <!-- Boolean Flags (Checks) -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <label class="flex items-center gap-3 p-3 bg-theme/5 rounded-2xl border border-theme cursor-pointer active:scale-95 transition" :class="hasNewCable ? 'border-tecsisa-yellow/30' : ''">
+                            <input type="checkbox" name="has_new_cable" value="1" x-model="hasNewCable" {{ $isReadOnly ? 'disabled' : '' }} class="w-5 h-5 rounded border-theme bg-theme text-tecsisa-yellow focus:ring-tecsisa-yellow">
+                            <span class="text-[8px] font-black uppercase text-theme-muted" :class="hasNewCable ? 'text-theme' : ''">Cable Nuevo</span>
+                        </label>
+                        <label class="flex items-center gap-3 p-3 bg-theme/5 rounded-2xl border border-theme cursor-pointer active:scale-95 transition" :class="hasNewJack ? 'border-tecsisa-yellow/30' : ''">
+                            <input type="checkbox" name="has_new_jack" value="1" x-model="hasNewJack" {{ $isReadOnly ? 'disabled' : '' }} class="w-5 h-5 rounded border-theme bg-theme text-tecsisa-yellow focus:ring-tecsisa-yellow">
+                            <span class="text-[8px] font-black uppercase text-theme-muted" :class="hasNewJack ? 'text-theme' : ''">Jack Nuevo</span>
+                        </label>
+                        <label class="flex items-center gap-3 p-3 bg-theme/5 rounded-2xl border border-theme cursor-pointer active:scale-95 transition" :class="hasNewFaceplate ? 'border-tecsisa-yellow/30' : ''">
+                            <input type="checkbox" name="has_new_faceplate" value="1" x-model="hasNewFaceplate" {{ $isReadOnly ? 'disabled' : '' }} class="w-5 h-5 rounded border-theme bg-theme text-tecsisa-yellow focus:ring-tecsisa-yellow">
+                            <span class="text-[8px] font-black uppercase text-theme-muted" :class="hasNewFaceplate ? 'text-theme' : ''">F. Plate Nuevo</span>
+                        </label>
+                        <label class="flex items-center gap-3 p-3 bg-theme/5 rounded-2xl border border-theme cursor-pointer active:scale-95 transition" :class="isCertified ? 'border-emerald-500/30' : ''">
+                            <input type="checkbox" name="is_certified" value="1" x-model="isCertified" {{ $isReadOnly ? 'disabled' : '' }} class="w-5 h-5 rounded border-theme bg-theme text-emerald-500 focus:ring-emerald-500">
+                            <span class="text-[8px] font-black uppercase text-theme-muted" :class="isCertified ? 'text-emerald-400' : ''">Certificado</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
 
 
             <!-- 📸 SECCIÓN UNIVERSAL: EVIDENCIA VISUAL -->
@@ -311,6 +368,7 @@
                                         <button type="button" @click="removePhoto('findings', index)" class="flex-1 h-10 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 text-[8px] font-black uppercase active:scale-90 transition">Quitar</button>
                                         <button type="button" @click="removePhoto('findings', index)" class="flex-1 h-10 bg-theme/5 border border-theme rounded-lg text-theme text-[8px] font-black uppercase active:scale-90 transition">Repetir</button>
                                     </div>
+                                    @endunless
                                 </div>
                             </div>
                             <div class="flex-1 min-w-0">
@@ -436,32 +494,6 @@
             </div>
             @endif
 
-            <!-- 🔌 SECCIÓN ESPECÍFICA: DISPOSITIVOS ACTIVOS (CCTV, INCENDIOS, ETC) -->
-            @if(in_array($task->equipment->system_id, [1, 3, 4]))
-            <h3 class="text-[10px] font-black text-cyan-500 uppercase tracking-[0.3em] mb-4 px-1 flex items-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                Diagnóstico de Dispositivo Activo
-            </h3>
-            <div class="space-y-4 mb-8">
-                <div class="bg-theme-card border border-theme p-4 rounded-3xl transition-colors duration-500">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-[9px] font-black text-theme-muted uppercase mb-2">Puerto / Canal</label>
-                            <input type="text" name="form_data[active_port]" value="{{ $task->form_data['active_port'] ?? '' }}" placeholder="Ej: P-12" {{ $isReadOnly ? 'disabled' : '' }} class="w-full bg-theme/5 border border-theme rounded-xl text-theme text-sm px-4 py-3 focus:ring-1 focus:ring-cyan-500 outline-none disabled:opacity-70">
-                        </div>
-                        <div>
-                            <label class="block text-[9px] font-black text-theme-muted uppercase mb-2">Estado LEDs</label>
-                            <select name="form_data[led_status]" {{ $isReadOnly ? 'disabled' : '' }} class="w-full bg-theme/5 border border-theme rounded-xl text-theme text-[10px] px-2 py-3 focus:ring-1 focus:ring-cyan-500 outline-none uppercase font-bold disabled:opacity-70">
-                                <option value="Normal" {{ ($task->form_data['led_status'] ?? '') == 'Normal' ? 'selected' : '' }}>Verde / Normal</option>
-                                <option value="Alerta" {{ ($task->form_data['led_status'] ?? '') == 'Alerta' ? 'selected' : '' }}>Naranja / Alerta</option>
-                                <option value="Error" {{ ($task->form_data['led_status'] ?? '') == 'Error' ? 'selected' : '' }}>Rojo / Fallo</option>
-                                <option value="Apagado" {{ ($task->form_data['led_status'] ?? '') == 'Apagado' ? 'selected' : '' }}>Sin Actividad</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            @endif
 
             <!-- 🔧 SECCIÓN POR TIPO DE TAREA -->
             @if($task->task_type === 'maintenance')
@@ -595,40 +627,141 @@
                 </table>
             </div>
             @endif
-            @endif
 
-            <!-- 📸 SECCIÓN: ANEXOS AL INFORME -->
-            <h3 class="text-[10px] font-black text-theme uppercase tracking-[0.3em] mb-4 px-1 flex items-center gap-2 text-center">
+            <h3 class="text-[10px] font-black text-theme uppercase tracking-[0.3em] mb-4 text-center">
                 Anexos Incluidos
             </h3>
-            <div class="grid grid-cols-3 gap-3 mb-10">
-                <label class="flex flex-col items-center gap-3 p-4 rounded-3xl border border-theme bg-theme-card group transition shadow-xl transition-colors duration-500 {{ $isReadOnly ? 'cursor-default pointer-events-none opacity-80' : 'cursor-pointer active:bg-blue-500/10' }}" :class="annexPhoto ? 'border-blue-500/30' : ''">
-                    <input type="checkbox" name="form_data[annex_photos]" value="1" x-model="annexPhoto" class="hidden" {{ $isReadOnly ? 'disabled' : '' }}>
-                    <div class="w-8 h-8 rounded-lg flex items-center justify-center transition" :class="annexPhoto ? 'bg-blue-500 text-white' : 'bg-theme/5 text-theme-muted'">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+                <!-- Anexo: Registro Fotográfico (Este es el que ya tenemos arriba, pero aquí se confirma) -->
+                <div class="flex flex-col gap-2">
+                    <label class="flex items-center gap-3 p-4 rounded-3xl border border-theme bg-theme-card group transition shadow-xl transition-colors duration-500 {{ $isReadOnly ? 'cursor-default pointer-events-none opacity-80' : 'cursor-pointer active:bg-blue-500/10' }}" :class="annexPhoto ? 'border-blue-500/30' : ''">
+                        <input type="checkbox" name="form_data[annex_photos]" value="1" x-model="annexPhoto" class="hidden" {{ $isReadOnly ? 'disabled' : '' }}>
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center transition" :class="annexPhoto ? 'bg-blue-500 text-white' : 'bg-theme/5 text-theme-muted'">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        </div>
+                        <span class="text-[8px] font-black uppercase text-theme-muted transition group-hover:text-blue-400" :class="annexPhoto ? 'text-blue-400' : ''">Fotos Incluidas</span>
+                    </label>
+                </div>
+
+                <!-- Anexo: Planos de Ubicación -->
+                <div class="flex flex-col gap-2">
+                    <label class="flex items-center gap-3 p-4 rounded-3xl border border-theme bg-theme-card group transition shadow-xl transition-colors duration-500 {{ $isReadOnly ? 'cursor-default pointer-events-none opacity-80' : 'cursor-pointer active:bg-orange-500/10' }}" :class="annexPlans ? 'border-orange-500/30' : ''">
+                        <input type="checkbox" name="form_data[annex_plans]" value="1" x-model="annexPlans" class="hidden" {{ $isReadOnly ? 'disabled' : '' }}>
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center transition" :class="annexPlans ? 'bg-orange-500 text-white' : 'bg-theme/5 text-theme-muted'">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+                        </div>
+                        <span class="text-[8px] font-black uppercase text-theme-muted transition group-hover:text-orange-400" :class="annexPlans ? 'text-orange-400' : ''">Planos de Red</span>
+                    </label>
+                    <div x-show="annexPlans" class="px-2 space-y-3">
+                        @if(!$isReadOnly)
+                            <div class="space-y-2">
+                                <label class="block text-[8px] font-black text-theme-muted uppercase tracking-widest pl-1">Añadir Archivos</label>
+                                <input type="file" name="annex_file_plans[]" multiple x-ref="plansInput" @change="updatePending($event, 'plans')" class="text-[10px] text-theme-muted file:bg-theme/10 file:border-none file:rounded-lg file:text-theme file:text-[9px] file:font-black file:uppercase file:px-3 file:py-1 cursor-pointer w-full">
+                                
+                                <template x-if="pendingPlans.length > 0">
+                                    <div class="mt-2 space-y-1">
+                                        <p class="text-[7px] font-black text-tecsisa-yellow uppercase tracking-widest px-1">Pendientes por subir:</p>
+                                        <template x-for="(name, i) in pendingPlans" :key="i">
+                                            <div class="flex items-center justify-between p-2 bg-tecsisa-yellow/5 rounded-xl border border-tecsisa-yellow/20">
+                                                <div class="flex items-center gap-2 truncate">
+                                                    <svg class="w-3 h-3 text-tecsisa-yellow shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                                    <span class="text-[8px] font-bold text-tecsisa-yellow truncate pr-2" x-text="name"></span>
+                                                </div>
+                                                <button type="button" @click="removePending('plans', i)" class="text-tecsisa-yellow hover:text-red-500 transition-colors p-1">
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                                </button>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+                        @endif
+                        
+                        <div class="space-y-2" x-show="plans.length > 0">
+                            <p class="text-[7px] font-black text-theme-muted uppercase tracking-widest pl-1" x-show="plans.length > 0">Archivos en el servidor:</p>
+                            <template x-for="(file, i) in plans" :key="i">
+                                <div class="flex items-center justify-between p-2 bg-theme/5 rounded-xl border border-theme/10">
+                                    <a :href="'{{ asset('storage') }}/' + file" target="_blank" class="text-[9px] font-black text-orange-400 uppercase truncate pr-2 hover:underline" x-text="file.split('/').pop()"></a>
+                                    @unless($isReadOnly)
+                                    <button type="button" @click="removeExisting('plans', file)" class="text-red-400 hover:scale-110 transition">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    </button>
+                                    @else
+                                    <svg class="w-3 h-3 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"></path></svg>
+                                    @endunless
+                                </div>
+                            </template>
+                        </div>
+
+                        {{-- Inputs para el controlador --}}
+                        <template x-for="path in plansToRemove">
+                            <input type="hidden" name="plans_to_remove[]" :value="path">
+                        </template>
                     </div>
-                    <span class="text-[8px] font-black uppercase text-theme-muted transition group-hover:text-blue-400" :class="annexPhoto ? 'text-blue-400' : ''">Fotos</span>
-                </label>
-                <label class="flex flex-col items-center gap-3 p-4 rounded-3xl border border-theme bg-theme-card group transition shadow-xl transition-colors duration-500 {{ $isReadOnly ? 'cursor-default pointer-events-none opacity-80' : 'cursor-pointer active:bg-orange-500/10' }}" :class="annexPlans ? 'border-orange-500/30' : ''">
-                    <input type="checkbox" name="form_data[annex_plans]" value="1" x-model="annexPlans" class="hidden" {{ $isReadOnly ? 'disabled' : '' }}>
-                    <div class="w-8 h-8 rounded-lg flex items-center justify-center transition" :class="annexPlans ? 'bg-orange-500 text-white' : 'bg-theme/5 text-theme-muted'">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+                </div>
+
+                <!-- Anexo: Certificaciones -->
+                <div class="flex flex-col gap-2">
+                    <label class="flex items-center gap-3 p-4 rounded-3xl border border-theme bg-theme-card group transition shadow-xl transition-colors duration-500 {{ $isReadOnly ? 'cursor-default pointer-events-none opacity-80' : 'cursor-pointer active:bg-emerald-500/10' }}" :class="annexCert ? 'border-emerald-500/30' : ''">
+                        <input type="checkbox" name="form_data[annex_cert]" value="1" x-model="annexCert" class="hidden" {{ $isReadOnly ? 'disabled' : '' }}>
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center transition" :class="annexCert ? 'bg-emerald-500 text-white' : 'bg-theme/5 text-theme-muted'">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <span class="text-[8px] font-black uppercase text-theme-muted transition group-hover:text-emerald-400" :class="annexCert ? 'text-emerald-400' : ''">Certificaciones</span>
+                    </label>
+                    <div x-show="annexCert" class="px-2 space-y-3">
+                        @if(!$isReadOnly)
+                            <div class="space-y-2">
+                                <label class="block text-[8px] font-black text-theme-muted uppercase tracking-widest pl-1">Añadir Archivos</label>
+                                <input type="file" name="annex_file_cert[]" multiple x-ref="certsInput" @change="updatePending($event, 'certs')" class="text-[10px] text-theme-muted file:bg-theme/10 file:border-none file:rounded-lg file:text-theme file:text-[9px] file:font-black file:uppercase file:px-3 file:py-1 cursor-pointer w-full">
+                                
+                                <template x-if="pendingCerts.length > 0">
+                                    <div class="mt-2 space-y-1">
+                                        <p class="text-[7px] font-black text-tecsisa-yellow uppercase tracking-widest px-1">Pendientes por subir:</p>
+                                        <template x-for="(name, i) in pendingCerts" :key="i">
+                                            <div class="flex items-center justify-between p-2 bg-tecsisa-yellow/5 rounded-xl border border-tecsisa-yellow/20">
+                                                <div class="flex items-center gap-2 truncate">
+                                                    <svg class="w-3 h-3 text-tecsisa-yellow shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                                    <span class="text-[8px] font-bold text-tecsisa-yellow truncate pr-2" x-text="name"></span>
+                                                </div>
+                                                <button type="button" @click="removePending('certs', i)" class="text-tecsisa-yellow hover:text-red-500 transition-colors p-1">
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                                </button>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+                        @endif
+
+                        <div class="space-y-2" x-show="certs.length > 0">
+                            <p class="text-[7px] font-black text-theme-muted uppercase tracking-widest pl-1" x-show="certs.length > 0">Archivos en el servidor:</p>
+                            <template x-for="(file, i) in certs" :key="i">
+                                <div class="flex items-center justify-between p-2 bg-theme/5 rounded-xl border border-theme/10">
+                                    <a :href="'{{ asset('storage') }}/' + file" target="_blank" class="text-[9px] font-black text-emerald-400 uppercase truncate pr-2 hover:underline" x-text="file.split('/').pop()"></a>
+                                    @unless($isReadOnly)
+                                    <button type="button" @click="removeExisting('certs', file)" class="text-red-400 hover:scale-110 transition">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    </button>
+                                    @else
+                                    <svg class="w-3 h-3 text-emerald-500" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"></path></svg>
+                                    @endunless
+                                </div>
+                            </template>
+                        </div>
+
+                        {{-- Inputs para el controlador --}}
+                        <template x-for="path in certsToRemove">
+                            <input type="hidden" name="certs_to_remove[]" :value="path">
+                        </template>
                     </div>
-                    <span class="text-[8px] font-black uppercase text-theme-muted transition group-hover:text-orange-400" :class="annexPlans ? 'text-orange-400' : ''">Planos</span>
-                </label>
-                <label class="flex flex-col items-center gap-3 p-4 rounded-3xl border border-theme bg-theme-card group transition shadow-xl transition-colors duration-500 {{ $isReadOnly ? 'cursor-default pointer-events-none opacity-80' : 'cursor-pointer active:bg-emerald-500/10' }}" :class="annexCert ? 'border-emerald-500/30' : ''">
-                    <input type="checkbox" name="form_data[annex_cert]" value="1" x-model="annexCert" class="hidden" {{ $isReadOnly ? 'disabled' : '' }}>
-                    <div class="w-8 h-8 rounded-lg flex items-center justify-center transition" :class="annexCert ? 'bg-emerald-500 text-white' : 'bg-theme/5 text-theme-muted'">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    </div>
-                    <span class="text-[8px] font-black uppercase text-theme-muted transition group-hover:text-emerald-400" :class="annexCert ? 'text-emerald-400' : ''">Certific.</span>
-                </label>
+                </div>
             </div>
 
 
             <!-- Barra de Acciones (No fija en móvil para evitar solapamiento con el menú permanente) -->
-            <div class="mt-12 bg-theme-card border border-theme rounded-[2.5rem] p-6 shadow-2xl transition-colors duration-500">
-                <div class="flex flex-col sm:flex-row gap-4 justify-end items-center w-full">
+            <div class="mt-12 bg-theme-card border border-theme rounded-[2.5rem] p-8 shadow-2xl transition-colors duration-500">
+                <div class="flex flex-col sm:flex-row gap-5 justify-center items-center w-full">
                     @if($task->status !== 'completed' && $task->status !== 'verified')
                         @php
                             $isRecentlyCreated = $task->created_at->diffInMinutes(now()) < 30;
@@ -638,12 +771,12 @@
 
                         @if($isAdmin && $task->status === 'in_review')
                             <div class="flex-1 w-full">
-                                <label class="block text-[8px] font-black text-theme-muted uppercase mb-1.5 tracking-widest">Comentarios de Revisión (Opcional)</label>
-                                <textarea name="review_comment" placeholder="Ej: Favor de mejorar la iluminación en la foto final..." class="w-full bg-theme/5 border border-theme rounded-xl text-[11px] text-theme p-3 focus:ring-1 focus:ring-tecsisa-yellow/30 transition shadow-inner h-11 resize-none"></textarea>
+                                <label class="block text-[8px] font-black text-theme-muted uppercase mb-1.5 tracking-widest pl-1">Motivo del Rechazo / Comentarios <span class="text-red-500">*</span></label>
+                                <textarea name="review_comment" placeholder="Describe claramente qué debe corregir el técnico..." class="w-full bg-theme/5 border border-theme rounded-xl text-[11px] text-theme p-4 focus:ring-1 focus:ring-tecsisa-yellow/30 transition shadow-inner h-24 resize-none"></textarea>
                             </div>
 
-                            <button type="button" @click="doSubmit('reject')" class="w-full sm:w-auto bg-red-500/10 border border-red-500/20 text-red-500 font-bold py-4 px-8 rounded-2xl text-[10px] uppercase tracking-widest transition hover:bg-red-500/20">
-                                Rechazar / Corrección
+                            <button type="button" @click="doSubmit('reject')" class="w-full sm:w-auto bg-red-500/10 border border-red-500/20 text-red-500 font-bold py-4 px-8 rounded-2xl text-[10px] uppercase tracking-widest transition hover:bg-red-500/20 hover:scale-[1.02] active:scale-95">
+                                Rechazar Reporte
                             </button>
 
                             <button type="button" @click="doSubmit('approve')" class="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-white font-black py-4 px-10 rounded-2xl text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-emerald-500/20 transition active:scale-95 flex items-center justify-center gap-2">
@@ -653,7 +786,7 @@
                         @elseif($task->status === 'in_review')
                             <div class="w-full bg-blue-500/5 border border-blue-500/10 rounded-2xl p-4 flex items-center justify-center gap-3">
                                 <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
-                                <span class="text-[10px] font-black text-blue-400 uppercase tracking-widest">Reporte en Revisión por el Administrador</span>
+                                <span class="text-[10px] font-black text-blue-400 uppercase tracking-widest">Reporte en Aprobación por el Administrador</span>
                             </div>
                         @else
                             @if($isNewTask)
@@ -672,7 +805,7 @@
                                 @endif
                             @endif
 
-                            <button type="button" @click="doSubmit('save_draft')" class="w-full sm:w-auto bg-theme/5 hover:bg-theme/10 border border-theme text-theme font-bold py-4 px-8 rounded-2xl text-[10px] uppercase tracking-[0.2em] transition" :class="{'opacity-50 cursor-not-allowed': isSubmitting}">
+                            <button type="button" @click="doSubmit('save_draft')" class="w-full sm:w-auto bg-gray-100 dark:bg-theme/10 hover:bg-gray-200 dark:hover:bg-theme/20 border border-theme text-gray-800 dark:text-theme font-bold py-4 px-8 rounded-2xl text-[10px] uppercase tracking-[0.2em] transition" :class="{'opacity-50 cursor-not-allowed': isSubmitting}">
                                 <span x-show="!isSubmitting">Guardar Borrador</span>
                                 <span x-show="isSubmitting">Guardando...</span>
                             </button>
@@ -681,7 +814,7 @@
                                 <button type="button" 
                                         :disabled="!canFinalize || isSubmitting"
                                         @click="doSubmit('submit')" 
-                                        class="w-full sm:w-auto font-black py-4 px-10 rounded-2xl text-[10px] uppercase tracking-[0.2em] transition active:scale-90 flex items-center justify-center gap-2" 
+                                        class="w-full sm:w-auto font-black py-4 px-10 rounded-2xl text-xs uppercase tracking-[0.2em] transition active:scale-90 flex items-center justify-center gap-2" 
                                         :class="canFinalize && !isSubmitting ? 'bg-tecsisa-yellow hover:bg-yellow-400 text-black shadow-[0_15px_40px_rgba(255,209,0,0.3)]' : 'bg-gray-300 dark:bg-gray-800 text-gray-500 cursor-not-allowed opacity-50'">
                                     <span x-show="!isSubmitting">Finalizar Reporte</span>
                                     <span x-show="isSubmitting">Enviando...</span>
@@ -718,7 +851,7 @@
                                 <a href="{{ route('tasks.index') }}" class="w-full sm:w-auto text-center text-[10px] font-black text-gray-500 hover:text-theme uppercase tracking-widest px-6 py-3 transition-colors">
                                     Volver
                                 </a>
-                                <a href="{{ route('tasks.pdf', $task) }}" class="w-full sm:w-auto bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-tecsisa-yellow/20 flex items-center justify-center gap-2 transition active:scale-95">
+                                <a href="{{ route('tasks.pdf', $task) }}" target="_blank" class="w-full sm:w-auto bg-tecsisa-yellow hover:bg-yellow-400 text-black px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-tecsisa-yellow/20 flex items-center justify-center gap-2 transition active:scale-95">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
                                     Descargar PDF
                                 </a>
@@ -741,10 +874,15 @@
         document.addEventListener('alpine:init', () => {
             Alpine.data('technicianForm', (config) => ({
                 isSubmitting: false,
+                hasChanges: false,
                 confirmFinal: true,
                 findings: config.findings,
                 materials: config.materials,
                 evaluations: {},
+                hasNewCable: {{ $task->has_new_cable ? 'true' : 'false' }},
+                hasNewJack: {{ $task->has_new_jack ? 'true' : 'false' }},
+                hasNewFaceplate: {{ $task->has_new_faceplate ? 'true' : 'false' }},
+                isCertified: {{ $task->is_certified ? 'true' : 'false' }},
                 annexPhoto: {{ isset($task->form_data['annex_photos']) ? 'true' : 'false' }},
                 annexPlans: {{ isset($task->form_data['annex_plans']) ? 'true' : 'false' }},
                 annexCert: {{ isset($task->form_data['annex_cert']) ? 'true' : 'false' }},
@@ -760,24 +898,81 @@
                 section: config.section,
                 start_time: config.start_time,
                 end_time: config.end_time,
-                init() {
-                    let savedEvals = {!! json_encode($task->form_data['evaluation'] ?? []) !!};
-                    if (Array.isArray(savedEvals) && savedEvals.length > 0) {
-                        savedEvals.forEach((ev, i) => {
-                            this.evaluations[i] = ev.status || '';
-                        });
-                    } else if (Object.keys(savedEvals).length > 0) {
-                        Object.keys(savedEvals).forEach(k => {
-                            this.evaluations[k] = savedEvals[k].status || '';
-                        });
+                plans: {!! json_encode($task->form_data['files']['plans'] ?? []) !!},
+                certs: {!! json_encode($task->form_data['files']['certs'] ?? []) !!},
+                plansToRemove: [],
+                certsToRemove: [],
+                pendingPlans: [],
+                pendingCerts: [],
+                removeExisting(type, path) {
+                    if (type === 'plans') {
+                        this.plans = this.plans.filter(p => p !== path);
+                        if (!this.plansToRemove.includes(path)) this.plansToRemove.push(path);
                     } else {
-                        @foreach($checklist as $i => $item)
-                        this.evaluations[{{ $i }}] = '';
-                        @endforeach
+                        this.certs = this.certs.filter(c => c !== path);
+                        if (!this.certsToRemove.includes(path)) this.certsToRemove.push(path);
                     }
-                    this.findings.forEach((f, i) => {
-                        this.previews.findings[i] = f.photo ? config.storagePath + f.photo : '';
-                    });
+                },
+                updatePending(event, type) {
+                    const files = Array.from(event.target.files);
+                    if (type === 'plans') {
+                        this.pendingPlans = files.map(f => f.name);
+                    } else {
+                        this.pendingCerts = files.map(f => f.name);
+                    }
+                },
+                removePending(type, index) {
+                    const input = type === 'plans' ? this.$refs.plansInput : this.$refs.certsInput;
+                    const dt = new DataTransfer();
+                    const { files } = input;
+                    for (let i = 0; i < files.length; i++) {
+                        if (i !== index) dt.items.add(files[i]);
+                    }
+                    input.files = dt.files;
+                    // Trigger update manually
+                    const event = { target: input };
+                    this.updatePending(event, type);
+                },
+                clearPending(type) {
+                    if (type === 'plans') {
+                        this.pendingPlans = [];
+                        this.$refs.plansInput.value = '';
+                    } else {
+                        this.pendingCerts = [];
+                        this.$refs.certsInput.value = '';
+                    }
+                },
+                init() {
+                    let rawEvals = {!! json_encode($task->form_data['evaluation'] ?? []) !!};
+                    this.evaluations = {};
+                    
+                    // Populate evaluations safely
+                    if (rawEvals && typeof rawEvals === 'object') {
+                        Object.keys(rawEvals).forEach(k => {
+                            this.evaluations[k] = (typeof rawEvals[k] === 'object') ? (rawEvals[k].status || '') : rawEvals[k];
+                        });
+                    }
+
+                    // Default values for missing checklist items
+                    @foreach($checklist as $i => $item)
+                        if (this.evaluations[{{ $i }}] === undefined) {
+                            this.evaluations[{{ $i }}] = '';
+                        }
+                    @endforeach
+
+                    // Findings Previews
+                    if (Array.isArray(this.findings)) {
+                        this.findings.forEach((f, i) => {
+                            if (f && f.photo) {
+                                // If it already looks like a URL (data: or http), use it, otherwise add storage path
+                                this.previews.findings[i] = (f.photo.startsWith('data:') || f.photo.startsWith('http')) 
+                                    ? f.photo 
+                                    : config.storagePath + f.photo;
+                            } else {
+                                this.previews.findings[i] = '';
+                            }
+                        });
+                    }
                 },
                 get validationErrors() {
                     let errors = [];
@@ -840,8 +1035,24 @@
                     }
 
                     if(actionType === 'submit') {
-
                         if(!confirm('¿Estás seguro de FINALIZAR este reporte? Una vez enviado no podrá ser editado.')) {
+                            return;
+                        }
+                    }
+
+                    if(actionType === 'reject') {
+                        const comment = document.querySelector('textarea[name="review_comment"]');
+                        if(!comment || !comment.value.trim()) {
+                            alert('Es obligatorio indicar el motivo del rechazo para que el técnico sepa qué corregir.');
+                            return;
+                        }
+                        if(!confirm('¿Seguro que deseas RECHAZAR este reporte? Se le notificará al técnico.')) {
+                            return;
+                        }
+                    }
+
+                    if(actionType === 'approve') {
+                        if(!confirm('¿Estás seguro de APROBAR este reporte? Este se marcará como verificado y ya no podrá ser editado.')) {
                             return;
                         }
                     }

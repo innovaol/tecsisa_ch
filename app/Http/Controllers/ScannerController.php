@@ -7,12 +7,13 @@ use Illuminate\Http\Request;
 
 class ScannerController extends Controller
 {
-    /**
-     * View for the mobile technician to scan or manually search for equipment.
-     */
     public function index()
     {
-        return view('scanner.index');
+        $equipments = Equipment::with('system', 'location')->get();
+        $locations = \App\Models\Location::all();
+        $systems = \App\Models\System::all();
+        
+        return view('scanner.index', compact('equipments', 'locations', 'systems'));
     }
 
     public function showResult(Equipment $equipment)
@@ -55,14 +56,10 @@ class ScannerController extends Controller
     }
 
     /**
-     * View all equipment organized by location.
+     * View all equipment with unified search and filters.
      */
     public function equipmentList()
     {
-        $locations = \App\Models\Location::with(['equipments' => function ($q) {
-            $q->with('system');
-        }])->get();
-
-        return view('scanner.equipment_list', ['locations' => $locations]);
+        return $this->index();
     }
 }

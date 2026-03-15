@@ -180,6 +180,7 @@
                                 <div class="flex flex-wrap gap-2">
                                     @php
                                         $fields = $sys->form_schema['specs'] ?? (isset($sys->form_schema[0]['label']) ? $sys->form_schema : []);
+                                        $checklistItems = $sys->form_schema['checklist'] ?? [];
                                     @endphp
                                     @forelse($fields as $field)
                                         <span class="text-[10px] bg-black/5 dark:bg-white/5 border border-theme px-2 py-1 rounded text-theme-muted">
@@ -189,6 +190,18 @@
                                         <span class="text-[10px] text-gray-600 italic">Sin campos personalizados</span>
                                     @endforelse
                                 </div>
+                                @if(count($checklistItems) > 0)
+                                <div class="flex items-center gap-2 mt-2">
+                                    <span class="inline-flex items-center gap-1 text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-black">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                                        {{ count($checklistItems) }} actividades en checklist
+                                    </span>
+                                </div>
+                                @else
+                                <div class="mt-2">
+                                    <span class="text-[10px] text-gray-600 italic">Sin checklist de mantenimiento</span>
+                                </div>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -340,7 +353,7 @@
                 <div x-show="showSystemModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                      class="relative w-full max-w-2xl bg-theme-card border border-theme rounded-3xl shadow-2xl overflow-hidden transition-all duration-500">
                     
-                    <form method="post" :action="systemFormAction" class="p-8">
+                    <form method="post" :action="systemFormAction" class="p-8" @submit.prevent="submitSystemForm($el)">
                         @csrf
                         <template x-if="systemEditMode">
                             <input type="hidden" name="_method" value="PUT">
@@ -364,7 +377,11 @@
                                        placeholder="Ej: CCTV, Control de Acceso, Redes...">
                             </div>
 
+                            <!-- Inputs ocultos para pasar validación requerida del controlador -->
+                            <input type="hidden" name="maintenance_interval_days" :value="systemFormData.maintenance_interval_days">
+                            <input type="hidden" name="maintenance_guide" :value="systemFormData.maintenance_guide">
 
+                            <!-- Sección: Campos Dinámicos de Especificación -->
                             <div class="bg-theme/5 rounded-2xl p-6 border border-theme">
                                 <div class="flex justify-between items-center mb-4">
                                     <h3 class="text-xs font-black text-theme-muted uppercase tracking-widest flex items-center gap-2">
@@ -408,6 +425,44 @@
 
                                     <template x-if="systemFormData.form_schema.length === 0">
                                         <p class="text-center text-xs text-theme-muted py-6 italic font-bold">No has definido campos técnicos para este sistema.</p>
+                                    </template>
+                                </div>
+                            </div>
+
+                            <!-- Sección: Checklist de Actividades de Mantenimiento -->
+                            <div class="bg-emerald-500/5 rounded-2xl p-6 border border-emerald-500/20">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h3 class="text-xs font-black text-emerald-400 uppercase tracking-widest flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                                        Checklist de Actividades de Mantenimiento
+                                    </h3>
+                                    <button type="button" @click="addChecklistItem()" class="text-[10px] bg-emerald-500 text-white px-4 py-1.5 rounded-full font-black hover:bg-emerald-400 transition uppercase tracking-widest">
+                                        + Añadir Actividad
+                                    </button>
+                                </div>
+                                <p class="text-[10px] text-gray-500 mb-4 font-bold">Cada ítem es una línea de la tabla SI/NO que el técnico responde al ejecutar la tarea.</p>
+
+                                <div class="space-y-2">
+                                    <template x-for="(item, idx) in systemFormData.checklist" :key="idx">
+                                        <div class="flex gap-2 items-center bg-theme/10 px-4 py-2.5 rounded-xl border border-theme/50 group">
+                                            <span class="text-[10px] font-black text-emerald-400 w-6 shrink-0" x-text="idx + 1 + '.'"></span>
+                                            <input type="text"
+                                                   data-checklist-input
+                                                   :value="item"
+                                                   class="flex-1 bg-transparent border-0 border-b border-theme/30 focus:border-emerald-400 text-[11px] text-theme h-8 px-1 font-bold uppercase tracking-wide outline-none transition"
+                                                   placeholder="Ej: CABLEADO (UTP): REVISIÓN DE ESTADO FÍSICO, ETIQUETADO Y CERTIFICACIÓN">
+                                            <button type="button" @click="removeChecklistItem(idx)"
+                                                    class="text-theme-muted hover:text-red-400 p-1.5 transition opacity-0 group-hover:opacity-100">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                            </button>
+                                        </div>
+                                    </template>
+
+                                    <template x-if="systemFormData.checklist.length === 0">
+                                        <div class="text-center py-8 border-2 border-dashed border-emerald-500/20 rounded-xl">
+                                            <svg class="w-10 h-10 text-emerald-500/30 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                                            <p class="text-xs text-gray-600 font-bold italic">Aún no hay actividades definidas. Haz clic en "+ Añadir Actividad" para comenzar.</p>
+                                        </div>
                                     </template>
                                 </div>
                             </div>
@@ -635,6 +690,14 @@
             allLocations: locations,
             allSystems: systems,
             allRacks: racks,
+
+            init() {
+                this.$watch('activeTab', tab => {
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('tab', tab);
+                    history.replaceState(null, '', url.toString());
+                });
+            },
             
             // Equipment Modal state
             showEquipmentModal: false,
@@ -663,6 +726,7 @@
                 id: '',
                 name: '',
                 form_schema: [],
+                checklist: [],
                 maintenance_interval_days: 90,
                 maintenance_guide: ''
             },
@@ -745,6 +809,7 @@
                     id: '', 
                     name: '', 
                     form_schema: [],
+                    checklist: [],
                     maintenance_interval_days: 90,
                     maintenance_guide: ''
                 };
@@ -754,10 +819,15 @@
             openEditSystemModal(sys) {
                 this.systemEditMode = true;
                 this.systemFormAction = `/catalogos/systems/${sys.id}`;
+                const schema = sys.form_schema || {};
+                // Soporte para ambos formatos: array plano (viejo) o objeto con claves
+                const specFields = Array.isArray(schema) ? schema : (schema.specs || []);
+                const checklistItems = Array.isArray(schema) ? [] : (schema.checklist || []);
                 this.systemFormData = {
                     id: sys.id,
                     name: sys.name,
-                    form_schema: sys.form_schema ? JSON.parse(JSON.stringify(sys.form_schema)) : [],
+                    form_schema: JSON.parse(JSON.stringify(specFields)),
+                    checklist: JSON.parse(JSON.stringify(checklistItems)),
                     maintenance_interval_days: sys.maintenance_interval_days || 90,
                     maintenance_guide: sys.maintenance_guide || ''
                 };
@@ -770,6 +840,34 @@
 
             removeFieldFromSchema(index) {
                 this.systemFormData.form_schema.splice(index, 1);
+            },
+
+            addChecklistItem() {
+                this.systemFormData.checklist.push('');
+            },
+
+            removeChecklistItem(idx) {
+                this.systemFormData.checklist.splice(idx, 1);
+            },
+
+            submitSystemForm(form) {
+                // Limpiar hidden inputs previos
+                form.querySelectorAll('[data-cl]').forEach(el => el.remove());
+
+                // Leer directamente del DOM — garantiza el valor que el usuario tecleó
+                const inputs = form.querySelectorAll('[data-checklist-input]');
+                inputs.forEach((input, idx) => {
+                    const val = input.value.trim();
+                    if (val === '') return;
+                    const hidden = document.createElement('input');
+                    hidden.type  = 'hidden';
+                    hidden.name  = `checklist[${idx}]`;
+                    hidden.value = val;
+                    hidden.setAttribute('data-cl', '1');
+                    form.appendChild(hidden);
+                });
+
+                form.submit();
             },
 
             // --- Locations Logic ---

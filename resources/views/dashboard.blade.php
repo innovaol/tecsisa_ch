@@ -70,9 +70,9 @@
                     </h3>
                     <div class="flex gap-2 w-full sm:w-auto">
                         @if(Auth::user()->hasRole('Administrador'))
-                        <a href="{{ route('reports.weekly.index') }}" class="flex-1 sm:flex-none text-[9px] font-black text-emerald-500 transition uppercase tracking-widest border border-emerald-500/20 bg-emerald-500/5 hover:bg-emerald-500 px-4 py-2.5 rounded-xl flex items-center justify-center gap-2" :class="theme === 'light' ? 'hover:text-white' : 'hover:text-white'">
+                        <a href="{{ route('reports.index') }}" class="flex-1 sm:flex-none text-[9px] font-black text-emerald-500 transition uppercase tracking-widest border border-emerald-500/20 bg-emerald-500/5 hover:bg-emerald-500 px-4 py-2.5 rounded-xl flex items-center justify-center gap-2" :class="theme === 'light' ? 'hover:text-white' : 'hover:text-white'">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                            Reporte Semanal
+                            Central de Reportes
                         </a>
                         @endif
                         <a href="{{ route('tasks.index') }}" class="flex-1 sm:flex-none text-[9px] font-black text-tecsisa-yellow hover:text-black transition uppercase tracking-widest border border-tecsisa-yellow/20 bg-tecsisa-yellow/5 hover:bg-tecsisa-yellow px-4 py-2.5 rounded-xl flex items-center justify-center">

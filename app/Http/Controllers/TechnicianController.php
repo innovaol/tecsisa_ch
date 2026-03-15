@@ -43,7 +43,13 @@ class TechnicianController extends Controller
 
         $task->load('equipment.location', 'equipment.system');
 
-        return view('technician.task', compact('task'));
+        // Extraer checklist del form_schema del sistema (soporte viejo y nuevo formato)
+        $rawSchema = $task->equipment->system->form_schema ?? [];
+        $checklist = isset($rawSchema['specs'])
+            ? ($rawSchema['checklist'] ?? [])
+            : [];
+
+        return view('technician.task', compact('task', 'checklist'));
     }
 
     public function updateTaskStatus(Request $request, Task $task)

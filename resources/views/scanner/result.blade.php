@@ -4,7 +4,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="h-16 flex items-center justify-between">
                 <div class="flex items-center gap-4">
-                    <a href="{{ route('technician.equipment.list') }}" class="w-9 h-9 rounded-xl bg-black/5 border border-theme flex items-center justify-center text-gray-400 hover:text-tecsisa-yellow hover:border-tecsisa-yellow/30 transition shadow-lg group active:scale-90">
+                    <a href="{{ route('technician.scanner') }}" class="w-9 h-9 rounded-xl bg-black/5 border border-theme flex items-center justify-center text-gray-400 hover:text-tecsisa-yellow hover:border-tecsisa-yellow/30 transition shadow-lg group active:scale-90">
                         <svg class="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
                     </a>
                     <div class="flex flex-col">
@@ -158,9 +158,9 @@
                     </div>
 
                     <div class="mt-8 pt-6 border-t border-theme">
-                        <a href="{{ route('technician.equipment.list') }}" class="flex items-center justify-center gap-2 text-gray-500 text-[10px] font-black uppercase tracking-[0.2em] transition group" :class="theme === 'light' ? 'hover:text-slate-900' : 'hover:text-white'">
+                        <a href="{{ route('technician.scanner') }}" class="flex items-center justify-center gap-2 text-gray-500 text-[10px] font-black uppercase tracking-[0.2em] transition group" :class="theme === 'light' ? 'hover:text-slate-900' : 'hover:text-white'">
                             <svg class="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 19l-7-7 7-7"></path></svg>
-                            Volver al Listado
+                            Volver al Buscador
                         </a>
                     </div>
                  </div>

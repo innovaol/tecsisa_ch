@@ -32,8 +32,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Módulo Técnico Móvil (Buscador Activos y Tareas)
         Route::middleware('role:Tecnico|Administrador')->prefix('technician')->name('technician.')->group(function () {
             Route::get('/dashboard', [\App\Http\Controllers\TechnicianController::class , 'dashboard'])->name('dashboard');
-            Route::get('/tasks/{task}', [\App\Http\Controllers\TechnicianController::class , 'showTask'])->name('task.show');
-            Route::put('/tasks/{task}', [\App\Http\Controllers\TechnicianController::class , 'updateTaskStatus'])->name('task.update');
 
             Route::get('/scanner', [\App\Http\Controllers\ScannerController::class , 'index'])->name('scanner');
             Route::get('/scanner/result/{equipment}', [\App\Http\Controllers\ScannerController::class , 'showResult'])->name('scanner.result');
@@ -72,9 +70,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
             // User and Role Management
             Route::resource('users', \App\Http\Controllers\UserController::class);
 
-            // Reportes Semanales
-            Route::get('/reportes/semanal', [\App\Http\Controllers\ReportController::class , 'index'])->name('reports.weekly.index');
-            Route::post('/reportes/semanal/generar', [\App\Http\Controllers\ReportController::class , 'generateWeekly'])->name('reports.weekly.generate');
+            // Central de Reportes
+            Route::get('/reportes', [\App\Http\Controllers\ReportController::class, 'index'])->name('reports.index');
+            Route::post('/reportes/ejecutivo', [\App\Http\Controllers\ReportController::class, 'generateWeekly'])->name('reports.weekly.generate');
+            Route::post('/reportes/interno', [\App\Http\Controllers\ReportController::class, 'exportInternal'])->name('reports.export.internal');
 
             // Configuración de la Empresa
             Route::get('/configuracion', [\App\Http\Controllers\SettingController::class, 'index'])->name('settings.index');

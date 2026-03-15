@@ -90,29 +90,45 @@ class CatalogController extends Controller
     public function storeSystem(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'form_schema' => 'nullable|array',
+            'name'                      => 'required|string|max:255',
+            'form_schema'               => 'nullable|array',
+            'checklist'                 => 'nullable|array',
             'maintenance_interval_days' => 'required|integer|min:1',
-            'maintenance_guide' => 'nullable|string',
+            'maintenance_guide'         => 'nullable|string',
         ]);
+
+        // Guardar form_schema como objeto estructurado {specs, checklist}
+        $validated['form_schema'] = [
+            'specs'     => array_values(array_filter($validated['form_schema'] ?? [], fn($f) => !empty($f['label']))),
+            'checklist' => array_values(array_filter($validated['checklist'] ?? [], fn($i) => trim($i) !== '')),
+        ];
+        unset($validated['checklist']);
 
         System::create($validated);
 
-        return redirect()->back()->with('success', 'Sistema técnico creado correctamente.');
+        return redirect()->to(route('catalog.index') . '?tab=systems')->with('success', 'Sistema técnico creado correctamente.');
     }
 
     public function updateSystem(Request $request, System $system)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'form_schema' => 'nullable|array',
+            'name'                      => 'required|string|max:255',
+            'form_schema'               => 'nullable|array',
+            'checklist'                 => 'nullable|array',
             'maintenance_interval_days' => 'required|integer|min:1',
-            'maintenance_guide' => 'nullable|string',
+            'maintenance_guide'         => 'nullable|string',
         ]);
+
+        // Guardar form_schema como objeto estructurado {specs, checklist}
+        $validated['form_schema'] = [
+            'specs'     => array_values(array_filter($validated['form_schema'] ?? [], fn($f) => !empty($f['label']))),
+            'checklist' => array_values(array_filter($validated['checklist'] ?? [], fn($i) => trim($i) !== '')),
+        ];
+        unset($validated['checklist']);
 
         $system->update($validated);
 
-        return redirect()->back()->with('success', 'Sistema técnico actualizado correctamente.');
+        return redirect()->to(route('catalog.index') . '?tab=systems')->with('success', 'Sistema técnico actualizado correctamente.');
     }
 
     public function destroySystem(System $system)

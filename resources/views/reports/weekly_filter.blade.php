@@ -34,15 +34,29 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div>
                                 <label class="block text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-3 ml-1">Fecha Inicio</label>
-                                <input type="date" name="start_date" required value="{{ date('Y-m-d', strtotime('monday this week')) }}"
+                                <input type="text" name="start_date" id="start_date" required value="{{ date('d/m/Y', strtotime('monday this week')) }}"
                                        class="w-full bg-black/20 border-theme rounded-xl text-sm focus:border-tecsisa-yellow focus:ring-0 transition h-12 px-4 font-bold transition-colors duration-500" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">
                             </div>
                             <div>
                                 <label class="block text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-3 ml-1">Fecha Cierre</label>
-                                <input type="date" name="end_date" required value="{{ date('Y-m-d', strtotime('sunday this week')) }}"
+                                <input type="text" name="end_date" id="end_date" required value="{{ date('d/m/Y', strtotime('sunday this week')) }}"
                                        class="w-full bg-black/20 border-theme rounded-xl text-sm focus:border-tecsisa-yellow focus:ring-0 transition h-12 px-4 font-bold transition-colors duration-500" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">
                             </div>
                         </div>
+
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                const fpConfig = {
+                                    dateFormat: "Y-m-d", // Backend
+                                    altInput: true,
+                                    altFormat: "d/m/Y", // Visual
+                                    locale: "es",
+                                    allowInput: true,
+                                };
+                                flatpickr("#start_date", fpConfig);
+                                flatpickr("#end_date", fpConfig);
+                            });
+                        </script>
 
                         <!-- Texto de Portada -->
                         <div>
