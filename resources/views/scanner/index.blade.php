@@ -86,27 +86,33 @@
                      class="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center p-4">
                     
                     <!-- Scanner Header -->
-                    <div class="absolute top-0 inset-x-0 p-6 pt-safe flex justify-between items-center z-20">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-tecsisa-yellow rounded-xl flex items-center justify-center text-black shadow-[0_0_20px_rgba(255,209,0,0.5)]">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                    <div class="absolute top-0 inset-x-0 p-6 pt-16 sm:pt-10 flex flex-col sm:flex-row justify-between items-center gap-6 z-20 bg-gradient-to-b from-black/80 to-transparent">
+                        <div class="flex items-center gap-4 w-full sm:w-auto">
+                            <div class="w-12 h-12 bg-tecsisa-yellow rounded-2xl flex items-center justify-center text-black shadow-[0_0_30px_rgba(255,209,0,0.6)] shrink-0">
+                                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
                             </div>
-                            <div>
-                                <span class="block text-xs font-black text-tecsisa-yellow uppercase tracking-[0.2em]">Visión QR</span>
-                                <span class="block text-[8px] font-bold text-gray-500 uppercase tracking-widest">Escaneando Infraestructura</span>
+                            <div class="flex-1">
+                                <span class="block text-sm font-black text-tecsisa-yellow uppercase tracking-[0.3em]">Visión QR / Bar</span>
+                                <span class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">Módulo de Exploración Técnica</span>
                             </div>
                         </div>
-                        <div class="flex items-center gap-3">
-                            <!-- Flash Toggle (Mobile Only) -->
+                        
+                        <div class="flex items-center justify-end gap-4 w-full sm:w-auto">
+                            <!-- Safe Area Spacer for very extreme notches -->
+                            <div class="w-2 sm:hidden"></div>
+
+                            <!-- Flash Toggle -->
                             <button @click="toggleFlash()" x-show="hasFlash" 
-                                    class="w-12 h-12 flex items-center justify-center bg-white/10 hover:bg-white/20 border border-white/20 rounded-2xl text-white transition-all backdrop-blur-md active:scale-90"
-                                    :class="flashOn ? 'bg-tecsisa-yellow/20 border-tecsisa-yellow/50' : ''">
-                                <svg x-show="!flashOn" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                                <svg x-show="flashOn" style="display: none;" class="w-5 h-5 text-tecsisa-yellow" fill="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                    class="flex-1 sm:flex-none h-14 px-6 flex items-center justify-center bg-white/10 hover:bg-white/20 border border-white/20 rounded-2xl text-white transition-all backdrop-blur-xl active:scale-95 group"
+                                    :class="flashOn ? 'bg-tecsisa-yellow/30 border-tecsisa-yellow shadow-[0_0_20px_rgba(255,209,0,0.3)]' : ''">
+                                <svg x-show="!flashOn" class="w-6 h-6 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                <svg x-show="flashOn" style="display: none;" class="w-6 h-6 text-tecsisa-yellow animate-pulse" fill="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                <span class="ml-3 text-[10px] font-black uppercase tracking-widest sm:hidden">Linterna</span>
                             </button>
                             
-                            <button @click="toggleCamera()" class="w-12 h-12 flex items-center justify-center bg-white/10 hover:bg-white/20 border border-white/20 rounded-2xl text-white transition-all backdrop-blur-md">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            <!-- Close Button -->
+                            <button @click="toggleCamera()" class="h-14 w-14 flex items-center justify-center bg-red-500/20 hover:bg-red-500 border border-red-500/30 rounded-2xl text-white transition-all backdrop-blur-xl active:scale-95 group">
+                                <svg class="w-7 h-7 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
                             </button>
                         </div>
                     </div>
