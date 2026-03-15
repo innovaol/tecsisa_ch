@@ -16,7 +16,7 @@
             </div>
             <button @click="showCreateModal = true" class="bg-tecsisa-yellow hover:bg-yellow-400 text-black font-black px-10 py-5 rounded-2xl text-[10px] uppercase tracking-[0.2em] transition-all duration-300 shadow-[0_15px_40px_rgba(255,209,0,0.3)] flex items-center gap-4 active:scale-95 whitespace-nowrap group">
                 <svg class="w-6 h-6 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
-                + Nuevo
+                Nuevo
             </button>
         </div>
 

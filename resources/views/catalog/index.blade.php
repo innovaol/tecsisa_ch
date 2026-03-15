@@ -70,8 +70,9 @@
                             <svg class="w-4 h-4 text-gray-500 absolute left-3 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </div>
                         @if(Auth::user()->hasRole('Administrador'))
-                        <button @click="openCreateModal()" class="w-full sm:w-auto flex justify-center items-center bg-tecsisa-yellow hover:bg-yellow-400 text-black px-6 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl transition-all active:scale-95">
-                            + Nuevo
+                        <button @click="openCreateModal()" class="w-full sm:w-auto flex justify-center items-center gap-2 bg-tecsisa-yellow hover:bg-yellow-400 text-black px-6 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl transition-all active:scale-95">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
+                            Nuevo
                         </button>
                         @endif
                     </div>
@@ -154,8 +155,9 @@
                         <p class="text-gray-500 text-xs font-bold tracking-widest uppercase mt-1">Parámetros y configuraciones por especialidad</p>
                     </div>
                     @if(Auth::user()->hasRole('Administrador'))
-                    <button @click="openSystemModal()" class="w-full md:w-auto flex justify-center items-center bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl transition-all active:scale-95">
-                        + Nuevo
+                    <button @click="openSystemModal()" class="w-full md:w-auto flex justify-center items-center gap-2 bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl transition-all active:scale-95">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
+                        Nuevo
                     </button>
                     @endif
                 </div>
@@ -227,11 +229,13 @@
                         </div>
                         @if(Auth::user()->hasRole('Administrador'))
                         <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto relative z-10">
-                            <button @click="openCreateLocationModal()" class="w-full sm:w-auto flex justify-center items-center bg-theme-border border border-theme hover:bg-theme-table-row-hover text-gray-400 px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95" :class="theme === 'light' ? 'hover:text-slate-900' : 'hover:text-white'">
-                                + Nueva
+                            <button @click="openCreateLocationModal()" class="w-full sm:w-auto flex justify-center items-center gap-2 bg-theme-border border border-theme hover:bg-theme-table-row-hover text-gray-400 px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95" :class="theme === 'light' ? 'hover:text-slate-900' : 'hover:text-white'">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
+                                Nueva
                             </button>
-                            <button @click="openCreateRackModal()" class="w-full sm:w-auto flex justify-center items-center bg-tecsisa-yellow hover:bg-yellow-400 text-black px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-[0_10px_20px_rgba(255,191,0,0.2)] transition-all active:scale-95">
-                                + Nuevo
+                            <button @click="openCreateRackModal()" class="w-full sm:w-auto flex justify-center items-center gap-2 bg-tecsisa-yellow hover:bg-yellow-400 text-black px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-[0_10px_20px_rgba(255,191,0,0.2)] transition-all active:scale-95">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
+                                Nuevo
                             </button>
                         </div>
                         @endif
