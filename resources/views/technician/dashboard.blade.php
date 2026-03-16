@@ -211,7 +211,7 @@
                         };
                         fetchNext();
                     }
-                }, 2000); // Esperar 2 segundos para no afectar la carga principal de la página
+                }, 5000); // Wait 5 seconds to ensure any previous redirect/load is fully finished
             }
         };
 

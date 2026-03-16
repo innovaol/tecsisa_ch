@@ -170,7 +170,7 @@
         <div class="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-tecsisa-yellow/5 blur-[120px] pointer-events-none z-0" :class="theme === 'light' ? 'opacity-20' : ''"></div>
         <div class="fixed bottom-[-10%] right-[-10%] w-[30%] h-[30%] rounded-full bg-blue-500/5 blur-[120px] pointer-events-none z-0" :class="theme === 'light' ? 'opacity-20' : ''"></div>
 
-        <div class="flex-1 flex flex-col relative z-20 h-full">
+        <div class="flex-1 flex flex-col relative z-20">
             @include('layouts.navigation')
 
             <!-- Page Heading -->
