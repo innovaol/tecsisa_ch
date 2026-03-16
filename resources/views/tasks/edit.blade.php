@@ -1113,6 +1113,7 @@
                         return;
                     }
 
+                    this.$refs.form.dataset.submitting = 'true';
                     this.$refs.form.submit();
                 }
             }));
