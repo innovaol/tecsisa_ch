@@ -26,25 +26,24 @@ class TaskController extends Controller
         $equipments = \App\Models\Equipment::all(['id', 'name', 'internal_id']);
 
         if (Auth::user()->hasRole('Administrador')) {
-            $allTasks = Task::all(); // For global stats
-            $tasks = $query->orderBy('created_at', 'desc')->get();
+            $tasks = $query->orderBy('created_at', 'desc')->paginate(20);
             $stats = [
-                'total' => $allTasks->count(),
-                'pending' => $allTasks->where('status', 'pending')->count(),
-                'in_review' => $allTasks->where('status', 'in_review')->count(),
-                'completed' => $allTasks->whereIn('status', ['completed', 'verified'])->count(),
+                'total' => Task::count(),
+                'pending' => Task::where('status', 'pending')->count(),
+                'in_review' => Task::where('status', 'in_review')->count(),
+                'completed' => Task::whereIn('status', ['completed', 'verified'])->count(),
             ];
-        }
-        else {
-            $myTasks = Task::where('assigned_to', Auth::id())->get();
+        } else {
             $tasks = $query->where('assigned_to', Auth::id())
                 ->orderBy('created_at', 'desc')
-                ->get();
+                ->paginate(20);
+                
+            $myTasksQuery = Task::where('assigned_to', Auth::id());
             $stats = [
-                'total' => $myTasks->count(),
-                'pending' => $myTasks->where('status', 'pending')->count(),
-                'in_review' => $myTasks->where('status', 'in_review')->count(),
-                'completed' => $myTasks->whereIn('status', ['completed', 'verified'])->count(),
+                'total' => $myTasksQuery->count(),
+                'pending' => (clone $myTasksQuery)->where('status', 'pending')->count(),
+                'in_review' => (clone $myTasksQuery)->where('status', 'in_review')->count(),
+                'completed' => (clone $myTasksQuery)->whereIn('status', ['completed', 'verified'])->count(),
             ];
         }
 
@@ -321,7 +320,14 @@ class TaskController extends Controller
         $task->save();
         \Illuminate\Support\Facades\Log::info("DIAGNOSTIC: DB Save took " . (microtime(true) - $dbStart) . "s");
         \Illuminate\Support\Facades\Log::info("DIAGNOSTIC: Total update " . (microtime(true) - $start) . "s");
-        return redirect()->route('tasks.index')->with('success', $message);
+        
+        session_write_close(); // Prevent session blocking for subsequent requests
+        
+        if ($isAdmin) {
+            return redirect()->route('tasks.index')->with('success', $message);
+        } else {
+            return redirect()->route('technician.dashboard')->with('success', $message);
+        }
     }
 
     public function destroy(Task $task, Request $request)
