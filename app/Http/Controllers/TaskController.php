@@ -22,30 +22,29 @@ class TaskController extends Controller
             $query->where('status', $request->status);
         }
 
-        $users = \App\Models\User::all(['id', 'name']);
-        $equipments = \App\Models\Equipment::all(['id', 'name', 'internal_id']);
+        $users = \App\Models\User::select('id', 'name')->get();
+        $equipments = \App\Models\Equipment::select('id', 'name', 'internal_id')->get();
 
         if (Auth::user()->hasRole('Administrador')) {
-            $allTasks = Task::all(); // For global stats
-            $tasks = $query->orderBy('created_at', 'desc')->get();
             $stats = [
-                'total' => $allTasks->count(),
-                'pending' => $allTasks->where('status', 'pending')->count(),
-                'in_review' => $allTasks->where('status', 'in_review')->count(),
-                'completed' => $allTasks->whereIn('status', ['completed', 'verified'])->count(),
+                'total' => Task::count(),
+                'pending' => Task::where('status', 'pending')->count(),
+                'in_review' => Task::where('status', 'in_review')->count(),
+                'completed' => Task::whereIn('status', ['completed', 'verified'])->count(),
             ];
+            $tasks = $query->orderBy('created_at', 'desc')->paginate(20);
         }
         else {
-            $myTasks = Task::where('assigned_to', Auth::id())->get();
-            $tasks = $query->where('assigned_to', Auth::id())
-                ->orderBy('created_at', 'desc')
-                ->get();
+            $userId = Auth::id();
             $stats = [
-                'total' => $myTasks->count(),
-                'pending' => $myTasks->where('status', 'pending')->count(),
-                'in_review' => $myTasks->where('status', 'in_review')->count(),
-                'completed' => $myTasks->whereIn('status', ['completed', 'verified'])->count(),
+                'total' => Task::where('assigned_to', $userId)->count(),
+                'pending' => Task::where('assigned_to', $userId)->where('status', 'pending')->count(),
+                'in_review' => Task::where('assigned_to', $userId)->where('status', 'in_review')->count(),
+                'completed' => Task::where('assigned_to', $userId)->whereIn('status', ['completed', 'verified'])->count(),
             ];
+            $tasks = $query->where('assigned_to', $userId)
+                ->orderBy('created_at', 'desc')
+                ->paginate(20);
         }
 
         return view('tasks.index', compact('tasks', 'users', 'equipments', 'stats'));
@@ -147,6 +146,7 @@ class TaskController extends Controller
      */
     public function update(Request $request, Task $task)
     {
+        $start = microtime(true);
         if ($task->assigned_to != Auth::id() && !Auth::user()->hasRole('Administrador')) {
             abort(403, 'No autorizado.');
         }
@@ -157,13 +157,15 @@ class TaskController extends Controller
             'action' => 'required|in:save_draft,submit,approve,reject,reassign',
             'assigned_to' => 'nullable|exists:users,id',
             'review_comment' => 'nullable|string',
-            'photos.*' => 'nullable|image|max:5120', // Max 5MB per photo
+            'photos.*' => 'nullable|image|max:5120',
             'is_additional' => 'nullable|boolean',
             'has_new_cable' => 'nullable|boolean',
             'has_new_jack' => 'nullable|boolean',
             'has_new_faceplate' => 'nullable|boolean',
             'is_certified' => 'nullable|boolean',
         ]);
+        $step = microtime(true);
+        \Illuminate\Support\Facades\Log::info("DEBUG: Validation for Task " . $task->id . " took " . ($step - $start) . "s");
 
         $isAdmin = Auth::user()->hasRole('Administrador');
 
@@ -312,7 +314,16 @@ class TaskController extends Controller
             ]);
         }
 
+        \Illuminate\Support\Facades\Log::info("DEBUG: Data processing took " . (microtime(true) - $step) . "s");
+        $dbStep = microtime(true);
         $task->save();
+        \Illuminate\Support\Facades\Log::info("DEBUG: DB Save took " . (microtime(true) - $dbStep) . "s");
+        \Illuminate\Support\Facades\Log::info("DEBUG: Total update took " . (microtime(true) - $start) . "s");
+
+        if (!Auth::user()->hasRole('Administrador')) {
+            return redirect()->route('technician.dashboard')->with('success', $message);
+        }
+
         return redirect()->route('tasks.index')->with('success', $message);
     }
 
