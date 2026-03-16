@@ -1061,64 +1061,19 @@
                     this.hasChanges = false;
                     this.$refs.actionField.value = actionType;
                     
-                    const form = this.$refs.form;
-                    const formData = new FormData(form);
+                    this.isSubmitting = true;
+                    this.hasChanges = false;
+                    this.$refs.actionField.value = actionType;
                     
-                    // PERFORMANCE FIX: 
-                    // Remove empty file payloads to avoid WAF/Antivirus hanging the POST request
-                    for (let [key, val] of Array.from(formData.entries())) {
-                        if (val instanceof File && val.size === 0) {
-                            formData.delete(key);
+                    // Optimización: Deshabilitar inputs de archivo vacíos para acelerar la subida y evitar bloqueos
+                    const fileInputs = this.$refs.form.querySelectorAll('input[type="file"]');
+                    fileInputs.forEach(input => {
+                        if (!input.files || input.files.length === 0) {
+                            input.disabled = true;
                         }
-                    }
-                    
-                    fetch(form.getAttribute('action'), {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'Accept': 'application/json'
-                        }
-                    }).then(async response => {
-                        this.isSubmitting = false;
-                        
-                        // Parse JSON safely
-                        let data;
-                        try {
-                            data = await response.json();
-                        } catch(e) {
-                            // If response is not JSON, it fell back to redirect or failed
-                            window.location.reload();
-                            return;
-                        }
-                        
-                        if (response.ok && data.success) {
-                            // Create floating success toast
-                            const toast = document.createElement('div');
-                            toast.className = 'fixed top-20 left-1/2 -translate-x-1/2 z-[9999] bg-emerald-500 text-white font-black text-sm px-8 py-4 rounded-2xl shadow-2xl transition-opacity duration-300';
-                            toast.textContent = data.message || 'Guardado exitosamente ✓';
-                            document.body.appendChild(toast);
-                            
-                            // Cleanup toast
-                            setTimeout(() => {
-                                toast.style.opacity = '0';
-                                setTimeout(() => toast.remove(), 300);
-                            }, 3000);
-                            
-                            // Navigate if required (submit/approve/reject)
-                            if (data.redirect) {
-                                setTimeout(() => {
-                                    window.location.href = data.redirect;
-                                }, 600);
-                            }
-                        } else {
-                            alert('Hubo un problema: ' + (data.message || 'Error desconocido'));
-                        }
-                    }).catch(err => {
-                        console.error('Save error:', err);
-                        alert('Error de red. Asegúrate de tener conexión e inténtalo de nuevo.');
-                        this.isSubmitting = false;
                     });
+                    
+                    this.$refs.form.submit();
                 }
             }));
 
