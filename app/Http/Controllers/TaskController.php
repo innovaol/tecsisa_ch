@@ -324,7 +324,11 @@ class TaskController extends Controller
         \Illuminate\Support\Facades\Log::info("DIAGNOSTIC: Total update " . (microtime(true) - $start) . "s");
         \Illuminate\Support\Facades\Log::info("DIAGNOSTIC: Redirect destination: " . ($isAdmin ? 'tasks.index (ADMIN)' : 'technician.dashboard (TECH)'));
         
-        if ($isAdmin) {
+        // For draft saves: go back to the same task (page is already in browser cache = fast)
+        // For final actions (submit/approve/reject): go to the list
+        if ($validated['action'] === 'save_draft') {
+            return redirect()->route('tasks.edit', $task)->with('success', $message);
+        } elseif ($isAdmin) {
             return redirect()->route('tasks.index')->with('success', $message);
         } else {
             return redirect()->route('technician.dashboard')->with('success', $message);
