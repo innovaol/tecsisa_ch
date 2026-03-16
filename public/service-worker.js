@@ -1,6 +1,10 @@
-const CACHE_NAME = 'tecsisa-ch-cache-v3';
+const CACHE_NAME = 'tecsisa-ch-cache-v4';
 const STATIC_ASSETS = [
     '/offline',
+    '/dashboard',
+    '/tasks',
+    '/technician/dashboard',
+    '/technician/scanner',
     '/manifest.json',
     '/icons/icon-192x192.png',
     '/icons/icon-512x512.png'
