@@ -230,6 +230,18 @@
                 hasFlash: false,
                 html5QrCode: null,
 
+                init() {
+                    // Prevent memory leaks and camera lock when navigating away via Turbo
+                    document.addEventListener('turbo:before-visit', () => {
+                        if (this.isScanning && this.html5QrCode) {
+                            this.html5QrCode.stop().then(() => {
+                                this.isScanning = false;
+                                this.flashOn = false;
+                            }).catch(() => {});
+                        }
+                    });
+                },
+
                 resetFilters() {
                     this.search = '';
                     this.filterLocation = '';
