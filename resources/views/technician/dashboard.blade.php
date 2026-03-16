@@ -168,4 +168,34 @@
             </div>
         @endif
     </div>
+
+    @push('scripts')
+    <script>
+        // Proactive Task Caching (Magia Offline)
+        // Este script descarga silenciosamente todas las tareas que el técnico tiene asignadas en su pantalla,
+        // para que cuando se quede sin internet, ya estén guardadas en su celular.
+        window.addEventListener('load', () => {
+            if ('serviceWorker' in navigator && navigator.onLine) {
+                setTimeout(() => {
+                    // Buscar todos los enlaces que lleven a editar una tarea
+                    const taskLinks = Array.from(document.querySelectorAll('a[href*="/tasks/"]'))
+                                          .map(a => a.href)
+                                          .filter(href => href.includes('/edit') || href.match(/\/tasks\/\d+$/));
+                    
+                    // Eliminar duplicados
+                    const uniqueLinks = [...new Set(taskLinks)];
+
+                    if (uniqueLinks.length > 0) {
+                        console.log(`[Offline Prefetch] Descargando silenciosamente ${uniqueLinks.length} tareas para modo sin conexión...`);
+                        
+                        // Hacer una petición "fantasma" a cada enlace para que el Service Worker lo intercepte y lo guarde
+                        uniqueLinks.forEach(link => {
+                            fetch(link, { priority: 'low' }).catch(err => console.debug('Prefetch ignorado (offline)'));
+                        });
+                    }
+                }, 2000); // Esperar 2 segundos para no afectar la carga principal de la página
+            }
+        });
+    </script>
+    @endpush
 </x-technician-layout>
