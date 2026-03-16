@@ -1,33 +1,5 @@
 <x-technician-layout>
-    <div class="px-5 pt-6 max-w-7xl mx-auto md:py-10 md:px-8 lg:px-12" x-data="{ 
-        pendingSyncCount: 0,
-        async checkPendingSync() {
-            if (window.offlineDB) {
-                const tasks = await window.offlineDB.getAllTasks();
-                this.pendingSyncCount = tasks.length;
-            }
-        }
-    }" x-init="checkPendingSync(); window.addEventListener('offline-sync-completed', () => checkPendingSync())">
-        
-        <!-- Offline Sync Notification -->
-        <template x-if="pendingSyncCount > 0">
-            <div class="bg-tecsisa-yellow/10 border border-tecsisa-yellow/30 rounded-3xl p-6 mb-8 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-2xl animate-pulse">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 bg-tecsisa-yellow rounded-2xl flex items-center justify-center text-black shadow-lg">
-                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                    </div>
-                    <div>
-                        <h4 class="text-sm font-black text-tecsisa-yellow uppercase tracking-widest">Sincronización Pendiente</h4>
-                        <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">
-                            Tienes <span class="text-white" x-text="pendingSyncCount"></span> reporte(s) guardados localmente esperando conexión.
-                        </p>
-                    </div>
-                </div>
-                <button @click="window.syncHelper.syncAll()" class="bg-tecsisa-yellow text-black px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest active:scale-95 transition-all w-full sm:w-auto">
-                    Sincronizar Ahora
-                </button>
-            </div>
-        </template>
+    <div class="px-5 pt-6 max-w-7xl mx-auto md:py-10 md:px-8 lg:px-12">
         <!-- Header Section: Tarjeta Propia -->
         <div class="bg-theme-card border border-theme rounded-[2.5rem] p-6 sm:p-10 mb-6 sm:mb-10 transition-all duration-500 shadow-xl relative">
             <!-- Decorative Orbs (Clipped) -->
@@ -168,56 +140,4 @@
             </div>
         @endif
     </div>
-
-    @push('scripts')
-    <script>
-        // Proactive Task Caching (Magia Offline)
-        // Este script descarga silenciosamente todas las tareas que el técnico tiene asignadas en su pantalla,
-        // para que cuando se quede sin internet, ya estén guardadas en su celular.
-        const runOfflinePrefetch = () => {
-            if ('serviceWorker' in navigator && navigator.onLine) {
-                setTimeout(() => {
-                    // Buscar todos los enlaces que lleven a editar una tarea
-                    const taskLinks = Array.from(document.querySelectorAll('a[href*="/tasks/"]'))
-                                          .map(a => a.href)
-                                          .filter(href => href.includes('/edit') || href.match(/\/tasks\/\d+$/));
-                    
-                    // Eliminar duplicados
-                    const uniqueLinks = [...new Set(taskLinks)];
-
-                    // LÍMITE DE SEGURIDAD (Cap de Descarga)
-                    // Evita que el navegador colapse si un técnico tiene 100 tareas asignadas.
-                    // 15 es un número muy seguro entre consumo de datos y tareas diarias promedio.
-                    const maxTasksToPrefetch = 15;
-                    const linksToFetch = uniqueLinks.slice(0, maxTasksToPrefetch);
-
-                    if (linksToFetch.length > 0) {
-                        console.log(`[Offline Prefetch] Descargando silenciosamente ${linksToFetch.length} tareas (de ${uniqueLinks.length} en pantalla) para modo sin conexión...`);
-                        
-                        // Descarga escalonada para no ahogar el servidor de XAMPP
-                        let index = 0;
-                        const fetchNext = () => {
-                            if (index < linksToFetch.length) {
-                                fetch(linksToFetch[index], { 
-                                    priority: 'low',
-                                    headers: { 'Accept': 'text/html' }
-                                })
-                                    .then(() => {
-                                        index++;
-                                        setTimeout(fetchNext, 500); // Dar un respiro de 500ms entre tarea y tarea
-                                    })
-                                    .catch(err => console.debug('Prefetch ignorado (offline)'));
-                            }
-                        };
-                        fetchNext();
-                    }
-                }, 5000); // Wait 5 seconds to ensure any previous redirect/load is fully finished
-            }
-        };
-
-        // Run on normal load and on Turbo navigations
-        // document.addEventListener('DOMContentLoaded', runOfflinePrefetch);
-        // document.addEventListener('turbo:load', runOfflinePrefetch);
-    </script>
-    @endpush
 </x-technician-layout>

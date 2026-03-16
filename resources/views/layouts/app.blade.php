@@ -4,13 +4,6 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <meta name="theme-color" content="#FFD100">
-        <meta name="apple-mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-        <meta name="apple-mobile-web-app-title" content="TECSISA CH">
-        <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
-
-        <link rel="manifest" href="/manifest.json">
 
         <title>{{ $company_name ?? config('app.name', 'Laravel') }}</title>
 
@@ -48,10 +41,6 @@
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
         <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-        
-        <!-- Hotwire Turbo (Navegación Acelerada) -->
-        <script type="module" src="https://cdn.jsdelivr.net/npm/@hotwired/turbo@8.0.4/dist/turbo.es2017-esm.js"></script>
-
         
         <!-- Flatpickr for forced dd/mm/yyyy visually -->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -170,7 +159,7 @@
         <div class="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-tecsisa-yellow/5 blur-[120px] pointer-events-none z-0" :class="theme === 'light' ? 'opacity-20' : ''"></div>
         <div class="fixed bottom-[-10%] right-[-10%] w-[30%] h-[30%] rounded-full bg-blue-500/5 blur-[120px] pointer-events-none z-0" :class="theme === 'light' ? 'opacity-20' : ''"></div>
 
-        <div class="flex-1 flex flex-col relative z-20">
+        <div class="flex-1 flex flex-col relative z-20 overflow-hidden h-full">
             @include('layouts.navigation')
 
             <!-- Page Heading -->
@@ -182,22 +171,8 @@
                 </header>
             @endif
 
-            <div x-data="{ online: navigator.onLine, showStatus: false, statusType: '' }"
-                 x-init="window.addEventListener('online', () => { online = true; statusType = 'online'; showStatus = true; setTimeout(() => showStatus = false, 3000) }); 
-                         window.addEventListener('offline', () => { online = false; statusType = 'offline'; showStatus = true; setTimeout(() => showStatus = false, 3000) })"
-                 class="fixed bottom-24 left-1/2 -translate-x-1/2 z-[200]">
-                <template x-if="showStatus">
-                    <div :class="statusType === 'online' ? 'bg-emerald-500 shadow-emerald-500/40' : 'bg-red-500 shadow-red-500/40'" 
-                         class="px-6 py-3 rounded-2xl flex items-center gap-3 shadow-2xl animate-bounce">
-                        <div class="w-2 h-2 rounded-full bg-white animate-pulse"></div>
-                        <span class="text-white text-[10px] font-black uppercase tracking-widest" 
-                              x-text="statusType === 'online' ? 'Conexión Recuperada' : 'Modo Offline Activo'"></span>
-                    </div>
-                </template>
-            </div>
-
             <!-- Page Content -->
-            <main class="flex-1 w-full relative sm:pb-0 pb-32 pb-safe transition-all mt-0">
+            <main class="flex-1 w-full relative md:overflow-visible overflow-y-auto no-scrollbar sm:pb-0 pb-32 pb-safe transition-all mt-0">
                 {{ $slot }}
                 <!-- Spacer for mobile stability -->
                 <div class="h-20 md:hidden"></div>
@@ -205,14 +180,5 @@
         </div>
 
         @stack('scripts')
-        <script>
-            if ('serviceWorker' in navigator) {
-                window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('/service-worker.js')
-                        .then(reg => console.log('Service Worker registered', reg))
-                        .catch(err => console.log('Service Worker registration failed', err));
-                });
-            }
-        </script>
     </body>
 </html>

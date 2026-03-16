@@ -131,49 +131,4 @@
                 </div>
             </div>
     </div>
-
-    @push('scripts')
-    <script>
-        // Proactive Task Caching (Magia Offline)
-        // Este script descarga silenciosamente todas las tareas que aparecen en la tabla,
-        // para que cuando se quede sin internet, ya estén guardadas en su celular o PC.
-        const runOfflinePrefetch = () => {
-            if ('serviceWorker' in navigator && navigator.onLine) {
-                setTimeout(() => {
-                    const taskLinks = Array.from(document.querySelectorAll('a[href*="/tasks/"]'))
-                                          .map(a => a.href)
-                                          .filter(href => href.includes('/edit') || href.match(/\/tasks\/\d+$/));
-                    
-                    const uniqueLinks = [...new Set(taskLinks)];
-                    const maxTasksToPrefetch = 15;
-                    const linksToFetch = uniqueLinks.slice(0, maxTasksToPrefetch);
-
-                    if (linksToFetch.length > 0) {
-                        console.log(`[Offline Prefetch] Descargando silenciosamente ${linksToFetch.length} tareas (de ${uniqueLinks.length} en pantalla) para modo sin conexión...`);
-                        
-                        let index = 0;
-                        const fetchNext = () => {
-                            if (index < linksToFetch.length) {
-                                fetch(linksToFetch[index], { 
-                                    priority: 'low',
-                                    headers: { 'Accept': 'text/html' }
-                                })
-                                    .then(() => {
-                                        index++;
-                                        setTimeout(fetchNext, 500);
-                                    })
-                                    .catch(err => console.debug('Prefetch ignorado (offline)'));
-                            }
-                        };
-                        fetchNext();
-                    }
-                }, 2000);
-            }
-        };
-
-        // Run on normal load and on Turbo navigations
-        document.addEventListener('DOMContentLoaded', runOfflinePrefetch);
-        document.addEventListener('turbo:load', runOfflinePrefetch);
-    </script>
-    @endpush
 </x-app-layout>

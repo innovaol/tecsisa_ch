@@ -4,13 +4,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="theme-color" content="#FFD100">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="TECSISA CH">
-    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
-
-    <link rel="manifest" href="/manifest.json">
 
     <title>{{ $company_name ?? config('app.name', 'Tecsisa App') }} - Técnico</title>
 
@@ -46,10 +39,6 @@
     </script>
     <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    
-    <!-- Hotwire Turbo (Navegación Acelerada) -->
-    <script type="module" src="https://cdn.jsdelivr.net/npm/@hotwired/turbo@8.0.4/dist/turbo.es2017-esm.js"></script>
-
     
     <style>
         /* Variables System */
@@ -102,6 +91,7 @@
         body {
             background-color: var(--theme-bg);
             color: var(--theme-text);
+            overscroll-behavior-y: none;
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
@@ -149,7 +139,7 @@
         }
     }" 
     :class="theme"
-    class="font-sans antialiased flex flex-col min-h-screen">
+    class="font-sans antialiased md:overflow-auto md:h-auto overflow-hidden h-[100dvh]" style="display: flex; flex-direction: column;">
     
     <!-- Background Glowing Orbs -->
     <div class="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-tecsisa-yellow/5 blur-[120px] pointer-events-none z-0" :class="theme === 'light' ? 'opacity-20' : ''"></div>
@@ -158,22 +148,8 @@
     <!-- Unified Master Navigation -->
     @include('layouts.navigation', ['hideHeader' => $hideHeader ?? false])
 
-    <div x-data="{ online: navigator.onLine, showStatus: false, statusType: '' }"
-         x-init="window.addEventListener('online', () => { online = true; statusType = 'online'; showStatus = true; setTimeout(() => showStatus = false, 3000) }); 
-                 window.addEventListener('offline', () => { online = false; statusType = 'offline'; showStatus = true; setTimeout(() => showStatus = false, 3000) })"
-         class="fixed bottom-24 left-1/2 -translate-x-1/2 z-[200] pointer-events-none">
-        <template x-if="showStatus">
-            <div :class="statusType === 'online' ? 'bg-emerald-500 shadow-emerald-500/40' : 'bg-red-500 shadow-red-500/40'" 
-                 class="px-6 py-3 rounded-2xl flex items-center gap-3 shadow-2xl animate-bounce">
-                <div class="w-2 h-2 rounded-full bg-white animate-pulse"></div>
-                <span class="text-white text-[10px] font-black uppercase tracking-widest" 
-                      x-text="statusType === 'online' ? 'Conexión Recuperada' : 'Modo Offline Activo'"></span>
-            </div>
-        </template>
-    </div>
-
     <!-- Contenido Principal -->
-    <main class="flex-1 relative z-10 {{ ($hideNav ?? false) ? '' : 'pb-32 pb-safe md:pb-0' }}">
+    <main class="flex-1 md:overflow-visible overflow-y-auto no-scrollbar relative z-10 {{ ($hideNav ?? false) ? '' : 'pb-32 pb-safe md:pb-0' }}">
         <div class="md:max-w-7xl md:mx-auto md:w-full md:px-6 lg:px-8">
             {{ $slot }}
             <!-- Spacer for mobile stability -->
@@ -182,16 +158,5 @@
     </main>
 
     @stack('scripts')
-    <script src="/js/offline-db.js"></script>
-    <script src="/js/sync-helper.js"></script>
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/service-worker.js')
-                    .then(reg => console.log('Service Worker registered', reg))
-                    .catch(err => console.log('Service Worker registration failed', err));
-            });
-        }
-    </script>
 </body>
 </html>

@@ -119,7 +119,7 @@
                     <div class="absolute bottom-0 inset-x-0 p-10 pb-20 flex flex-col gap-6 z-20 bg-gradient-to-t from-black via-black/80 to-transparent">
                         <div class="flex items-center gap-4 max-w-sm mx-auto w-full">
                             <!-- Flash Toggle Button -->
-                            <button @click="toggleFlash()" x-show="hasFlash"
+                            <button @click="toggleFlash()" 
                                     class="flex-1 h-16 flex flex-col items-center justify-center bg-white/5 border border-white/10 rounded-[2rem] text-white transition-all backdrop-blur-2xl active:scale-95 group shadow-2xl"
                                     :class="flashOn ? 'bg-tecsisa-yellow/20 border-tecsisa-yellow ring-4 ring-tecsisa-yellow/10' : ''">
                                 <svg x-show="!flashOn" class="w-6 h-6 mb-1 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
@@ -219,7 +219,7 @@
     </div>
 
     <script>
-        const initDiscoveryApp = () => {
+        document.addEventListener('alpine:init', () => {
             Alpine.data('discoveryApp', (equipments) => ({
                 equipments: equipments,
                 search: '',
@@ -229,18 +229,6 @@
                 flashOn: false,
                 hasFlash: false,
                 html5QrCode: null,
-
-                init() {
-                    // Prevent memory leaks and camera lock when navigating away via Turbo
-                    document.addEventListener('turbo:before-visit', () => {
-                        if (this.isScanning && this.html5QrCode) {
-                            this.html5QrCode.stop().then(() => {
-                                this.isScanning = false;
-                                this.flashOn = false;
-                            }).catch(() => {});
-                        }
-                    });
-                },
 
                 resetFilters() {
                     this.search = '';
@@ -319,52 +307,36 @@
                 toggleFlash() {
                     if (!this.isScanning) return;
                     
-                    this.flashOn = !this.flashOn;
-                    
                     try {
-                        // Enfoque 1: Intento Directo al Hardware (Mejor para Chrome Android)
-                        const videoElement = document.querySelector('#reader video');
-                        if (videoElement && videoElement.srcObject) {
-                            const track = videoElement.srcObject.getVideoTracks()[0];
-                            if (track) {
-                                const imageCapture = window.ImageCapture ? new ImageCapture(track) : null;
-                                // Verificamos primero si el equipo reporta soporte
-                                const capabilities = track.getCapabilities();
-                                if (!capabilities.torch) {
-                                    throw new Error("El hardware no reporta soporte de linterna (torch).");
+                        // Attempt 1: Using html5-qrcode's built-in method
+                        this.flashOn = !this.flashOn;
+                        this.html5QrCode.applyVideoConstraints({
+                            advanced: [{ torch: this.flashOn }]
+                        }).then(() => {
+                            console.log("Torch toggled via library");
+                        }).catch(err => {
+                            // Attempt 2: Direct track access if library method fails
+                            console.warn("Library torch failed, trying direct track access:", err);
+                            const videoElement = document.querySelector('#reader video');
+                            if (videoElement && videoElement.srcObject) {
+                                const track = videoElement.srcObject.getVideoTracks()[0];
+                                if (track) {
+                                    track.applyConstraints({
+                                        advanced: [{ torch: this.flashOn }]
+                                    }).catch(e => {
+                                        console.error("Direct torch failed:", e);
+                                        this.flashOn = false;
+                                        alert("La linterna no es compatible con este navegador/celular.");
+                                    });
                                 }
-
-                                track.applyConstraints({
-                                    advanced: [{ torch: this.flashOn }]
-                                }).then(() => {
-                                    console.log("Linterna encendida directo al track.");
-                                }).catch(e => {
-                                    console.warn("Fallo directo:", e);
-                                    // Enfoque 2: Intento a través de la librería HTML5-QRCode
-                                    if(this.html5QrCode) {
-                                        this.html5QrCode.applyVideoConstraints({
-                                            advanced: [{ torch: this.flashOn }]
-                                        }).catch(err => {
-                                            this.flashOn = false;
-                                            alert("La linterna web está bloqueada por su navegador o dispositivo (Común en iPhone/Safari o si la cámara no tiene flash).");
-                                        });
-                                    }
-                                });
                             }
-                        }
+                        });
                     } catch (err) {
                         this.flashOn = false;
-                        this.hasFlash = false; // Ocultamos el botón si resulta estar bloqueado para no frustrar.
-                        console.error("No soportado:", err);
+                        console.error("General torch error:", err);
                     }
                 }
             }));
-        };
-
-        if (window.Alpine) {
-            initDiscoveryApp();
-        } else {
-            document.addEventListener('alpine:init', initDiscoveryApp);
-        }
+        });
     </script>
 </x-technician-layout>

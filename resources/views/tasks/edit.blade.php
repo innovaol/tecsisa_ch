@@ -871,7 +871,7 @@
 
     @push('scripts')
     <script>
-        const initTechnicianForm = () => {
+        document.addEventListener('alpine:init', () => {
             Alpine.data('technicianForm', (config) => ({
                 isSubmitting: false,
                 hasChanges: false,
@@ -1027,77 +1027,40 @@
                 removeMaterial(index) {
                     this.materials.splice(index, 1);
                 },
-                async doSubmit(actionType) {
+                doSubmit(actionType) {
                     if(this.isSubmitting) return;
                     
-                    if(actionType === 'save_draft' && !confirm('¿Deseas guardar los cambios actuales como borrador?')) return;
-                    if(actionType === 'submit' && !confirm('¿Estás seguro de FINALIZAR este reporte? Una vez enviado no podrá ser editado.')) return;
+                    if(actionType === 'save_draft' && !confirm('¿Deseas guardar los cambios actuales como borrador?')) {
+                        return;
+                    }
+
+                    if(actionType === 'submit') {
+                        if(!confirm('¿Estás seguro de FINALIZAR este reporte? Una vez enviado no podrá ser editado.')) {
+                            return;
+                        }
+                    }
 
                     if(actionType === 'reject') {
                         const comment = document.querySelector('textarea[name="review_comment"]');
                         if(!comment || !comment.value.trim()) {
-                            alert('Es obligatorio indicar el motivo del rechazo.');
+                            alert('Es obligatorio indicar el motivo del rechazo para que el técnico sepa qué corregir.');
+                            return;
+                        }
+                        if(!confirm('¿Seguro que deseas RECHAZAR este reporte? Se le notificará al técnico.')) {
+                            return;
+                        }
+                    }
+
+                    if(actionType === 'approve') {
+                        if(!confirm('¿Estás seguro de APROBAR este reporte? Este se marcará como verificado y ya no podrá ser editado.')) {
                             return;
                         }
                     }
 
                     this.isSubmitting = true;
+                    this.hasChanges = false; // Disable warning on submit
                     this.$refs.actionField.value = actionType;
-
-                    // Improved connectivity check: actually try the network if possible
-                    let isActuallyOnline = navigator.onLine;
-                    
-                    if (isActuallyOnline) {
-                        this.$refs.form.dataset.submitting = 'true';
-                        try {
-                            if (typeof this.$refs.form.requestSubmit === 'function') {
-                                this.$refs.form.requestSubmit();
-                                return; // Browser takes over
-                            }
-                        } catch (err) {
-                            console.warn('requestSubmit failed, falling back', err);
-                        }
-                        this.$refs.form.submit();
-                        return;
-                    }
-
-                    // OFFLINE FALLBACK
-                    try {
-                        const formData = new FormData(this.$refs.form);
-                        const taskPayload = {
-                            id: Date.now(),
-                            original_task_id: '{{ $task->id }}',
-                            url: this.$refs.form.action,
-                            fields: {},
-                            blobs: []
-                        };
-
-                        for (let [key, value] of formData.entries()) {
-                            if (value instanceof File && value.size > 0) {
-                                const dataUrl = await new Promise(resolve => {
-                                    const reader = new FileReader();
-                                    reader.onload = e => resolve(e.target.result);
-                                    reader.readAsDataURL(value);
-                                });
-                                taskPayload.blobs.push({ fieldName: key, fileName: value.name, data: dataUrl });
-                            } else if (!(value instanceof File)) {
-                                if (taskPayload.fields[key]) {
-                                    if (!Array.isArray(taskPayload.fields[key])) taskPayload.fields[key] = [taskPayload.fields[key]];
-                                    taskPayload.fields[key].push(value);
-                                } else {
-                                    taskPayload.fields[key] = value;
-                                }
-                            }
-                        }
-
-                        await window.offlineDB.saveTask(taskPayload);
-                        alert('⚠️ GUARDADO LOCAL: Estás offline. Los cambios se guardaron en tu celular y se sincronizarán al recuperar señal.');
-                        window.location.href = "{{ route('technician.dashboard') }}";
-                    } catch (e) {
-                        console.error('Offline save error:', e);
-                        alert('Error al guardar localmente. Por favor, busca señal para guardar directamente.');
-                        this.isSubmitting = false;
-                    }
+                    this.$refs.form.submit();
                 }
             }));
 
@@ -1110,13 +1073,7 @@
                     // However, standard browser warning is better.
                 }
             });
-        };
-
-        if (window.Alpine) {
-            initTechnicianForm();
-        } else {
-            document.addEventListener('alpine:init', initTechnicianForm);
-        }
+        });
     </script>
     @endpush
 </x-technician-layout>
