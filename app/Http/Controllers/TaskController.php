@@ -314,17 +314,24 @@ class TaskController extends Controller
             ]);
         }
 
-        \Illuminate\Support\Facades\Log::info("DEBUG: Data processing took " . (microtime(true) - $step) . "s");
         $dbStep = microtime(true);
         $task->save();
+        $totalTime = round((microtime(true) - $start) * 1000);
+        $message .= " (Procesado en {$totalTime}ms)";
+
         \Illuminate\Support\Facades\Log::info("DEBUG: DB Save took " . (microtime(true) - $dbStep) . "s");
-        \Illuminate\Support\Facades\Log::info("DEBUG: Total update took " . (microtime(true) - $start) . "s");
+        \Illuminate\Support\Facades\Log::info("DEBUG: Total update for Task " . $task->id . " took " . (microtime(true) - $start) . "s");
+
+        // Force session write and close to prevent blocking redirects or background requests
+        session()->flash('success', $message);
+        session()->save();
+        session_write_close();
 
         if (!Auth::user()->hasRole('Administrador')) {
-            return redirect()->route('technician.dashboard')->with('success', $message);
+            return redirect()->route('technician.dashboard');
         }
 
-        return redirect()->route('tasks.index')->with('success', $message);
+        return redirect()->route('tasks.index');
     }
 
     public function destroy(Task $task, Request $request)

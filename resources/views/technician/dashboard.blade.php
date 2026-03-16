@@ -216,8 +216,8 @@
         };
 
         // Run on normal load and on Turbo navigations
-        document.addEventListener('DOMContentLoaded', runOfflinePrefetch);
-        document.addEventListener('turbo:load', runOfflinePrefetch);
+        // document.addEventListener('DOMContentLoaded', runOfflinePrefetch);
+        // document.addEventListener('turbo:load', runOfflinePrefetch);
     </script>
     @endpush
 </x-technician-layout>
