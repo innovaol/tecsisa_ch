@@ -21,11 +21,22 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Share company settings with all views
-        View::composer('*', function ($view) {
-            $view->with('company_name', Setting::getValue('company_name', 'Tecsisa'));
-            $view->with('company_logo', Setting::getValue('company_logo'));
-            $view->with('company_footer', Setting::getValue('company_footer', 'Sistema de Gestión de Infraestructura Hospitalaria'));
+        // Cache company settings ONCE, then share with all views
+        // Previously: View::composer('*') ran 3 DB queries per every single view/partial (could be 100+ per page!)
+        $companyName = null;
+        $companyLogo = null;
+        $companyFooter = null;
+
+        View::composer('layouts.*', function ($view) use (&$companyName, &$companyLogo, &$companyFooter) {
+            if ($companyName === null) {
+                $settings = Setting::whereIn('key', ['company_name', 'company_logo', 'company_footer'])->pluck('value', 'key');
+                $companyName = $settings['company_name'] ?? 'Tecsisa';
+                $companyLogo = $settings['company_logo'] ?? null;
+                $companyFooter = $settings['company_footer'] ?? 'Sistema de Gestión de Infraestructura Hospitalaria';
+            }
+            $view->with('company_name', $companyName);
+            $view->with('company_logo', $companyLogo);
+            $view->with('company_footer', $companyFooter);
         });
     }
 }
