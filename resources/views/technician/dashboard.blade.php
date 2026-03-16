@@ -185,13 +185,28 @@
                     // Eliminar duplicados
                     const uniqueLinks = [...new Set(taskLinks)];
 
-                    if (uniqueLinks.length > 0) {
-                        console.log(`[Offline Prefetch] Descargando silenciosamente ${uniqueLinks.length} tareas para modo sin conexión...`);
+                    // LÍMITE DE SEGURIDAD (Cap de Descarga)
+                    // Evita que el navegador colapse si un técnico tiene 100 tareas asignadas.
+                    // 15 es un número muy seguro entre consumo de datos y tareas diarias promedio.
+                    const maxTasksToPrefetch = 15;
+                    const linksToFetch = uniqueLinks.slice(0, maxTasksToPrefetch);
+
+                    if (linksToFetch.length > 0) {
+                        console.log(`[Offline Prefetch] Descargando silenciosamente ${linksToFetch.length} tareas (de ${uniqueLinks.length} en pantalla) para modo sin conexión...`);
                         
-                        // Hacer una petición "fantasma" a cada enlace para que el Service Worker lo intercepte y lo guarde
-                        uniqueLinks.forEach(link => {
-                            fetch(link, { priority: 'low' }).catch(err => console.debug('Prefetch ignorado (offline)'));
-                        });
+                        // Descarga escalonada para no ahogar el servidor de XAMPP
+                        let index = 0;
+                        const fetchNext = () => {
+                            if (index < linksToFetch.length) {
+                                fetch(linksToFetch[index], { priority: 'low' })
+                                    .then(() => {
+                                        index++;
+                                        setTimeout(fetchNext, 500); // Dar un respiro de 500ms entre tarea y tarea
+                                    })
+                                    .catch(err => console.debug('Prefetch ignorado (offline)'));
+                            }
+                        };
+                        fetchNext();
                     }
                 }, 2000); // Esperar 2 segundos para no afectar la carga principal de la página
             }
