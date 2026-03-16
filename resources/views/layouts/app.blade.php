@@ -159,7 +159,7 @@
         <div class="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-tecsisa-yellow/5 blur-[120px] pointer-events-none z-0" :class="theme === 'light' ? 'opacity-20' : ''"></div>
         <div class="fixed bottom-[-10%] right-[-10%] w-[30%] h-[30%] rounded-full bg-blue-500/5 blur-[120px] pointer-events-none z-0" :class="theme === 'light' ? 'opacity-20' : ''"></div>
 
-        <div class="flex-1 flex flex-col relative z-20 overflow-hidden h-full">
+        <div class="flex-1 flex flex-col relative z-20">
             @include('layouts.navigation')
 
             <!-- Page Heading -->
@@ -172,7 +172,7 @@
             @endif
 
             <!-- Page Content -->
-            <main class="flex-1 w-full relative md:overflow-visible overflow-y-auto no-scrollbar sm:pb-0 pb-32 pb-safe transition-all mt-0">
+            <main class="flex-1 w-full relative sm:pb-0 pb-32 pb-safe transition-all mt-0">
                 {{ $slot }}
                 <!-- Spacer for mobile stability -->
                 <div class="h-20 md:hidden"></div>
