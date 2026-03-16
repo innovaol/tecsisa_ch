@@ -119,7 +119,7 @@
                     <div class="absolute bottom-0 inset-x-0 p-10 pb-20 flex flex-col gap-6 z-20 bg-gradient-to-t from-black via-black/80 to-transparent">
                         <div class="flex items-center gap-4 max-w-sm mx-auto w-full">
                             <!-- Flash Toggle Button -->
-                            <button @click="toggleFlash()" 
+                            <button @click="toggleFlash()" x-show="hasFlash"
                                     class="flex-1 h-16 flex flex-col items-center justify-center bg-white/5 border border-white/10 rounded-[2rem] text-white transition-all backdrop-blur-2xl active:scale-95 group shadow-2xl"
                                     :class="flashOn ? 'bg-tecsisa-yellow/20 border-tecsisa-yellow ring-4 ring-tecsisa-yellow/10' : ''">
                                 <svg x-show="!flashOn" class="w-6 h-6 mb-1 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
