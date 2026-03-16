@@ -1064,6 +1064,14 @@
                     const form = this.$refs.form;
                     const formData = new FormData(form);
                     
+                    // PERFORMANCE FIX: 
+                    // Remove empty file payloads to avoid WAF/Antivirus hanging the POST request
+                    for (let [key, val] of Array.from(formData.entries())) {
+                        if (val instanceof File && val.size === 0) {
+                            formData.delete(key);
+                        }
+                    }
+                    
                     fetch(form.getAttribute('action'), {
                         method: 'POST',
                         body: formData,
