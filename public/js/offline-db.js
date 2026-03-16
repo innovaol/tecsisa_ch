@@ -36,13 +36,22 @@ const offlineDB = {
             const transaction = db.transaction([STORE_NAME], 'readwrite');
             const store = transaction.objectStore(STORE_NAME);
             
-            // Add a timestamp to identify когда it was saved
+            // Add metadata
             taskData.offline_timestamp = new Date().toISOString();
             
-            const request = store.add(taskData);
+            // Use .put() instead of .add() to allow overwriting if the technician 
+            // edits the same task multiple times while offline.
+            const request = store.put(taskData);
 
-            request.onsuccess = () => resolve(request.result);
-            request.onerror = (event) => reject(event.target.error);
+            request.onsuccess = () => {
+                console.log('[OfflineDB] Task saved successfully:', taskData.fields?.id || 'new');
+                resolve(request.result);
+            };
+
+            request.onerror = (event) => {
+                console.error('[OfflineDB] Error saving task:', event.target.error);
+                reject(event.target.error);
+            };
         });
     },
 
