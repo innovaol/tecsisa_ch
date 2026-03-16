@@ -1064,7 +1064,7 @@
                     const form = this.$refs.form;
                     const formData = new FormData(form);
                     
-                    fetch(form.action, {
+                    fetch(form.getAttribute('action'), {
                         method: 'POST',
                         body: formData,
                         headers: {
