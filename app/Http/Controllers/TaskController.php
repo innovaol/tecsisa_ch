@@ -120,6 +120,7 @@ class TaskController extends Controller
      */
     public function edit(Task $task)
     {
+        $editStart = microtime(true);
         // Ensure user can only edit their own tasks or is admin
         if ($task->assigned_to != Auth::id() && !Auth::user()->hasRole('Administrador')) {
             abort(403, 'No autorizado para ver esta tarea.');
@@ -131,16 +132,18 @@ class TaskController extends Controller
         // Obtener el esquema del sistema — soporte para formato viejo (array plano) y nuevo ({specs, checklist})
         $rawSchema = $task->equipment->system->form_schema ?? [];
         if (isset($rawSchema['specs'])) {
-            // Nuevo formato estructurado
             $formSchema = $rawSchema['specs'] ?? [];
             $checklist  = $rawSchema['checklist'] ?? [];
         } else {
-            // Formato viejo: array plano de campos de specs
             $formSchema = is_array($rawSchema) ? $rawSchema : [];
             $checklist  = [];
         }
 
-        return view('tasks.edit', compact('task', 'formSchema', 'checklist', 'users'));
+        \Illuminate\Support\Facades\Log::info("DIAG edit() data loaded in " . round((microtime(true) - $editStart) * 1000) . "ms");
+        $viewStart = microtime(true);
+        $response = view('tasks.edit', compact('task', 'formSchema', 'checklist', 'users'));
+        \Illuminate\Support\Facades\Log::info("DIAG edit() view rendered in " . round((microtime(true) - $viewStart) * 1000) . "ms | total edit(): " . round((microtime(true) - $editStart) * 1000) . "ms");
+        return $response;
     }
 
     /**
