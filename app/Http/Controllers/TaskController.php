@@ -321,7 +321,17 @@ class TaskController extends Controller
         \Illuminate\Support\Facades\Log::info("DIAGNOSTIC: DB Save took " . (microtime(true) - $dbStart) . "s");
         \Illuminate\Support\Facades\Log::info("DIAGNOSTIC: Total update " . (microtime(true) - $start) . "s");
         
-        session_write_close(); // Prevent session blocking for subsequent requests
+        session_write_close();
+        
+        // AJAX requests get instant JSON response (no redirect = no page reload wait)
+        if ($request->ajax() || $request->wantsJson()) {
+            $redirectUrl = $isAdmin ? route('tasks.index') : route('technician.dashboard');
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'redirect' => $redirectUrl
+            ]);
+        }
         
         if ($isAdmin) {
             return redirect()->route('tasks.index')->with('success', $message);
