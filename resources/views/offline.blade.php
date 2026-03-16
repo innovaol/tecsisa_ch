@@ -1,4 +1,4 @@
-<x-technician-layout :hideNav="true">
+<x-technician-layout :hideNav="false">
     <div class="min-h-screen flex flex-col items-center justify-center p-6 text-center">
         <div class="w-24 h-24 bg-tecsisa-yellow/10 rounded-full flex items-center justify-center text-tecsisa-yellow mb-8 animate-pulse">
             <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
