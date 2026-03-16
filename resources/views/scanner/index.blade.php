@@ -319,33 +319,43 @@
                 toggleFlash() {
                     if (!this.isScanning) return;
                     
+                    this.flashOn = !this.flashOn;
+                    
                     try {
-                        // Attempt 1: Using html5-qrcode's built-in method
-                        this.flashOn = !this.flashOn;
-                        this.html5QrCode.applyVideoConstraints({
-                            advanced: [{ torch: this.flashOn }]
-                        }).then(() => {
-                            console.log("Torch toggled via library");
-                        }).catch(err => {
-                            // Attempt 2: Direct track access if library method fails
-                            console.warn("Library torch failed, trying direct track access:", err);
-                            const videoElement = document.querySelector('#reader video');
-                            if (videoElement && videoElement.srcObject) {
-                                const track = videoElement.srcObject.getVideoTracks()[0];
-                                if (track) {
-                                    track.applyConstraints({
-                                        advanced: [{ torch: this.flashOn }]
-                                    }).catch(e => {
-                                        console.error("Direct torch failed:", e);
-                                        this.flashOn = false;
-                                        alert("La linterna no es compatible con este navegador/celular.");
-                                    });
+                        // Enfoque 1: Intento Directo al Hardware (Mejor para Chrome Android)
+                        const videoElement = document.querySelector('#reader video');
+                        if (videoElement && videoElement.srcObject) {
+                            const track = videoElement.srcObject.getVideoTracks()[0];
+                            if (track) {
+                                const imageCapture = window.ImageCapture ? new ImageCapture(track) : null;
+                                // Verificamos primero si el equipo reporta soporte
+                                const capabilities = track.getCapabilities();
+                                if (!capabilities.torch) {
+                                    throw new Error("El hardware no reporta soporte de linterna (torch).");
                                 }
+
+                                track.applyConstraints({
+                                    advanced: [{ torch: this.flashOn }]
+                                }).then(() => {
+                                    console.log("Linterna encendida directo al track.");
+                                }).catch(e => {
+                                    console.warn("Fallo directo:", e);
+                                    // Enfoque 2: Intento a través de la librería HTML5-QRCode
+                                    if(this.html5QrCode) {
+                                        this.html5QrCode.applyVideoConstraints({
+                                            advanced: [{ torch: this.flashOn }]
+                                        }).catch(err => {
+                                            this.flashOn = false;
+                                            alert("La linterna web está bloqueada por su navegador o dispositivo (Común en iPhone/Safari o si la cámara no tiene flash).");
+                                        });
+                                    }
+                                });
                             }
-                        });
+                        }
                     } catch (err) {
                         this.flashOn = false;
-                        console.error("General torch error:", err);
+                        console.error("No soportado:", err);
+                        alert("Lamentablemente la API web de la linterna está restringida en este celular/navegador por seguridad del fabricante.");
                     }
                 }
             }));
