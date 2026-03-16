@@ -354,8 +354,8 @@
                         }
                     } catch (err) {
                         this.flashOn = false;
+                        this.hasFlash = false; // Ocultamos el botón si resulta estar bloqueado para no frustrar.
                         console.error("No soportado:", err);
-                        alert("Lamentablemente la API web de la linterna está restringida en este celular/navegador por seguridad del fabricante.");
                     }
                 }
             }));
