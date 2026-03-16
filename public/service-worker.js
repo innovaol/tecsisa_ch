@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tecsisa-ch-cache-v4';
+const CACHE_NAME = 'tecsisa-ch-cache-v5';
 const STATIC_ASSETS = [
     '/offline',
     '/dashboard',
@@ -14,6 +14,7 @@ const STATIC_ASSETS = [
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
+            console.log('[SW] Pre-caching static assets');
             return cache.addAll(STATIC_ASSETS);
         })
     );
@@ -26,7 +27,10 @@ self.addEventListener('activate', (event) => {
         caches.keys().then((keys) => {
             return Promise.all(
                 keys.map((key) => {
-                    if (key !== CACHE_NAME) return caches.delete(key);
+                    if (key !== CACHE_NAME) {
+                        console.log('[SW] Removing old cache:', key);
+                        return caches.delete(key);
+                    }
                 })
             );
         })
@@ -39,21 +43,26 @@ self.addEventListener('fetch', (event) => {
     const { request } = event;
     const url = new URL(request.url);
 
-    // Skip non-GET requests and internal Laravel routes like livewire or poses
+    // Skip non-GET requests
     if (request.method !== 'GET') return;
 
-    // Strategy: Network First for HTML/Pages
-    if (request.mode === 'navigate' || request.headers.get('accept').includes('text/html')) {
+    // Strategy: Network First for HTML/Pages (including our proactive fetches)
+    const isHtml = request.mode === 'navigate' || 
+                   (request.headers.get('accept') && request.headers.get('accept').includes('text/html')) ||
+                   url.pathname.startsWith('/tasks/') || 
+                   url.pathname.startsWith('/technician/');
+
+    if (isHtml) {
         event.respondWith(
             fetch(request)
                 .then((response) => {
-                    // Clone and save to cache for offline use
-                    const copy = response.clone();
-                    caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+                    if (response.status === 200) {
+                        const copy = response.clone();
+                        caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+                    }
                     return response;
                 })
                 .catch(() => {
-                    // If network fails, try to serve from cache
                     return caches.match(request).then((cachedResponse) => {
                         return cachedResponse || caches.match('/offline');
                     });

@@ -174,7 +174,7 @@
         // Proactive Task Caching (Magia Offline)
         // Este script descarga silenciosamente todas las tareas que el técnico tiene asignadas en su pantalla,
         // para que cuando se quede sin internet, ya estén guardadas en su celular.
-        window.addEventListener('load', () => {
+        const runOfflinePrefetch = () => {
             if ('serviceWorker' in navigator && navigator.onLine) {
                 setTimeout(() => {
                     // Buscar todos los enlaces que lleven a editar una tarea
@@ -198,7 +198,10 @@
                         let index = 0;
                         const fetchNext = () => {
                             if (index < linksToFetch.length) {
-                                fetch(linksToFetch[index], { priority: 'low' })
+                                fetch(linksToFetch[index], { 
+                                    priority: 'low',
+                                    headers: { 'Accept': 'text/html' }
+                                })
                                     .then(() => {
                                         index++;
                                         setTimeout(fetchNext, 500); // Dar un respiro de 500ms entre tarea y tarea
@@ -210,7 +213,11 @@
                     }
                 }, 2000); // Esperar 2 segundos para no afectar la carga principal de la página
             }
-        });
+        };
+
+        // Run on normal load and on Turbo navigations
+        document.addEventListener('DOMContentLoaded', runOfflinePrefetch);
+        document.addEventListener('turbo:load', runOfflinePrefetch);
     </script>
     @endpush
 </x-technician-layout>

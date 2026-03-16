@@ -137,7 +137,7 @@
         // Proactive Task Caching (Magia Offline)
         // Este script descarga silenciosamente todas las tareas que aparecen en la tabla,
         // para que cuando se quede sin internet, ya estén guardadas en su celular o PC.
-        window.addEventListener('load', () => {
+        const runOfflinePrefetch = () => {
             if ('serviceWorker' in navigator && navigator.onLine) {
                 setTimeout(() => {
                     const taskLinks = Array.from(document.querySelectorAll('a[href*="/tasks/"]'))
@@ -154,7 +154,10 @@
                         let index = 0;
                         const fetchNext = () => {
                             if (index < linksToFetch.length) {
-                                fetch(linksToFetch[index], { priority: 'low' })
+                                fetch(linksToFetch[index], { 
+                                    priority: 'low',
+                                    headers: { 'Accept': 'text/html' }
+                                })
                                     .then(() => {
                                         index++;
                                         setTimeout(fetchNext, 500);
@@ -166,7 +169,11 @@
                     }
                 }, 2000);
             }
-        });
+        };
+
+        // Run on normal load and on Turbo navigations
+        document.addEventListener('DOMContentLoaded', runOfflinePrefetch);
+        document.addEventListener('turbo:load', runOfflinePrefetch);
     </script>
     @endpush
 </x-app-layout>
