@@ -871,7 +871,7 @@
 
     @push('scripts')
     <script>
-        document.addEventListener('alpine:init', () => {
+        const initTechnicianForm = () => {
             Alpine.data('technicianForm', (config) => ({
                 isSubmitting: false,
                 hasChanges: false,
@@ -1122,7 +1122,13 @@
                     // However, standard browser warning is better.
                 }
             });
-        });
+        };
+
+        if (window.Alpine) {
+            initTechnicianForm();
+        } else {
+            document.addEventListener('alpine:init', initTechnicianForm);
+        }
     </script>
     @endpush
 </x-technician-layout>

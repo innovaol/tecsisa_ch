@@ -219,7 +219,7 @@
     </div>
 
     <script>
-        document.addEventListener('alpine:init', () => {
+        const initDiscoveryApp = () => {
             Alpine.data('discoveryApp', (equipments) => ({
                 equipments: equipments,
                 search: '',
@@ -349,6 +349,12 @@
                     }
                 }
             }));
-        });
+        };
+
+        if (window.Alpine) {
+            initDiscoveryApp();
+        } else {
+            document.addEventListener('alpine:init', initDiscoveryApp);
+        }
     </script>
 </x-technician-layout>

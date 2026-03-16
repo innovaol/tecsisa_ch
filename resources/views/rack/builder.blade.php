@@ -279,7 +279,7 @@
     
     <!-- Alpine.js Logic para el Constructor de Rack -->
     <script>
-        document.addEventListener('alpine:init', () => {
+        const initRackBuilder = () => {
             Alpine.data('rackBuilder', (unassignedCatalog = []) => ({
                 rackId: {{ $rack->id }},
                 totalU: {{ $rack->total_units }}, // Total units from PHP ($rack->total_units)
@@ -576,7 +576,13 @@
                     setTimeout(() => { this.saving = false; }, 500);
                 }
             }));
-        });
+        };
+
+        if (window.Alpine) {
+            initRackBuilder();
+        } else {
+            document.addEventListener('alpine:init', initRackBuilder);
+        }
     </script>
 
     <style>
