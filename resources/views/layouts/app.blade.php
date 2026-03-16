@@ -156,5 +156,18 @@
         </div>
 
         @stack('scripts')
+        
+        <!-- PWA Service Worker Killer - Force clear broken SWs -->
+        <script>
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                    for(let registration of registrations) {
+                        registration.unregister().then(function(boolean) {
+                            console.log('- Broken Service worker unregistered:', boolean);
+                        });
+                    }
+                });
+            }
+        </script>
     </body>
 </html>
