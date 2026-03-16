@@ -64,8 +64,17 @@ self.addEventListener('fetch', (event) => {
             if (cachedResponse) return cachedResponse;
 
             return fetch(request).then((networkResponse) => {
-                // Cache dynamic assets (not huge ones)
-                if (url.origin === location.origin && !url.pathname.includes('storage')) {
+                // Cache dynamic assets from our own origin OR trusted CDNs
+                const trustedCDNs = [
+                    'unpkg.com',
+                    'cdn.jsdelivr.net',
+                    'cdn.tailwindcss.com',
+                    'fonts.bunny.net'
+                ];
+                
+                const isTrustedCDN = trustedCDNs.some(domain => url.hostname.includes(domain));
+
+                if ((url.origin === location.origin || isTrustedCDN) && !url.pathname.includes('storage')) {
                     const copy = networkResponse.clone();
                     caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
                 }
