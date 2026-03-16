@@ -328,8 +328,17 @@ class TaskController extends Controller
         \Illuminate\Support\Facades\Log::info("DIAGNOSTIC: Total update " . (microtime(true) - $start) . "s");
         \Illuminate\Support\Facades\Log::info("DIAGNOSTIC: Redirect destination: " . ($isAdmin ? 'tasks.index (ADMIN)' : 'technician.dashboard (TECH)'));
         
-        // For draft saves: go back to the same task (page is already in browser cache = fast)
-        // For final actions (submit/approve/reject): go to the list
+        // If it's an AJAX fetch request (fast save without reload)
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'action' => $validated['action'],
+                'redirect' => $validated['action'] === 'save_draft' ? null : ($isAdmin ? route('tasks.index') : route('technician.dashboard'))
+            ]);
+        }
+        
+        // Traditional Fallback (just in case)
         if ($validated['action'] === 'save_draft') {
             return redirect()->route('tasks.edit', $task)->with('success', $message);
         } elseif ($isAdmin) {
