@@ -1058,9 +1058,49 @@
                     }
 
                     this.isSubmitting = true;
-                    this.hasChanges = false; // Disable warning on submit
+                    this.hasChanges = false;
                     this.$refs.actionField.value = actionType;
-                    this.$refs.form.submit();
+                    
+                    const form = this.$refs.form;
+                    const formData = new FormData(form);
+                    
+                    fetch(form.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'text/html'
+                        },
+                        redirect: 'follow'
+                    }).then(response => {
+                        if (response.ok || response.redirected) {
+                            // Show instant success
+                            const msg = actionType === 'save_draft' ? 'Borrador guardado ✓' 
+                                      : actionType === 'submit' ? 'Reporte enviado ✓'
+                                      : actionType === 'approve' ? 'Tarea aprobada ✓'
+                                      : actionType === 'reject' ? 'Tarea rechazada ✓'
+                                      : 'Guardado ✓';
+                            
+                            // Create floating success toast
+                            const toast = document.createElement('div');
+                            toast.className = 'fixed top-20 left-1/2 -translate-x-1/2 z-[9999] bg-emerald-500 text-white font-black text-sm px-8 py-4 rounded-2xl shadow-2xl';
+                            toast.style.animation = 'fadeIn 0.3s ease';
+                            toast.textContent = msg;
+                            document.body.appendChild(toast);
+                            
+                            // Navigate after a brief moment so user sees the toast
+                            setTimeout(() => {
+                                window.location.href = response.url || '{{ route("technician.dashboard") }}';
+                            }, 600);
+                        } else {
+                            alert('Error al guardar. Inténtalo de nuevo.');
+                            this.isSubmitting = false;
+                        }
+                    }).catch(err => {
+                        console.error('Save error:', err);
+                        alert('Error de conexión. Verifica tu señal e inténtalo de nuevo.');
+                        this.isSubmitting = false;
+                    });
                 }
             }));
 
