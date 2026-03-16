@@ -334,13 +334,14 @@ class TaskController extends Controller
                 'success' => true,
                 'message' => $message,
                 'action' => $validated['action'],
-                'redirect' => $validated['action'] === 'save_draft' ? null : ($isAdmin ? route('tasks.index') : route('technician.dashboard'))
+                // ALWAYS redirect out of the page upon ANY save type over AJAX based on role
+                'redirect' => $isAdmin ? route('tasks.index') : route('technician.dashboard')
             ]);
         }
         
         // Traditional Fallback (just in case)
         if ($validated['action'] === 'save_draft') {
-            return redirect()->route('tasks.edit', $task)->with('success', $message);
+            return redirect()->route('tasks.index')->with('success', $message);
         } elseif ($isAdmin) {
             return redirect()->route('tasks.index')->with('success', $message);
         } else {
