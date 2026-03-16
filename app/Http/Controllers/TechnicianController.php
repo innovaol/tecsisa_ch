@@ -11,9 +11,9 @@ class TechnicianController extends Controller
 {
     public function dashboard()
     {
+        $dashStart = microtime(true);
         $user = Auth::user();
 
-        // Get tasks: If Admin, show all. If Technician, show only assigned.
         $query = Task::with(['equipment.location', 'assignee'])
             ->whereIn('status', ['draft', 'pending', 'in_progress', 'in_review'])
             ->orderBy('priority', 'desc')
@@ -30,6 +30,7 @@ class TechnicianController extends Controller
 
         $tasks = $query->get();
         $completedTasks = $completedQuery->get();
+        \Illuminate\Support\Facades\Log::info("DIAG Dashboard: loaded in " . round((microtime(true) - $dashStart) * 1000) . "ms");
 
         return view('technician.dashboard', compact('tasks', 'completedTasks'));
     }
