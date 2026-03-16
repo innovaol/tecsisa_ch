@@ -1027,7 +1027,7 @@
                 removeMaterial(index) {
                     this.materials.splice(index, 1);
                 },
-                doSubmit(actionType) {
+                async doSubmit(actionType) {
                     if(this.isSubmitting) return;
                     
                     if(actionType === 'save_draft' && !confirm('¿Deseas guardar los cambios actuales como borrador?')) {
@@ -1058,8 +1058,57 @@
                     }
 
                     this.isSubmitting = true;
-                    this.hasChanges = false; // Disable warning on submit
+                    this.hasChanges = false;
                     this.$refs.actionField.value = actionType;
+
+                    // OFLINE SUPPORT
+                    if (!navigator.onLine) {
+                        try {
+                            const formData = new FormData(this.$refs.form);
+                            const taskPayload = {
+                                id: Date.now(), // Local temporary ID
+                                original_task_id: '{{ $task->id }}',
+                                url: this.$refs.form.action,
+                                fields: {},
+                                blobs: []
+                            };
+
+                            // Convert FormData to serializable object
+                            for (let [key, value] of formData.entries()) {
+                                if (value instanceof File && value.size > 0) {
+                                    const dataUrl = await new Promise(resolve => {
+                                        const reader = new FileReader();
+                                        reader.onload = e => resolve(e.target.result);
+                                        reader.readAsDataURL(value);
+                                    });
+                                    taskPayload.blobs.push({
+                                        fieldName: key,
+                                        fileName: value.name,
+                                        data: dataUrl
+                                    });
+                                } else if (!(value instanceof File)) {
+                                    if (taskPayload.fields[key]) {
+                                        if (!Array.isArray(taskPayload.fields[key])) {
+                                            taskPayload.fields[key] = [taskPayload.fields[key]];
+                                        }
+                                        taskPayload.fields[key].push(value);
+                                    } else {
+                                        taskPayload.fields[key] = value;
+                                    }
+                                }
+                            }
+
+                            await window.offlineDB.saveTask(taskPayload);
+                            alert('⚠️ SIN CONEXIÓN: Los cambios se han guardado localmente en tu celular. Se sincronizarán automáticamente cuando recuperes la señal.');
+                            window.location.href = "{{ route('technician.dashboard') }}";
+                        } catch (e) {
+                            console.error('Error saving to offline DB:', e);
+                            alert('Error al guardar localmente. Por favor, intenta de nuevo o busca señal.');
+                            this.isSubmitting = false;
+                        }
+                        return;
+                    }
+
                     this.$refs.form.submit();
                 }
             }));

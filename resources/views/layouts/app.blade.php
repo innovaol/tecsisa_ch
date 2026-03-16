@@ -178,6 +178,20 @@
                 </header>
             @endif
 
+            <div x-data="{ online: navigator.onLine, showStatus: false, statusType: '' }"
+                 x-init="window.addEventListener('online', () => { online = true; statusType = 'online'; showStatus = true; setTimeout(() => showStatus = false, 3000) }); 
+                         window.addEventListener('offline', () => { online = false; statusType = 'offline'; showStatus = true; setTimeout(() => showStatus = false, 3000) })"
+                 class="fixed bottom-24 left-1/2 -translate-x-1/2 z-[200]">
+                <template x-if="showStatus">
+                    <div :class="statusType === 'online' ? 'bg-emerald-500 shadow-emerald-500/40' : 'bg-red-500 shadow-red-500/40'" 
+                         class="px-6 py-3 rounded-2xl flex items-center gap-3 shadow-2xl animate-bounce">
+                        <div class="w-2 h-2 rounded-full bg-white animate-pulse"></div>
+                        <span class="text-white text-[10px] font-black uppercase tracking-widest" 
+                              x-text="statusType === 'online' ? 'Conexión Recuperada' : 'Modo Offline Activo'"></span>
+                    </div>
+                </template>
+            </div>
+
             <!-- Page Content -->
             <main class="flex-1 w-full relative md:overflow-visible overflow-y-auto no-scrollbar sm:pb-0 pb-32 pb-safe transition-all mt-0">
                 {{ $slot }}

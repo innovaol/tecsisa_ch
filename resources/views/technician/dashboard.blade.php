@@ -1,5 +1,33 @@
 <x-technician-layout>
-    <div class="px-5 pt-6 max-w-7xl mx-auto md:py-10 md:px-8 lg:px-12">
+    <div class="px-5 pt-6 max-w-7xl mx-auto md:py-10 md:px-8 lg:px-12" x-data="{ 
+        pendingSyncCount: 0,
+        async checkPendingSync() {
+            if (window.offlineDB) {
+                const tasks = await window.offlineDB.getAllTasks();
+                this.pendingSyncCount = tasks.length;
+            }
+        }
+    }" x-init="checkPendingSync(); window.addEventListener('offline-sync-completed', () => checkPendingSync())">
+        
+        <!-- Offline Sync Notification -->
+        <template x-if="pendingSyncCount > 0">
+            <div class="bg-tecsisa-yellow/10 border border-tecsisa-yellow/30 rounded-3xl p-6 mb-8 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-2xl animate-pulse">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-tecsisa-yellow rounded-2xl flex items-center justify-center text-black shadow-lg">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-black text-tecsisa-yellow uppercase tracking-widest">Sincronización Pendiente</h4>
+                        <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">
+                            Tienes <span class="text-white" x-text="pendingSyncCount"></span> reporte(s) guardados localmente esperando conexión.
+                        </p>
+                    </div>
+                </div>
+                <button @click="window.syncHelper.syncAll()" class="bg-tecsisa-yellow text-black px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest active:scale-95 transition-all w-full sm:w-auto">
+                    Sincronizar Ahora
+                </button>
+            </div>
+        </template>
         <!-- Header Section: Tarjeta Propia -->
         <div class="bg-theme-card border border-theme rounded-[2.5rem] p-6 sm:p-10 mb-6 sm:mb-10 transition-all duration-500 shadow-xl relative">
             <!-- Decorative Orbs (Clipped) -->
