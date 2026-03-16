@@ -102,7 +102,6 @@
         body {
             background-color: var(--theme-bg);
             color: var(--theme-text);
-            overscroll-behavior-y: none;
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
@@ -150,7 +149,7 @@
         }
     }" 
     :class="theme"
-    class="font-sans antialiased md:overflow-auto md:h-auto overflow-hidden h-[100dvh]" style="display: flex; flex-direction: column;">
+    class="font-sans antialiased flex flex-col min-h-screen">
     
     <!-- Background Glowing Orbs -->
     <div class="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-tecsisa-yellow/5 blur-[120px] pointer-events-none z-0" :class="theme === 'light' ? 'opacity-20' : ''"></div>
@@ -174,7 +173,7 @@
     </div>
 
     <!-- Contenido Principal -->
-    <main class="flex-1 md:overflow-visible overflow-y-auto no-scrollbar relative z-10 {{ ($hideNav ?? false) ? '' : 'pb-32 pb-safe md:pb-0' }}">
+    <main class="flex-1 relative z-10 {{ ($hideNav ?? false) ? '' : 'pb-32 pb-safe md:pb-0' }}">
         <div class="md:max-w-7xl md:mx-auto md:w-full md:px-6 lg:px-8">
             {{ $slot }}
             <!-- Spacer for mobile stability -->

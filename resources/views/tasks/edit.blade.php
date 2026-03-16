@@ -1103,7 +1103,11 @@
                             window.location.href = "{{ route('technician.dashboard') }}";
                         } catch (e) {
                             console.error('Error saving to offline DB:', e);
-                            alert('Error al guardar localmente. Por favor, intenta de nuevo o busca señal.');
+                            if (e.name === 'QuotaExceededError') {
+                                alert('Error: Tu celular no tiene espacio suficiente o ha bloqueado el almacenamiento local. Libera espacio e intenta de nuevo.');
+                            } else {
+                                alert('Error al guardar en la base de datos local del celular. Motivo: ' + (e.message || 'Desconocido') + '. Por favor, reconéctate a internet para guardar directamente.');
+                            }
                             this.isSubmitting = false;
                         }
                         return;
