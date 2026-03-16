@@ -16,6 +16,7 @@ class TaskController extends Controller
      */
     public function index(Request $request)
     {
+        $indexStart = microtime(true);
         $query = Task::with(['equipment.system', 'equipment.location', 'assignee']);
 
         if ($request->has('status')) {
@@ -46,6 +47,7 @@ class TaskController extends Controller
                 'completed' => (clone $myTasksQuery)->whereIn('status', ['completed', 'verified'])->count(),
             ];
         }
+        \Illuminate\Support\Facades\Log::info("DIAG tasks.index loaded in " . round((microtime(true) - $indexStart) * 1000) . "ms");
 
         return view('tasks.index', compact('tasks', 'users', 'equipments', 'stats'));
     }
@@ -320,18 +322,7 @@ class TaskController extends Controller
         $task->save();
         \Illuminate\Support\Facades\Log::info("DIAGNOSTIC: DB Save took " . (microtime(true) - $dbStart) . "s");
         \Illuminate\Support\Facades\Log::info("DIAGNOSTIC: Total update " . (microtime(true) - $start) . "s");
-        
-        session_write_close();
-        
-        // AJAX requests get instant JSON response (no redirect = no page reload wait)
-        if ($request->ajax() || $request->wantsJson()) {
-            $redirectUrl = $isAdmin ? route('tasks.index') : route('technician.dashboard');
-            return response()->json([
-                'success' => true,
-                'message' => $message,
-                'redirect' => $redirectUrl
-            ]);
-        }
+        \Illuminate\Support\Facades\Log::info("DIAGNOSTIC: Redirect destination: " . ($isAdmin ? 'tasks.index (ADMIN)' : 'technician.dashboard (TECH)'));
         
         if ($isAdmin) {
             return redirect()->route('tasks.index')->with('success', $message);
