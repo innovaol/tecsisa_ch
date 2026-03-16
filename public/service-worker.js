@@ -1,33 +1,28 @@
-const CACHE_NAME = 'tecsisa-ch-v1';
-const ASSETS_TO_CACHE = [
-    '/',
-    '/dashboard',
+const CACHE_NAME = 'tecsisa-ch-cache-v2';
+const STATIC_ASSETS = [
     '/offline',
-    '/css/app.css',
-    '/js/app.js',
-    '/manifest.json'
+    '/manifest.json',
+    '/icons/icon-192x192.png',
+    '/icons/icon-512x512.png'
 ];
 
-// Install Event
+// Install Event: Cache static shell
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
-            console.log('[Service Worker] Caching active shell');
-            return cache.addAll(ASSETS_TO_CACHE);
+            return cache.addAll(STATIC_ASSETS);
         })
     );
     self.skipWaiting();
 });
 
-// Activate Event
+// Activate Event: Cleanup old caches
 self.addEventListener('activate', (event) => {
     event.waitUntil(
         caches.keys().then((keys) => {
             return Promise.all(
                 keys.map((key) => {
-                    if (key !== CACHE_NAME) {
-                        return caches.delete(key);
-                    }
+                    if (key !== CACHE_NAME) return caches.delete(key);
                 })
             );
         })
@@ -35,16 +30,46 @@ self.addEventListener('activate', (event) => {
     self.clients.claim();
 });
 
-// Fetch Event
+// Fetch Event: Network First strategy for pages, Cache First for assets
 self.addEventListener('fetch', (event) => {
+    const { request } = event;
+    const url = new URL(request.url);
+
+    // Skip non-GET requests and internal Laravel routes like livewire or poses
+    if (request.method !== 'GET') return;
+
+    // Strategy: Network First for HTML/Pages
+    if (request.mode === 'navigate' || request.headers.get('accept').includes('text/html')) {
+        event.respondWith(
+            fetch(request)
+                .then((response) => {
+                    // Clone and save to cache for offline use
+                    const copy = response.clone();
+                    caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+                    return response;
+                })
+                .catch(() => {
+                    // If network fails, try to serve from cache
+                    return caches.match(request).then((cachedResponse) => {
+                        return cachedResponse || caches.match('/offline');
+                    });
+                })
+        );
+        return;
+    }
+
+    // Strategy: Cache First for CSS, JS, and Images
     event.respondWith(
-        caches.match(event.request).then((response) => {
-            // Return cached asset if found, otherwise fetch from network
-            return response || fetch(event.request).catch(() => {
-                // If both fail (offline and not in cache), show offline page for navigation requests
-                if (event.request.mode === 'navigate') {
-                    return caches.match('/offline');
+        caches.match(request).then((cachedResponse) => {
+            if (cachedResponse) return cachedResponse;
+
+            return fetch(request).then((networkResponse) => {
+                // Cache dynamic assets (not huge ones)
+                if (url.origin === location.origin && !url.pathname.includes('storage')) {
+                    const copy = networkResponse.clone();
+                    caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
                 }
+                return networkResponse;
             });
         })
     );
