@@ -150,8 +150,7 @@ class TaskController extends Controller
     {
         $start = microtime(true);
         $contentLength = $request->header('Content-Length', 'unknown');
-        $fileCount = count(\Illuminate\Http\UploadedFile::createFromBase($request->files->all()) ?? []);
-        \Illuminate\Support\Facades\Log::info("DIAGNOSTIC: Update started for Task " . $task->id . " | Content-Length: " . $contentLength . " bytes | Files in request: " . count($request->allFiles()));
+        \Illuminate\Support\Facades\Log::info("DIAGNOSTIC: Update Task " . $task->id . " | Content-Length: " . $contentLength . " bytes");
         if ($task->assigned_to != Auth::id() && !Auth::user()->hasRole('Administrador')) {
             abort(403, 'No autorizado.');
         }
