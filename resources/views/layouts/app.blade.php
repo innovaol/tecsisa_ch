@@ -11,33 +11,9 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-        <!-- Scripts (Using CDN for local development without Node.js) -->
-        <script src="https://cdn.tailwindcss.com"></script>
-        <script>
-            tailwind.config = {
-                darkMode: 'class',
-                theme: {
-                    extend: {
-                        colors: {
-                            tecsisa: {
-                                yellow: '#FFD100',
-                                dark: '#0A0F1C',
-                            },
-                            // Map generic theme names
-                            'theme-bg': 'var(--theme-bg)',
-                            'theme-text': 'var(--theme-text)',
-                            'theme-muted': 'var(--theme-text-muted)',
-                            'theme-card': 'var(--theme-card)',
-                            'theme-border': 'var(--theme-border)',
-                            'theme-header': 'var(--theme-header)',
-                        },
-                        fontFamily: {
-                            sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
-                        }
-                    }
-                }
-            }
-        </script>
+        <!-- Scripts (Using Vite for precompiled optimized CSS/JS) -->
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
         <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>

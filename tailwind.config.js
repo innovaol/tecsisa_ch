@@ -9,17 +9,24 @@ export default {
         './resources/views/**/*.blade.php',
     ],
 
+    darkMode: 'class',
+
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
             },
             colors: {
                 tecsisa: {
-                    yellow: '#FFD100', // Yellow from logo
-                    dark: '#111827',   // Slate 900 for texts
-                    light: '#F8FAFC',  // Slate 50 for backgrounds
+                    yellow: '#FFD100',
+                    dark: '#0A0F1C',
                 },
+                'theme-bg': 'var(--theme-bg)',
+                'theme-text': 'var(--theme-text)',
+                'theme-muted': 'var(--theme-text-muted)',
+                'theme-card': 'var(--theme-card)',
+                'theme-border': 'var(--theme-border)',
+                'theme-header': 'var(--theme-header)',
             },
         },
     },
