@@ -147,6 +147,8 @@ class TaskController extends Controller
      */
     public function update(Request $request, Task $task)
     {
+        $start = microtime(true);
+        \Illuminate\Support\Facades\Log::info("DIAGNOSTIC: Update started for Task " . $task->id);
         if ($task->assigned_to != Auth::id() && !Auth::user()->hasRole('Administrador')) {
             abort(403, 'No autorizado.');
         }
@@ -164,6 +166,8 @@ class TaskController extends Controller
             'has_new_faceplate' => 'nullable|boolean',
             'is_certified' => 'nullable|boolean',
         ]);
+        \Illuminate\Support\Facades\Log::info("DIAGNOSTIC: Validation took " . (microtime(true) - $start) . "s");
+        $step = microtime(true);
 
         $isAdmin = Auth::user()->hasRole('Administrador');
 
@@ -312,7 +316,11 @@ class TaskController extends Controller
             ]);
         }
 
+        \Illuminate\Support\Facades\Log::info("DIAGNOSTIC: Logic preparation took " . (microtime(true) - $step) . "s");
+        $dbStart = microtime(true);
         $task->save();
+        \Illuminate\Support\Facades\Log::info("DIAGNOSTIC: DB Save took " . (microtime(true) - $dbStart) . "s");
+        \Illuminate\Support\Facades\Log::info("DIAGNOSTIC: Total update " . (microtime(true) - $start) . "s");
         return redirect()->route('tasks.index')->with('success', $message);
     }
 
