@@ -511,7 +511,7 @@
 
         <!-- Custom Modal Implementation (Integrated into root x-data scope) -->
         <div x-show="showEquipmentModal" 
-             style="display: none;"
+             x-cloak
              class="fixed inset-0 z-50 overflow-y-auto"
              role="dialog" aria-modal="true">
             
@@ -796,6 +796,7 @@
 
             // --- Equipment Logic ---
             openCreateModal() {
+                console.log("Ejecutando openCreateModal...");
                 this.editMode = false;
                 this.formAction = '/catalogos/equipment';
                 this.formData = {
@@ -805,9 +806,11 @@
                     specs: {}, notes: ''
                 };
                 this.showEquipmentModal = true;
+                console.log("Modal debe estar visible. showEquipmentModal =", this.showEquipmentModal);
             },
 
             openEditModal(eq) {
+                console.log("Ejecutando openEditModal... EQ:", eq);
                 this.editMode = true;
                 this.formAction = `/catalogos/equipment/${eq.id}`;
                 this.formData = {
@@ -820,12 +823,13 @@
                     system_id: eq.system_id ? String(eq.system_id) : '',
                     location_id: eq.location_id ? String(eq.location_id) : '',
                     status: String(eq.status || 'operative'),
-                    installation_date: eq.installation_date ? eq.installation_date.split('T')[0] : '',
-                    last_maintenance_at: eq.last_maintenance_at ? eq.last_maintenance_at.split('T')[0] : '',
+                    installation_date: eq.installation_date ? String(eq.installation_date).split('T')[0] : '',
+                    last_maintenance_at: eq.last_maintenance_at ? String(eq.last_maintenance_at).split('T')[0] : '',
                     specs: eq.specs ? JSON.parse(JSON.stringify(eq.specs)) : {},
                     notes: String(eq.notes || '')
                 };
                 this.showEquipmentModal = true;
+                console.log("Modal de Edicion activo.");
             },
 
             // --- Systems Logic ---
