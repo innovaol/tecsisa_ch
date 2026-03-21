@@ -101,6 +101,12 @@
                 max-width: 100%;
                 overflow-x: hidden;
             }
+
+            /* Autocierre de Scroll para cualquier modal activo en toda la interfaz */
+            body:has([role="dialog"]:not([style*="display: none"]):not([x-cloak])) {
+                overflow: hidden !important;
+            }
+
             
             @media (max-width: 768px) {
                 body {
