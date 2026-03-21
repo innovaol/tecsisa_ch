@@ -722,6 +722,16 @@
                     url.searchParams.set('tab', tab);
                     history.replaceState(null, '', url.toString());
                 });
+
+                const freezeScroll = (val) => {
+                    if(val) document.body.style.overflow = 'hidden';
+                    else document.body.style.overflow = '';
+                };
+
+                this.$watch('showEquipmentModal', freezeScroll);
+                this.$watch('showSystemModal', freezeScroll);
+                this.$watch('showLocationModal', freezeScroll);
+                this.$watch('showRackModal', freezeScroll);
             },
             
             // Equipment Modal state
