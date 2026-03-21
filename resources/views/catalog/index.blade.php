@@ -16,9 +16,17 @@
                 cursor: pointer;
             }
         </style>
+    @push('scripts')
+        <script>
+            window.catalogData = {
+                locations: @json($locationsFlat),
+                systems: @json($systems),
+                racks: @json($racks)
+            };
+        </script>
     @endpush
 
-    <div class="py-6 md:py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8" x-data="inventoryManager(@js($locationsFlat), @js($systems), @js($racks))">
+    <div class="py-6 md:py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8" x-data="inventoryManager(window.catalogData.locations, window.catalogData.systems, window.catalogData.racks)">
         <!-- Header: Tarjeta Propia -->
         <div class="bg-theme-card border border-theme rounded-[2.5rem] p-6 sm:p-8 mb-6 transition-all duration-500 shadow-xl relative">
             <!-- Decorative Orbs (Clipped) -->
