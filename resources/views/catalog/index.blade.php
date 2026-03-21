@@ -1,4 +1,23 @@
 <x-app-layout>
+    @push('scripts')
+        <!-- Flatpickr for Premium Date Selection -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+        <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+        <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+        <style>
+            .flatpickr-calendar { background: var(--theme-card) !important; border-color: var(--theme-border) !important; box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important; color: var(--theme-text) !important; }
+            .flatpickr-day.selected { background: #ffd100 !important; color: #000 !important; border-color: #ffd100 !important; }
+            .flatpickr-day:hover { background: rgba(255,209,0,0.2) !important; }
+            .flatpickr-month, .flatpickr-weekdays, .flatpickr-current-month { background: transparent !important; color: var(--theme-text) !important; }
+            .flatpickr-monthDropdown-months, .flatpickr-day { color: var(--theme-text) !important; }
+            input[type="date"]::-webkit-calendar-picker-indicator {
+                filter: invert(var(--theme-invert));
+                cursor: pointer;
+            }
+        </style>
+    @endpush
+
     <div class="py-6 md:py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8" x-data="inventoryManager(@js($locationsFlat), @js($systems), @js($racks))">
         <!-- Header: Tarjeta Propia -->
         <div class="bg-theme-card border border-theme rounded-[2.5rem] p-6 sm:p-8 mb-6 transition-all duration-500 shadow-xl relative">
@@ -25,23 +44,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Flatpickr for Premium Date Selection -->
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
-        <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-        <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
-        <style>
-            .flatpickr-calendar { background: var(--theme-card) !important; border-color: var(--theme-border) !important; box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important; color: var(--theme-text) !important; }
-            .flatpickr-day.selected { background: #ffd100 !important; color: #000 !important; border-color: #ffd100 !important; }
-            .flatpickr-day:hover { background: rgba(255,209,0,0.2) !important; }
-            .flatpickr-month, .flatpickr-weekdays, .flatpickr-current-month { background: transparent !important; color: var(--theme-text) !important; }
-            .flatpickr-monthDropdown-months, .flatpickr-day { color: var(--theme-text) !important; }
-            input[type="date"]::-webkit-calendar-picker-indicator {
-                filter: invert(var(--theme-invert));
-                cursor: pointer;
-            }
-        </style>
 
             
             <!-- Tabs Navigation -->
