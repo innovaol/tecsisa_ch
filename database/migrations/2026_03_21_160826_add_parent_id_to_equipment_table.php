@@ -12,7 +12,21 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('equipment', function (Blueprint $table) {
-            $table->foreignId('parent_id')->nullable()->constrained('equipment')->onDelete('cascade');
+            // Campos para Enlaces/Cables (Networking)
+            $table->foreignId('source_equipment_id')->nullable()->constrained('equipment')->onDelete('set null');
+            $table->string('source_port')->nullable();
+            
+            $table->foreignId('destination_equipment_id')->nullable()->constrained('equipment')->onDelete('set null');
+            $table->string('destination_port')->nullable();
+
+            // Metadatos de Certificación
+            $table->string('certification_pdf')->nullable();
+            $table->string('certification_status')->nullable(); // Pasa, Falla, Pendiente
+            $table->date('certification_date')->nullable();
+            
+            // Atributos físicos del tramo
+            $table->string('cable_category')->nullable(); // Cat 6, 6A, etc.
+            $table->decimal('cable_length', 8, 2)->nullable();
         });
     }
 
@@ -22,8 +36,14 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('equipment', function (Blueprint $table) {
-            $table->dropForeign(['parent_id']);
-            $table->dropColumn('parent_id');
+            $table->dropForeign(['source_equipment_id']);
+            $table->dropForeign(['destination_equipment_id']);
+            $table->dropColumn([
+                'source_equipment_id', 'source_port', 
+                'destination_equipment_id', 'destination_port',
+                'certification_pdf', 'certification_status', 'certification_date',
+                'cable_category', 'cable_length'
+            ]);
         });
     }
 };

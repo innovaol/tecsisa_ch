@@ -15,11 +15,11 @@ class CatalogController extends Controller
         $locationsTree = Location::with(['children', 'equipments'])->whereNull('parent_id')->get();
         $locationsFlat = Location::all();
         $systems = System::all();
-        $equipmentsTree = Equipment::with(['location', 'system', 'children', 'children.location', 'children.system'])->whereNull('parent_id')->orderBy('created_at', 'desc')->get();
+        $equipments = Equipment::with(['location', 'system', 'source', 'destination'])->orderBy('created_at', 'desc')->get();
         $allEquipments = Equipment::select('id', 'name', 'internal_id', 'form_factor')->orderBy('name')->get();
         $racks = Rack::with('location')->get();
 
-        return view('catalog.index', compact('locationsTree', 'locationsFlat', 'systems', 'equipmentsTree', 'allEquipments', 'racks'));
+        return view('catalog.index', compact('locationsTree', 'locationsFlat', 'systems', 'equipments', 'allEquipments', 'racks'));
     }
 
     public function updateEquipment(Request $request, Equipment $equipment)
@@ -28,21 +28,27 @@ class CatalogController extends Controller
             'internal_id' => 'required|unique:equipment,internal_id,' . $equipment->id,
             'serial_number' => 'nullable|string|unique:equipment,serial_number,' . $equipment->id,
             'name' => 'required|string|max:255',
-            'form_factor' => 'required|in:rackmount,peripheral,network_point',
+            'form_factor' => 'required|in:rackmount,peripheral,network_point,cable',
             'u_height' => 'required_if:form_factor,rackmount|nullable|integer|min:1|max:42',
             'system_id' => 'required|exists:systems,id',
             'location_id' => 'nullable|exists:locations,id',
-            'parent_id' => 'nullable|exists:equipment,id',
             'status' => 'required|in:operative,under_maintenance,out_of_service',
+            'source_equipment_id' => 'nullable|exists:equipment,id',
+            'source_port' => 'nullable|string',
+            'destination_equipment_id' => 'nullable|exists:equipment,id',
+            'destination_port' => 'nullable|string',
+            'certification_pdf' => 'nullable|string',
+            'certification_status' => 'nullable|string',
+            'certification_date' => 'nullable|date',
+            'cable_category' => 'nullable|string',
+            'cable_length' => 'nullable|numeric',
             'installation_date' => 'nullable|date',
             'last_maintenance_at' => 'nullable|date',
             'notes' => 'nullable|string',
             'specs' => 'nullable|array',
         ]);
 
-        if (isset($validated['parent_id']) && $validated['parent_id'] == $equipment->id) {
-            unset($validated['parent_id']); // Evitar que sea padre de si mismo
-        }
+
 
         if (!empty($validated['last_maintenance_at']) || !empty($validated['installation_date'])) {
             $baseDate = \Carbon\Carbon::parse($validated['last_maintenance_at'] ?? $validated['installation_date']);
@@ -61,12 +67,20 @@ class CatalogController extends Controller
             'internal_id' => 'required|unique:equipment,internal_id',
             'serial_number' => 'nullable|string|unique:equipment,serial_number',
             'name' => 'required|string|max:255',
-            'form_factor' => 'required|in:rackmount,peripheral,network_point',
+            'form_factor' => 'required|in:rackmount,peripheral,network_point,cable',
             'u_height' => 'required_if:form_factor,rackmount|nullable|integer|min:1|max:42',
             'system_id' => 'required|exists:systems,id',
             'location_id' => 'nullable|exists:locations,id',
-            'parent_id' => 'nullable|exists:equipment,id',
             'status' => 'required|in:operative,under_maintenance,out_of_service',
+            'source_equipment_id' => 'nullable|exists:equipment,id',
+            'source_port' => 'nullable|string',
+            'destination_equipment_id' => 'nullable|exists:equipment,id',
+            'destination_port' => 'nullable|string',
+            'certification_pdf' => 'nullable|string',
+            'certification_status' => 'nullable|string',
+            'certification_date' => 'nullable|date',
+            'cable_category' => 'nullable|string',
+            'cable_length' => 'nullable|numeric',
             'installation_date' => 'nullable|date',
             'last_maintenance_at' => 'nullable|date',
             'notes' => 'nullable|string',

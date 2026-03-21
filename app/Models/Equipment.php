@@ -16,8 +16,16 @@ class Equipment extends Model
         'form_factor',
         'u_height',
         'system_id',
-        'location_id',
-        'parent_id',
+        'parent_id', // Temporal maintenance
+        'source_equipment_id',
+        'source_port',
+        'destination_equipment_id',
+        'destination_port',
+        'certification_pdf',
+        'certification_status',
+        'certification_date',
+        'cable_category',
+        'cable_length',
         'status',
         'installation_date',
         'last_maintenance_at',
@@ -28,7 +36,7 @@ class Equipment extends Model
 
     protected $casts = [
         'specs' => 'array',
-        'installation_date' => 'date',
+        'certification_date' => 'date',
         'last_maintenance_at' => 'date',
         'next_maintenance_at' => 'date',
     ];
@@ -53,13 +61,13 @@ class Equipment extends Model
         return $this->hasOneThrough(Rack::class, RackUnit::class, 'equipment_id', 'id', 'id', 'rack_id');
     }
 
-    public function parent()
+    public function source()
     {
-        return $this->belongsTo(Equipment::class, 'parent_id');
+        return $this->belongsTo(Equipment::class, 'source_equipment_id');
     }
 
-    public function children()
+    public function destination()
     {
-        return $this->hasMany(Equipment::class, 'parent_id');
+        return $this->belongsTo(Equipment::class, 'destination_equipment_id');
     }
 }
