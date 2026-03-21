@@ -274,7 +274,7 @@
             </div>
 
         <!-- Location Modal -->
-        <div x-show="showLocationModal" style="display: none;" class="fixed inset-0 z-50 overflow-y-auto">
+        <div x-show="showLocationModal" style="display: none;" class="fixed inset-0 z-[200] overflow-y-auto">
             <div class="fixed inset-0 bg-black/80 backdrop-blur-sm" @click="showLocationModal = false"></div>
             <div class="flex min-h-full items-center justify-center p-4">
                 <div class="relative w-full max-w-md bg-theme-card border border-theme rounded-3xl p-8 shadow-2xl transition-colors duration-500">
@@ -312,7 +312,7 @@
         </div>
 
         <!-- Rack Modal -->
-        <div x-show="showRackModal" style="display: none;" class="fixed inset-0 z-50 overflow-y-auto">
+        <div x-show="showRackModal" style="display: none;" class="fixed inset-0 z-[200] overflow-y-auto">
             <div class="fixed inset-0 bg-black/80 backdrop-blur-sm" @click="showRackModal = false"></div>
             <div class="flex min-h-full items-center justify-center p-4">
                 <div class="relative w-full max-w-lg bg-theme-card border border-theme rounded-3xl p-8 shadow-2xl transition-colors duration-500">
@@ -368,7 +368,7 @@
         <!-- System Modal (Managing Schemas) -->
         <div x-show="showSystemModal" 
              style="display: none;"
-             class="fixed inset-0 z-50 overflow-y-auto"
+             class="fixed inset-0 z-[200] overflow-y-auto"
              role="dialog" aria-modal="true">
             
             <div x-show="showSystemModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" 
@@ -510,7 +510,7 @@
         <!-- Custom Modal Implementation (Integrated into root x-data scope) -->
         <div x-show="showEquipmentModal" 
              x-cloak
-             class="fixed inset-0 z-50 overflow-y-auto"
+             class="fixed inset-0 z-[200] overflow-y-auto"
              role="dialog" aria-modal="true">
             
             <!-- Backdrop -->
