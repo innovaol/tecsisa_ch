@@ -16,17 +16,17 @@
                 cursor: pointer;
             }
         </style>
-    @push('scripts')
         <script>
             window.catalogData = {
                 locations: @json($locationsFlat),
                 systems: @json($systems),
-                racks: @json($racks)
+                racks: @json($racks),
+                equipments: @json($allEquipments)
             };
         </script>
     @endpush
 
-    <div class="py-6 md:py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8" x-data="inventoryManager(window.catalogData.locations, window.catalogData.systems, window.catalogData.racks)">
+    <div class="py-6 md:py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8" x-data="inventoryManager(window.catalogData.locations, window.catalogData.systems, window.catalogData.racks, window.catalogData.equipments)">
         <!-- Header: Tarjeta Propia -->
         <div class="bg-theme-card border border-theme rounded-[2.5rem] p-6 sm:p-8 mb-6 transition-all duration-500 shadow-xl relative">
             <!-- Decorative Orbs (Clipped) -->
@@ -108,54 +108,8 @@
                             </tr>
                         </thead>
                         <tbody class="text-sm">
-                            @forelse($equipments as $eq)
-                            <tr class="border-b border-theme last:border-0 hover:bg-theme-table-row-hover transition-colors duration-500">
-                                <td class="py-5 pl-8">
-                                    <span class="font-mono text-tecsisa-yellow font-black text-xs">{{ $eq->internal_id }}</span>
-                                </td>
-                                <td class="py-5 px-4">
-                                    <div class="flex flex-col">
-                                        <span class="font-black text-sm uppercase transition-colors duration-500" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">{{ $eq->name }}</span>
-                                        <span class="text-[9px] text-gray-500 uppercase font-bold tracking-widest">{{ $eq->location->name ?? 'Sin ubicación' }}</span>
-                                    </div>
-                                </td>
-                                <td class="py-5 px-4">
-                                    @if($eq->form_factor === 'rackmount')
-                                        <span class="text-[8px] bg-blue-500/10 text-blue-400 px-2 py-1 rounded-lg border border-blue-500/20 uppercase font-black tracking-widest whitespace-nowrap">Rack {{ $eq->u_height }}U</span>
-                                    @elseif($eq->form_factor === 'peripheral')
-                                        <span class="text-[8px] bg-purple-500/10 text-purple-400 px-2 py-1 rounded-lg border border-purple-500/20 uppercase font-black tracking-widest">Periférico</span>
-                                    @else
-                                        <span class="text-[8px] bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded-lg border border-emerald-500/20 uppercase font-black tracking-widest">Red / Pared</span>
-                                    @endif
-                                </td>
-                                <td class="py-5 px-4">
-                                    <span class="text-xs font-bold uppercase transition-colors duration-500" :class="theme === 'light' ? 'text-slate-600' : 'text-gray-400'">{{ $eq->system->name ?? 'N/A' }}</span>
-                                </td>
-                                <td class="py-5 px-4 text-center">
-                                    <div class="flex items-center justify-center">
-                                        @if($eq->status === 'operative')
-                                            <div class="w-2.5 h-2.5 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.4)]" title="Operativo"></div>
-                                        @elseif($eq->status === 'under_maintenance')
-                                            <div class="w-2.5 h-2.5 rounded-full bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.4)]" title="Mantenimiento"></div>
-                                        @else
-                                            <div class="w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.4)]" title="Fuera de Servicio"></div>
-                                        @endif
-                                    </div>
-                                </td>
-                                <td class="py-5 pr-8 text-right">
-                                    <div class="flex items-center justify-end gap-2 relative z-10 transition-colors">
-                                        <button @click="openEditModal(@js($eq))" class="p-2.5 bg-theme-border border border-theme rounded-xl text-theme hover:text-tecsisa-yellow transition-all shadow-md active:scale-90">
-                                            <svg class="w-5 h-5 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                        </button>
-                                        <form action="{{ route('catalog.equipment.destroy', $eq) }}" method="POST" onsubmit="return confirm('¿Eliminar este equipo del inventario?')">
-                                            @csrf @method('DELETE')
-                                            <button type="submit" class="p-2.5 bg-red-500/5 rounded-xl border border-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-md active:scale-90">
-                                                <svg class="w-5 h-5 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
+                            @forelse($equipmentsTree as $eq)
+                                <x-equipment-row :equipment="$eq" :level="0" />
                             @empty
                             <tr><td colspan="6" class="py-8 text-center text-gray-500">El catálogo de equipos está vacío.</td></tr>
                             @endforelse
@@ -607,6 +561,21 @@
                                 </select>
                             </div>
 
+                            <!-- Dependencia Jerárquica (Parent_id) -->
+                            <div>
+                                <label class="block text-theme-muted text-[10px] font-bold uppercase mb-1.5 tracking-widest flex justify-between">
+                                    <span>Depende de (Padre)</span>
+                                    <span class="text-gray-500 italic lowercase font-normal leading">Opcional</span>
+                                </label>
+                                <select name="parent_id" x-model="formData.parent_id" 
+                                        class="w-full bg-theme/5 border border-theme rounded-xl text-theme focus:ring-2 focus:ring-tecsisa-yellow transition h-12 px-4 shadow-inner">
+                                    <option value="">-- Activo Principal / Independiente --</option>
+                                    <template x-for="pEq in allEquipments" :key="pEq.id">
+                                        <option :value="pEq.id" x-text="pEq.internal_id + ' - ' + pEq.name" x-show="String(pEq.id) !== String(formData.id)"></option>
+                                    </template>
+                                </select>
+                            </div>
+
                             <!-- Estatus -->
                             <div>
                                 <label class="block text-theme-muted text-[10px] font-bold uppercase mb-1.5 tracking-widest">Estado Operativo</label>
@@ -708,13 +677,14 @@
     </div>
 
 <script>
-    function inventoryManager(locations, systems, racks) {
+    function inventoryManager(locations, systems, racks, equipments) {
         const params = new URLSearchParams(window.location.search);
         return {
             activeTab: params.get('tab') || 'equipment',
             allLocations: locations,
             allSystems: systems,
             allRacks: racks,
+            allEquipments: equipments,
 
             init() {
                 this.$watch('activeTab', tab => {
@@ -751,6 +721,7 @@
                 u_height: 1,
                 system_id: '',
                 location_id: '',
+                parent_id: '',
                 status: '',
                 installation_date: '',
                 last_maintenance_at: '',
@@ -814,7 +785,7 @@
                 this.formAction = '/catalogos/equipment';
                 this.formData = {
                     id: '', internal_id: '', serial_number: '', name: '', form_factor: '',
-                    u_height: 1, system_id: '', location_id: '',
+                    u_height: 1, system_id: '', location_id: '', parent_id: '',
                     status: '', installation_date: '', last_maintenance_at: '',
                     specs: {}, notes: ''
                 };
@@ -835,6 +806,7 @@
                     u_height: eq.u_height || 1,
                     system_id: eq.system_id ? String(eq.system_id) : '',
                     location_id: eq.location_id ? String(eq.location_id) : '',
+                    parent_id: eq.parent_id ? String(eq.parent_id) : '',
                     status: String(eq.status || 'operative'),
                     installation_date: eq.installation_date ? String(eq.installation_date).split('T')[0] : '',
                     last_maintenance_at: eq.last_maintenance_at ? String(eq.last_maintenance_at).split('T')[0] : '',

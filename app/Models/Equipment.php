@@ -17,6 +17,7 @@ class Equipment extends Model
         'u_height',
         'system_id',
         'location_id',
+        'parent_id',
         'status',
         'installation_date',
         'last_maintenance_at',
@@ -50,5 +51,15 @@ class Equipment extends Model
     public function rack()
     {
         return $this->hasOneThrough(Rack::class, RackUnit::class, 'equipment_id', 'id', 'id', 'rack_id');
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(Equipment::class, 'parent_id');
+    }
+
+    public function children()
+    {
+        return $this->hasMany(Equipment::class, 'parent_id');
     }
 }
