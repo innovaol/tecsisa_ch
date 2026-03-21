@@ -12,7 +12,7 @@
                 </a>
                 <div>
                     <h2 class="text-2xl sm:text-3xl font-black transition-colors duration-500 leading-tight flex items-center gap-2" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">
-                        <span>Inventario</span>
+                        <span>Catálogo</span>
                         <div class="group relative inline-block">
                             <svg class="w-5 h-5 text-theme-muted cursor-help hover:text-tecsisa-yellow transition-colors overflow-visible" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             <div class="absolute sm:bottom-full top-full sm:top-auto left-1/2 -translate-x-1/2 sm:mb-3 mt-3 sm:mt-0 w-64 p-4 bg-black/95 text-[11px] text-white rounded-2xl opacity-0 group-hover:opacity-100 transition-all pointer-events-none z-[100] border border-theme shadow-2xl normal-case font-bold backdrop-blur-md">
@@ -49,7 +49,7 @@
                 <button @click="activeTab = 'equipment'" 
                         :class="activeTab === 'equipment' ? 'bg-tecsisa-yellow text-black' : 'text-gray-500 hover:text-slate-800 dark:hover:text-white'"
                         class="flex-1 px-3 sm:px-6 py-3 font-black transition-all rounded-2xl uppercase text-[9px] sm:text-[10px] tracking-wider sm:tracking-widest whitespace-nowrap text-center">
-                    Inventario
+                    Catálogo
                 </button>
                 <button @click="activeTab = 'systems'" 
                         :class="activeTab === 'systems' ? 'bg-tecsisa-yellow text-black' : 'text-gray-500 hover:text-slate-800 dark:hover:text-white'"
@@ -66,7 +66,7 @@
             <!-- Tab: Equipment (Main Catalog) -->
             <div x-show="activeTab === 'equipment'" x-transition class="space-y-8">
                 <div class="bg-theme-card border border-theme rounded-[2.5rem] p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-xl transition-all duration-500 relative overflow-hidden">
-                    <div class="absolute -right-10 -top-10 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl"></div>
+                    <div class="absolute -right-10 -top-10 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none"></div>
                     <div>
                         <h3 class="text-2xl font-black uppercase tracking-wider transition-colors duration-500" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">Activos</h3>
                         <p class="text-gray-500 text-[10px] font-bold tracking-widest uppercase mt-1">Activos y hardware técnica</p>
@@ -77,7 +77,7 @@
                             <svg class="w-4 h-4 text-gray-500 absolute left-3 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </div>
                         @if(Auth::user()->hasRole('Administrador'))
-                        <button @click="openCreateModal()" class="w-full sm:w-auto flex justify-center items-center gap-2 bg-tecsisa-yellow hover:bg-yellow-400 text-black px-6 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl transition-all active:scale-95">
+                        <button type="button" @click="openCreateModal()" class="w-full sm:w-auto flex justify-center items-center gap-2 bg-tecsisa-yellow hover:bg-yellow-400 text-black px-6 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl transition-all active:scale-95 relative z-10">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path></svg>
                             Nuevo
                         </button>
@@ -156,7 +156,7 @@
 
             <div x-show="activeTab === 'systems'" x-transition class="space-y-8">
                 <div class="bg-theme-card border border-theme rounded-[2.5rem] p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-xl transition-all duration-500 relative overflow-hidden">
-                    <div class="absolute -right-10 -top-10 w-32 h-32 bg-blue-500/5 rounded-full blur-2xl"></div>
+                    <div class="absolute -right-10 -top-10 w-32 h-32 bg-blue-500/5 rounded-full blur-2xl pointer-events-none"></div>
                     <div>
                         <h3 class="text-2xl font-black uppercase tracking-wider transition-colors duration-500" :class="theme === 'light' ? 'text-slate-800' : 'text-white'">Sistemas</h3>
                         <p class="text-gray-500 text-[10px] font-bold tracking-widest uppercase mt-1">Categorías de activos</p>
