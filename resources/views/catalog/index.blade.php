@@ -59,7 +59,7 @@
                 <button @click="activeTab = 'equipment'" 
                         :class="activeTab === 'equipment' ? 'bg-tecsisa-yellow text-black' : 'text-gray-500 hover:text-slate-800 dark:hover:text-white'"
                         class="flex-1 px-3 sm:px-6 py-3 font-black transition-all rounded-2xl uppercase text-[9px] sm:text-[10px] tracking-wider sm:tracking-widest whitespace-nowrap text-center">
-                    Catálogo
+                    Activos
                 </button>
                 <button @click="activeTab = 'systems'" 
                         :class="activeTab === 'systems' ? 'bg-tecsisa-yellow text-black' : 'text-gray-500 hover:text-slate-800 dark:hover:text-white'"
