@@ -103,8 +103,10 @@
             }
 
             /* Autocierre de Scroll para cualquier modal activo en toda la interfaz */
+            html:has([role="dialog"]:not([style*="display: none"]):not([x-cloak])),
             body:has([role="dialog"]:not([style*="display: none"]):not([x-cloak])) {
                 overflow: hidden !important;
+                touch-action: none !important;
             }
 
             
