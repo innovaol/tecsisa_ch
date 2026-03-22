@@ -100,6 +100,7 @@
             html, body {
                 max-width: 100%;
                 overflow-x: hidden;
+                scrollbar-gutter: stable;
             }
 
             /* Autocierre de Scroll para cualquier modal activo en toda la interfaz */

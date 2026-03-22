@@ -1,4 +1,12 @@
 <x-app-layout>
+    <script>
+        window.catalogData = {
+            locations: @json($locationsFlat),
+            systems: @json($systems),
+            racks: @json($racks),
+            equipments: @json($allEquipments)
+        };
+    </script>
     @push('scripts')
         <!-- Flatpickr for Premium Date Selection -->
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -16,15 +24,8 @@
                 cursor: pointer;
             }
         </style>
-        <script>
-            window.catalogData = {
-                locations: @json($locationsFlat),
-                systems: @json($systems),
-                racks: @json($racks),
-                equipments: @json($allEquipments)
-            };
-        </script>
     @endpush
+
 
     <div class="py-6 md:py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8" x-data="inventoryManager(window.catalogData.locations, window.catalogData.systems, window.catalogData.racks, window.catalogData.equipments)">
         <!-- Header: Tarjeta Propia -->
@@ -34,7 +35,7 @@
                 <div class="absolute -right-10 -top-10 w-32 h-32 bg-tecsisa-yellow/5 rounded-full blur-2xl"></div>
             </div>
             <div class="flex items-center gap-4 sm:gap-6 relative z-10">
-                <a href="{{ route('dashboard') }}" class="md:hidden w-11 h-11 flex items-center justify-center bg-theme/5 border border-theme text-theme-muted hover:text-tecsisa-yellow rounded-2xl transition-all shadow-md active:scale-95 group shrink-0">
+                <a href="{{ route('dashboard') }}" class="md:hidden w-11 h-11 flex items-center justify-center bg-theme-card border border-theme text-theme-muted hover:text-tecsisa-yellow rounded-2xl transition-all shadow-md active:scale-95 group shrink-0">
                     <svg class="w-6 h-6 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 </a>
                 <div>
@@ -83,7 +84,7 @@
                     </div>
                     <div class="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
                         <div class="relative w-full sm:w-auto flex items-center">
-                            <input type="text" placeholder="ID..." class="w-full bg-theme-border border border-theme text-[10px] font-bold text-gray-400 uppercase tracking-widest rounded-xl pl-10 pr-4 py-3 focus:border-tecsisa-yellow transition-all placeholder-gray-600 outline-none">
+                            <input type="text" placeholder="ID..." class="w-full bg-theme-card border border-theme text-[10px] font-bold text-gray-400 uppercase tracking-widest rounded-xl pl-10 pr-4 py-3 focus:border-tecsisa-yellow transition-all placeholder-gray-600 outline-none">
                             <svg class="w-4 h-4 text-gray-500 absolute left-3 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </div>
                         @if(Auth::user()->hasRole('Administrador'))
@@ -99,8 +100,8 @@
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-black/10 dark:bg-white/10 border-b border-theme text-[10px] font-black uppercase text-gray-500 tracking-[0.2em] transition-colors duration-500" :class="theme === 'light' ? 'bg-slate-50' : ''">
-                                <th class="py-5 pl-8">ID Interno</th>
-                                <th class="py-5 px-4 font-black">Equipo / Modelo</th>
+                                <th class="py-5 pl-8">Etiqueta</th>
+                                <th class="py-5 px-4 font-black">Nombre del Equipo</th>
                                 <th class="py-5 px-4 font-black">Naturaleza</th>
                                 <th class="py-5 px-4 font-black">Sistema</th>
                                 <th class="py-5 px-4 font-black text-center">Estatus</th>
@@ -188,76 +189,16 @@
                     @endif
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    @foreach($systems as $sys)
-                    <div class="bg-theme-card border p-6 rounded-[2rem] group transition-all duration-500 shadow-lg relative overflow-hidden" 
-                         :class="{{ $sys->is_core ? 'true' : 'false' }} ? 'border-violet-500/30 bg-violet-500/5' : 'border-theme hover:border-tecsisa-yellow/50'">
-                        
-                        @if($sys->is_core)
-                        <div class="absolute -right-4 -top-4 w-20 h-20 bg-violet-500/10 rounded-full blur-xl pointer-events-none transition-all duration-700 group-hover:scale-150 group-hover:bg-violet-500/20"></div>
-                        @endif
+                {{-- Grid Dinámico Continuo (Equilibrio 3/4) --}}
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                    @foreach($systems->take(3) as $sys)
+                        @include('catalog.partials.system-card', ['sys' => $sys])
+                    @endforeach
+                </div>
 
-                        <div class="flex justify-between items-start mb-4 relative z-10">
-                            <div class="flex flex-col gap-1">
-                                <h4 class="font-bold text-lg text-theme transition-colors" :class="{{ $sys->is_core ? 'true' : 'false' }} ? 'text-violet-400 font-black' : 'group-hover:text-tecsisa-yellow'">{{ $sys->name }}</h4>
-                                @if($sys->is_core)
-                                    <span class="text-[7px] bg-violet-500/20 text-violet-400 border border-violet-500/30 px-2 py-0.5 rounded-full font-black uppercase tracking-[0.2em] w-fit italic">Módulo de Sistema</span>
-                                @else
-                                    <span class="text-[7px] bg-yellow-500/10 text-yellow-500/70 border border-yellow-500/20 px-2 py-0.5 rounded-full font-black uppercase tracking-[0.2em] w-fit">Personalizado (Innova)</span>
-                                @endif
-                            </div>
-
-                            @if(Auth::user()->hasRole('Administrador'))
-                            <div class="flex gap-2">
-                                @if($sys->is_core)
-                                    <button @click="openEditSystemModal(@js($sys))" class="text-violet-400 hover:text-violet-300 transition p-1.5 bg-violet-500/10 rounded-xl border border-violet-500/20 shadow-inner" title="Consultar Definición">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                                    </button>
-                                @else
-                                    <button @click="openEditSystemModal(@js($sys))" class="text-theme hover:text-tecsisa-yellow transition p-1.5 bg-theme-border border border-theme rounded-xl">
-                                        <svg class="w-5 h-5 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                    </button>
-                                    <form action="{{ route('catalog.systems.destroy', $sys) }}" method="POST" onsubmit="return confirm('¿Eliminar este sistema? No podrá eliminarse si tiene equipos asociados.')">
-                                        @csrf @method('DELETE')
-                                        <button class="text-theme-muted hover:text-red-400 transition p-1.5 bg-red-500/5 rounded-xl border border-red-500/10"><svg class="w-5 h-5 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
-                                    </form>
-                                @endif
-                                
-                            </div>
-                            @endif
-                        </div>
-                        
-                        <div class="space-y-4 relative z-10">
-                            <div class="space-y-2">
-                                <p class="text-[10px] text-gray-500 uppercase font-black tracking-widest opacity-60">Esquema Definido:</p>
-                                <div class="flex flex-wrap gap-2">
-                                    @php
-                                        $fields = $sys->form_schema['specs'] ?? (isset($sys->form_schema[0]['label']) ? $sys->form_schema : []);
-                                        $checklistItems = $sys->form_schema['checklist'] ?? [];
-                                    @endphp
-                                    @forelse($fields as $field)
-                                        <span class="text-[9px] bg-black/5 dark:bg-white/5 border border-theme px-2 py-1 rounded-lg text-theme-muted font-bold">
-                                            {{ $field['label'] ?? 'Campo' }} <span class="text-tecsisa-yellow/50">({{ $field['type'] ?? 'text' }})</span>
-                                        </span>
-                                    @empty
-                                        <span class="text-[9px] text-gray-600 italic">Sin campos adicionales</span>
-                                    @endforelse
-                                </div>
-                                @if(count($checklistItems) > 0)
-                                <div class="flex items-center gap-2 mt-2">
-                                    <span class="inline-flex items-center gap-1 text-[9px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-black">
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                                        {{ count($checklistItems) }} actividades base
-                                    </span>
-                                </div>
-                                @else
-                                <div class="mt-2">
-                                    <span class="text-[9px] text-gray-600 italic">Perfil de mantenimiento fijo</span>
-                                </div>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    @foreach($systems->skip(3) as $sys)
+                        @include('catalog.partials.system-card', ['sys' => $sys])
                     @endforeach
                 </div>
             </div>
@@ -318,16 +259,19 @@
                         <div class="space-y-4">
                             <div>
                                 <label class="block text-theme-muted text-[10px] font-bold uppercase mb-1.5 tracking-widest">Nombre</label>
-                                <input type="text" name="name" x-model="locationFormData.name" required class="w-full bg-theme/5 border border-theme rounded-xl text-theme h-12 px-4 focus:ring-2 focus:ring-tecsisa-yellow transition">
+                                <input type="text" name="name" x-model="locationFormData.name" required class="w-full bg-theme-card border border-theme rounded-xl text-theme h-12 px-4 focus:ring-2 focus:ring-tecsisa-yellow transition">
                             </div>
                             <div>
                                 <label class="block text-theme-muted text-[10px] font-bold uppercase mb-1.5 tracking-widest">Ubicación Padre (Jerarquía)</label>
-                                <select name="parent_id" x-model="locationFormData.parent_id" class="w-full bg-theme/5 border border-theme rounded-xl text-theme h-12 px-4 focus:ring-2 focus:ring-tecsisa-yellow transition">
+                                <select name="parent_id" x-model="locationFormData.parent_id" 
+                                        class="w-full bg-theme-card border border-theme rounded-xl text-theme h-12 px-4 focus:ring-2 focus:ring-tecsisa-yellow transition shadow-sm">
                                     <option value="">-- Sin Padre (Raíz) --</option>
                                     @foreach($locationsFlat as $l)
                                         <option value="{{ $l->id }}">{{ $l->name }}</option>
                                     @endforeach
                                 </select>
+
+
                             </div>
                         </div>
                         <div class="mt-8 flex justify-end gap-3">
@@ -356,32 +300,36 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="md:col-span-2">
                                 <label class="block text-theme-muted text-[10px] font-bold uppercase mb-1.5 tracking-widest">Nombre / Identificador</label>
-                                <input type="text" name="name" x-model="rackFormData.name" required class="w-full bg-theme/5 border border-theme rounded-xl text-theme h-12 px-4 focus:ring-2 focus:ring-tecsisa-yellow transition" placeholder="Ej: RACK-MDF-01">
+                                <input type="text" name="name" x-model="rackFormData.name" required class="w-full bg-theme-card border border-theme rounded-xl text-theme h-12 px-4 focus:ring-2 focus:ring-tecsisa-yellow transition" placeholder="Ej: RACK-MDF-01">
                             </div>
                             <div>
                                 <label class="block text-theme-muted text-[10px] font-bold uppercase mb-1.5 tracking-widest">Unidades Totales (U)</label>
-                                <input type="number" name="total_units" x-model="rackFormData.total_units" min="1" max="52" required class="w-full bg-theme/5 border border-theme rounded-xl text-theme h-12 px-4 focus:ring-2 focus:ring-tecsisa-yellow transition">
+                                <input type="number" name="total_units" x-model="rackFormData.total_units" min="1" max="52" required class="w-full bg-theme-card border border-theme rounded-xl text-theme h-12 px-4 focus:ring-2 focus:ring-tecsisa-yellow transition">
                             </div>
                             <div>
                                 <label class="block text-theme-muted text-[10px] font-bold uppercase mb-1.5 tracking-widest">Ubicación</label>
-                                <select name="location_id" x-model="rackFormData.location_id" required class="w-full bg-theme/5 border border-theme rounded-xl text-theme h-12 px-4 focus:ring-2 focus:ring-tecsisa-yellow transition">
+                                <select name="location_id" x-model="rackFormData.location_id" required 
+                                        class="w-full bg-theme-card dark:bg-black/20 border border-theme rounded-xl text-theme h-12 px-4 focus:ring-2 focus:ring-tecsisa-yellow transition shadow-inner">
                                     <option value="">Seleccione site...</option>
                                     @foreach($locationsFlat as $l)
                                         <option value="{{ $l->id }}">{{ $l->name }}</option>
                                     @endforeach
                                 </select>
+
                             </div>
                             <div>
                                 <label class="block text-theme-muted text-[10px] font-bold uppercase mb-1.5 tracking-widest">Estado</label>
-                                <select name="status" x-model="rackFormData.status" class="w-full bg-theme/5 border border-theme rounded-xl text-theme h-12 px-4 focus:ring-2 focus:ring-tecsisa-yellow transition">
-                                    <option value="active">Activo / Disponible</option>
+                                <select name="status" x-model="rackFormData.status" 
+                                        class="w-full bg-theme-card dark:bg-black/20 border border-theme rounded-xl text-theme h-12 px-4 focus:ring-2 focus:ring-tecsisa-yellow transition shadow-inner">
+                                    <option value="active">Active / Disponible</option>
                                     <option value="full">Lleno</option>
                                     <option value="maintenance">Mantenimiento</option>
                                 </select>
+
                             </div>
                             <div class="md:col-span-2">
                                 <label class="block text-theme-muted text-[10px] font-bold uppercase mb-1.5 tracking-widest">Notas</label>
-                                <textarea name="notes" x-model="rackFormData.notes" class="w-full bg-theme/5 border border-theme rounded-xl text-theme p-4 h-24 text-sm focus:ring-2 focus:ring-tecsisa-yellow transition"></textarea>
+                                <textarea name="notes" x-model="rackFormData.notes" class="w-full bg-theme-card border border-theme rounded-xl text-theme p-4 h-24 text-sm focus:ring-2 focus:ring-tecsisa-yellow transition"></textarea>
                             </div>
                         </div>
                         <div class="mt-8 flex justify-end gap-3">
@@ -405,141 +353,171 @@
             <div class="flex min-h-full items-center justify-center p-4">
                 <div x-show="showSystemModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                      class="relative w-full max-w-2xl bg-theme-card border border-theme rounded-3xl shadow-2xl overflow-hidden transition-all duration-500">
-                    
-                    <form method="post" :action="systemFormAction" class="p-8" @submit.prevent="submitSystemForm($el)">
-                        @csrf
-                        <template x-if="systemEditMode">
-                            <input type="hidden" name="_method" value="PUT">
-                        </template>
+                    <div class="relative bg-theme-card">
+                        
+                        {{-- MODO A: Formulario de Edición (Sistemas Custom) --}}
+                        <form x-show="!systemFormData.is_core" method="post" :action="systemFormAction" class="p-8" @submit.prevent="submitSystemForm($el)">
+                            @csrf
+                            <template x-if="systemEditMode">
+                                <input type="hidden" name="_method" value="PUT">
+                            </template>
 
-                         <div class="flex justify-between items-center mb-6 border-b border-theme pb-4">
-                            <h2 class="text-xl font-bold text-theme flex items-center gap-2">
-                                <svg class="w-6 h-6 text-tecsisa-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg>
-                                <span x-text="systemEditMode ? 'Editar Sistema Técnico' : 'Definir Nuevo Sistema'"></span>
-                            </h2>
-                            <button type="button" @click="showSystemModal = false" class="text-theme-muted hover:text-theme transition">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                            </button>
-                        </div>
-
-                        <div class="space-y-6 max-h-[60vh] overflow-y-auto px-1 custom-scrollbar">
-                            <div>
-                                <label class="block text-theme-muted text-[10px] font-bold uppercase mb-1.5 tracking-widest">Nombre del Sistema</label>
-                                <input type="text" name="name" x-model="systemFormData.name" required :disabled="systemFormData.is_core" 
-                                       class="w-full bg-theme/5 border border-theme rounded-xl text-theme focus:ring-2 focus:ring-tecsisa-yellow transition h-12 px-4 shadow-inner" 
-                                       :class="systemFormData.is_core ? 'opacity-50 cursor-not-allowed' : ''"
-                                       placeholder="Ej: CCTV, Control de Acceso, Redes...">
+                             <div class="flex justify-between items-center mb-6 border-b border-theme pb-4">
+                                <h2 class="text-xl font-bold text-theme flex items-center gap-2">
+                                    <svg class="w-6 h-6 text-tecsisa-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg>
+                                    <span x-text="systemEditMode ? 'Editar Sistema Técnico' : 'Definir Nuevo Sistema'"></span>
+                                </h2>
+                                <button type="button" @click="showSystemModal = false" class="text-theme-muted hover:text-theme transition">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                </button>
                             </div>
 
-                            <!-- Inputs ocultos para pasar validación requerida del controlador -->
-                            <input type="hidden" name="maintenance_interval_days" :value="systemFormData.maintenance_interval_days">
-                            <input type="hidden" name="maintenance_guide" :value="systemFormData.maintenance_guide">
+                            <div class="space-y-6 max-h-[60vh] overflow-y-auto px-1 custom-scrollbar">
+                                <div>
+                                    <label class="block text-theme-muted text-[10px] font-bold uppercase mb-1.5 tracking-widest">Nombre del Sistema</label>
+                                    <input type="text" name="name" x-model="systemFormData.name" required 
+                                           class="w-full bg-theme-card border border-theme rounded-xl text-theme h-12 px-4 shadow-sm" 
+                                           placeholder="Ej: CCTV, Control de Acceso, Redes...">
+                                </div>
 
-                            <!-- Sección: Campos Dinámicos de Especificación -->
-                            <div class="bg-theme/5 rounded-2xl p-6 border border-theme">
-                                <div class="flex justify-between items-center mb-4">
-                                    <h3 class="text-xs font-black text-theme-muted uppercase tracking-widest flex items-center gap-2">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                                        Esquema de Especificaciones (Campos Dinámicos)
-                                    </h3>
-                                    <button x-show="!systemFormData.is_core" type="button" @click="addFieldToSchema()" class="text-[10px] bg-tecsisa-yellow text-tecsisa-dark px-4 py-1.5 rounded-full font-black hover:bg-yellow-400 transition uppercase tracking-widest">
-                                        + Agregar Campo
+                                <input type="hidden" name="maintenance_interval_days" :value="systemFormData.maintenance_interval_days">
+                                <input type="hidden" name="maintenance_guide" :value="systemFormData.maintenance_guide">
+
+                                <div class="bg-theme-card rounded-2xl p-6 border border-theme">
+                                    <div class="flex justify-between items-center mb-4 pb-2 border-b border-theme">
+                                        <h3 class="text-xs font-black text-theme-muted uppercase tracking-widest">Esquema Técnico</h3>
+                                        <button type="button" @click="addFieldToSchema()" class="text-[9px] bg-tecsisa-yellow text-tecsisa-dark px-3 py-1 rounded-lg font-black uppercase tracking-widest">+ Agregar</button>
+                                    </div>
+
+                                    <div class="space-y-3">
+                                        <template x-for="(field, index) in systemFormData.form_schema" :key="index">
+                                            <div class="flex gap-2 items-end">
+                                                <div class="flex-1">
+                                                    <input type="text" :name="'form_schema[' + index + '][label]'" x-model="field.label" class="w-full bg-theme-card border border-theme rounded-lg h-10 px-3 text-[10px] font-bold uppercase tracking-widest text-theme" placeholder="ETIQUETA">
+                                                </div>
+                                                <div class="w-32">
+                                                    <select :name="'form_schema[' + index + '][type]'" x-model="field.type" class="w-full bg-theme-card border border-theme rounded-lg h-10 px-3 text-[10px] font-black uppercase tracking-widest transition text-theme">
+                                                        <option value="text">Texto</option>
+                                                        <option value="number">Número</option>
+                                                        <option value="select">Dropdown</option>
+                                                    </select>
+                                                </div>
+                                                <button type="button" @click="removeFieldFromSchema(index)" class="text-theme-muted hover:text-red-400 p-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+
+                                <div class="bg-emerald-500/5 rounded-2xl p-6 border border-emerald-500/10">
+                                    <div class="flex justify-between items-center mb-4">
+                                        <h3 class="text-xs font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Protocolos</h3>
+                                        <button type="button" @click="addChecklistItem()" class="text-[9px] bg-emerald-500 text-white px-3 py-1 rounded-lg font-black uppercase tracking-widest">+ Añadir</button>
+                                    </div>
+                                    <div class="space-y-2">
+                                        <template x-for="(item, idx) in systemFormData.checklist" :key="idx">
+                                            <div class="flex gap-2 items-center bg-black/5 dark:bg-black/20 p-2 rounded-xl transition-all border border-theme">
+                                                <input type="text" data-checklist-input :value="item" class="flex-1 bg-transparent border-0 text-[10px] font-bold uppercase px-2 text-theme" placeholder="Describir actividad...">
+                                                <button type="button" @click="removeChecklistItem(idx)" class="text-red-400 p-1 opacity-60 hover:opacity-100 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-8 flex justify-end gap-3 pt-6 border-t border-theme">
+                                <button type="button" @click="showSystemModal = false" class="px-6 py-3 rounded-xl text-theme-muted hover:text-theme font-bold text-[10px] uppercase tracking-widest transition">Cancelar</button>
+                                <button type="submit" class="bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-black px-8 py-3 rounded-xl transition shadow-xl uppercase text-[10px] tracking-widest">Guardar Cambios</button>
+                            </div>
+                        </form>
+
+                        {{-- MODO B: Ficha de Activo Premium (Human-Centric CORE) --}}
+                        <div x-show="systemFormData.is_core" class="flex min-h-[450px] w-full transition-all duration-700">
+                            
+                            {{-- Barra de Identidad Violeta (Fiel a la tarjeta) --}}
+                            <div class="w-2 shrink-0 bg-violet-600"></div>
+
+                            <div class="flex-1 p-8 flex flex-col relative overflow-hidden bg-transparent">
+                                {{-- Cabeza de la Ficha --}}
+                                <div class="flex justify-between items-start mb-10 border-b border-theme pb-8 relative z-10 text-left">
+                                    <div class="space-y-4 text-left">
+                                        <div class="flex items-center gap-3">
+                                            <span class="inline-flex items-center px-3 py-1.5 rounded-xl bg-violet-500/10 text-violet-500 text-[10px] font-black uppercase tracking-widest border border-violet-500/20">
+                                                Sistema de Infraestructura Crítica
+                                            </span>
+                                        </div>
+                                        <h2 class="text-3xl font-black text-theme tracking-tight leading-none" x-text="systemFormData.name"></h2>
+                                        <div class="flex items-center gap-3 text-[10px] text-theme-muted font-bold uppercase tracking-widest">
+                                            <span>Tipo: <span class="text-theme uppercase">Infraestructura Core</span></span>
+                                        </div>
+                                    </div>
+                                    <button @click="showSystemModal = false" class="w-10 h-10 rounded-2xl flex items-center justify-center bg-theme/5 text-theme-muted hover:text-red-500 transition-all border border-theme active:scale-95 shadow-sm">
+                                        <svg class="w-5 h-5 font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path></svg>
                                     </button>
                                 </div>
 
-                                <div class="space-y-3">
-                                    <template x-for="(field, index) in systemFormData.form_schema" :key="index">
-                                        <div class="flex gap-2 items-end bg-theme/10 p-4 rounded-xl border border-theme">
-                                            <div class="flex-1">
-                                                <label class="text-[10px] text-theme-muted font-bold uppercase tracking-widest block mb-1">Etiqueta (Label)</label>
-                                                <input type="text" :name="'form_schema[' + index + '][label]'" x-model="field.label" 
-                                                       class="w-full bg-theme/5 border border-theme rounded-lg text-[10px] text-theme h-10 px-3 uppercase tracking-widest font-bold" placeholder="Ej: Resolución, IP, Piso...">
-                                            </div>
-                                            <div class="w-32">
-                                                <label class="text-[10px] text-theme-muted font-bold uppercase tracking-widest block mb-1">Tipo de Dato</label>
-                                                <select :name="'form_schema[' + index + '][type]'" x-model="field.type"
-                                                        class="w-full bg-theme/5 border border-theme rounded-lg text-[10px] text-theme h-10 px-3 uppercase tracking-widest font-black">
-                                                    <option value="text">Texto Corto</option>
-                                                    <option value="long_text">Texto Largo (Área)</option>
-                                                    <option value="number">Número</option>
-                                                    <option value="date">Fecha (Calendario)</option>
-                                                    <option value="select">Lista (Dropdown)</option>
-                                                </select>
-                                            </div>
-                                            <div class="flex-1" x-show="field.type === 'select'">
-                                                <label class="text-[10px] text-theme-muted font-bold uppercase tracking-widest block mb-1">Opciones</label>
-                                                <input type="text" :name="'form_schema[' + index + '][options]'" x-model="field.options" 
-                                                       class="w-full bg-theme/5 border border-theme rounded-lg text-[10px] text-theme h-10 px-3 uppercase tracking-widest font-bold font-mono" placeholder="Op 1, Op 2, Op 3...">
-                                            </div>
-                                            <button x-show="!systemFormData.is_core" type="button" @click="removeFieldFromSchema(index)" class="text-theme-muted hover:text-red-400 p-2.5 transition">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                            </button>
+                                {{-- Cuerpo de la Ficha --}}
+                                <div class="flex-1 overflow-y-auto pr-4 custom-scrollbar space-y-12 relative z-10">
+                                    
+                                    {{-- Bloque: Especificaciones Técnicas --}}
+                                    <div class="space-y-6 text-left">
+                                        <div class="flex items-center gap-3 border-l-4 border-theme pl-4 py-1">
+                                            <h3 class="text-xs font-black text-theme uppercase tracking-widest">Especificaciones de Configuración</h3>
                                         </div>
-                                    </template>
 
-                                    <template x-if="systemFormData.form_schema.length === 0">
-                                        <p class="text-center text-xs text-theme-muted py-6 italic font-bold">No has definido campos técnicos para este sistema.</p>
-                                    </template>
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <template x-for="(field, index) in systemFormData.form_schema" :key="index">
+                                                <div class="p-4 rounded-2xl bg-theme/5 border border-theme flex flex-col gap-2 group hover:bg-theme/10 transition-all shadow-sm hover:shadow-md">
+                                                    <div class="flex items-center justify-between">
+                                                        <span class="text-[9px] font-black text-theme-muted uppercase tracking-widest" x-text="field.label"></span>
+                                                        <svg class="w-3.5 h-3.5 text-theme-muted opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                    </div>
+                                                    <span class="text-[11px] font-black text-theme uppercase tracking-tight" 
+                                                          x-text="field.type === 'text' ? 'Campo de Texto' : 
+                                                                  field.type === 'number' ? 'Valor Numérico' : 
+                                                                  field.type === 'date' ? 'Fecha Calendario' : 
+                                                                  field.type === 'select' ? 'Lista Desplegable' : field.type"></span>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </div>
+
+                                    {{-- Bloque: Mantenimiento --}}
+                                    <div class="mt-6 flex flex-col gap-3 text-left">
+                                        <div class="flex items-center gap-3 border-l-4 border-emerald-500/50 pl-4 py-1">
+                                            <h3 class="text-xs font-black text-theme uppercase tracking-widest">Actividades de Mantenimiento Preventivo</h3>
+                                        </div>
+
+                                        <div class="space-y-3 bg-emerald-500/5 p-6 rounded-3xl border border-emerald-500/10">
+                                            <template x-for="(item, idx) in systemFormData.checklist" :key="idx">
+                                                <div class="flex gap-4 items-center">
+                                                    <div class="w-6 h-6 rounded-lg bg-emerald-500/10 flex items-center justify-center shrink-0 border border-emerald-500/20">
+                                                        <svg class="w-3 h-3 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                                    </div>
+                                                    <p class="text-[11px] text-theme font-bold uppercase tracking-wide leading-relaxed" x-text="item"></p>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <!-- Sección: Checklist de Actividades de Mantenimiento -->
-                            <div class="bg-emerald-500/5 rounded-2xl p-6 border border-emerald-500/20">
-                                <div class="flex justify-between items-center mb-4">
-                                    <h3 class="text-xs font-black text-emerald-400 uppercase tracking-widest flex items-center gap-2">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
-                                        Checklist de Actividades de Mantenimiento
-                                    </h3>
-                                    <button x-show="!systemFormData.is_core" type="button" @click="addChecklistItem()" class="text-[10px] bg-emerald-500 text-white px-4 py-1.5 rounded-full font-black hover:bg-emerald-400 transition uppercase tracking-widest">
-                                        + Añadir Actividad
+                                {{-- Pie de Ficha --}}
+                                <div class="mt-8 pt-8 border-t border-theme flex items-center justify-end relative z-10 text-left">
+                                    <button @click="showSystemModal = false" class="bg-tecsisa-yellow hover:bg-yellow-400 text-black px-10 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl transition-all active:scale-95">
+                                        Finalizar Consulta
                                     </button>
                                 </div>
-                                <p class="text-[10px] text-gray-500 mb-4 font-bold">Cada ítem es una línea de la tabla SI/NO que el técnico responde al ejecutar la tarea.</p>
-
-                                <div class="space-y-2">
-                                    <template x-for="(item, idx) in systemFormData.checklist" :key="idx">
-                                        <div class="flex gap-2 items-center bg-theme/10 px-4 py-2.5 rounded-xl border border-theme/50 group">
-                                            <span class="text-[10px] font-black text-emerald-400 w-6 shrink-0" x-text="idx + 1 + '.'"></span>
-                                            <input type="text"
-                                                   data-checklist-input
-                                                   :value="item"
-                                                   class="flex-1 bg-transparent border-0 border-b border-theme/30 focus:border-emerald-400 text-[11px] text-theme h-8 px-1 font-bold uppercase tracking-wide outline-none transition"
-                                                   placeholder="Ej: CABLEADO (UTP): REVISIÓN DE ESTADO FÍSICO, ETIQUETADO Y CERTIFICACIÓN">
-                                            <button x-show="!systemFormData.is_core" type="button" @click="removeChecklistItem(idx)"
-                                                    class="text-theme-muted hover:text-red-400 p-1.5 transition opacity-0 group-hover:opacity-100">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                                            </button>
-                                        </div>
-                                    </template>
-
-                                    <template x-if="systemFormData.checklist.length === 0">
-                                        <div class="text-center py-8 border-2 border-dashed border-emerald-500/20 rounded-xl">
-                                            <svg class="w-10 h-10 text-emerald-500/30 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
-                                            <p class="text-xs text-gray-600 font-bold italic">Aún no hay actividades definidas. Haz clic en "+ Añadir Actividad" para comenzar.</p>
-                                        </div>
-                                    </template>
-                                </div>
                             </div>
                         </div>
 
-                        <div class="mt-8 flex justify-end gap-3">
-                            <button type="button" @click="showSystemModal = false" class="px-6 py-4 border border-theme rounded-2xl text-theme-muted font-bold uppercase tracking-widest text-[10px] hover:bg-theme/5 transition">
-                                <span x-text="systemFormData.is_core ? 'Cerrar Consulta' : 'Cancelar'"></span>
-                            </button>
-
-                             <button x-show="!systemFormData.is_core" type="submit" class="bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-black px-8 py-4 rounded-2xl transition shadow-xl shadow-tecsisa-yellow/20 uppercase text-[10px] tracking-widest active:scale-95">
-                                <span>Guardar</span>
-                            </button>
-                        </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Custom Modal Implementation (Integrated into root x-data scope) -->
         <div x-show="showEquipmentModal" 
-             x-cloak
              class="fixed inset-0 z-[200] overflow-y-auto"
+
              role="dialog" aria-modal="true">
             
             <!-- Backdrop -->
@@ -551,7 +529,8 @@
                 <div x-show="showEquipmentModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                      class="relative w-full max-w-4xl bg-theme-card border border-theme rounded-3xl shadow-2xl overflow-hidden transition-all duration-500">
                     
-                    <form method="post" :action="formAction" class="p-8">
+                    <form method="post" :action="formAction" class="p-8" enctype="multipart/form-data">
+
                         @csrf
                         <template x-if="editMode">
                             <input type="hidden" name="_method" value="PUT">
@@ -568,66 +547,71 @@
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- ID Interno -->
-                            <div>
-                                <label class="block text-theme-muted text-[10px] font-bold uppercase mb-1.5 tracking-widest">ID de Placa / Tag</label>
+                            <!-- Etiqueta -->
+                            <div class="md:col-span-2">
+
+                                <label class="block text-theme-muted text-[10px] font-bold uppercase mb-1.5 tracking-widest">Etiqueta</label>
                                 <input type="text" name="internal_id" x-model="formData.internal_id" required 
-                                       class="w-full bg-theme/5 border border-theme rounded-xl text-theme focus:ring-2 focus:ring-tecsisa-yellow transition h-12 px-4 shadow-inner" 
+                                       class="w-full bg-theme-card border border-theme rounded-xl text-theme focus:ring-2 focus:ring-tecsisa-yellow transition h-12 px-4 shadow-sm" 
                                        placeholder="Ej: SW-MDF-001">
                             </div>
 
-                            <!-- Serial Number -->
+
+                            <!-- Número de Serie -->
                             <div>
-                                <label class="block text-theme-muted text-[10px] font-bold uppercase mb-1.5 tracking-widest">N/S Fabricante (Código de Barras)</label>
+                                <label class="block text-theme-muted text-[10px] font-bold uppercase mb-1.5 tracking-widest">Número de Serie (S/N)</label>
                                 <input type="text" name="serial_number" x-model="formData.serial_number" 
-                                       class="w-full bg-theme/5 border border-theme rounded-xl text-theme focus:ring-2 focus:ring-tecsisa-yellow transition h-12 px-4 shadow-inner" 
+                                       class="w-full bg-theme-card border border-theme rounded-xl text-theme focus:ring-2 focus:ring-tecsisa-yellow transition h-12 px-4 shadow-sm" 
                                        placeholder="Ej: FOC2345678">
                             </div>
 
+
                             <!-- Nombre -->
                             <div>
-                                <label class="block text-theme-muted text-[10px] font-bold uppercase mb-1.5 tracking-widest">Nombre del Equipo / Modelo</label>
+                                <label class="block text-theme-muted text-[10px] font-bold uppercase mb-1.5 tracking-widest">Nombre del Equipo</label>
                                 <input type="text" name="name" x-model="formData.name" required 
-                                       class="w-full bg-theme/5 border border-theme rounded-xl text-theme focus:ring-2 focus:ring-tecsisa-yellow transition h-12 px-4 shadow-inner" 
+                                       class="w-full bg-theme-card border border-theme rounded-xl text-theme focus:ring-2 focus:ring-tecsisa-yellow transition h-12 px-4 shadow-sm" 
                                        placeholder="Ej: Cisco Catalyst 9300">
                             </div>
 
-                            <!-- Form Factor -->
-                            <div>
-                                <label class="block text-theme-muted text-[10px] font-bold uppercase mb-1.5 tracking-widest">Tipo de Activo (Form Factor)</label>
-                                <select name="form_factor" x-model="formData.form_factor" 
-                                        class="w-full bg-theme/5 border border-theme rounded-xl text-theme focus:ring-2 focus:ring-tecsisa-yellow transition h-12 px-4">
-                                    <option value="">-- Seleccione Tipo --</option>
-                                    <option value="rackmount">Equipment Rackmount (Switch/NVR/Servidor)</option>
-                                    <option value="standalone">Equipment Standalone (Cámara/UPS/PC)</option>
-                                </select>
-                            </div>
 
-                            <!-- Altura en U (Solo Rackmount) -->
-                            <div x-show="formData.form_factor === 'rackmount'" x-transition>
-                                <label class="block text-theme-muted text-[10px] font-bold uppercase mb-1.5 tracking-widest">Altura (Unidades de Rack - U)</label>
-                                <input type="number" name="u_height" x-model="formData.u_height" min="1" max="42"
-                                       class="w-full bg-theme/5 border border-theme rounded-xl text-theme focus:ring-2 focus:ring-tecsisa-yellow transition h-12 px-4 shadow-inner" 
-                                       placeholder="Ej: 1, 2, 4...">
-                            </div>
+
+
+                             <!-- Submit con flag de compatibilidad con backend -->
+                            <select name="form_factor" id="form_factor_hidden" class="hidden">
+                                <option value="standalone">standalone</option>
+                                <option value="rackmount">rackmount</option>
+                            </select>
+
+
 
                             <!-- Sistema -->
                             <div>
                                 <label class="block text-theme-muted text-[10px] font-bold uppercase mb-1.5 tracking-widest">Sistema Perteneciente</label>
                                 <select name="system_id" x-model="formData.system_id" 
-                                        class="w-full bg-theme/5 border border-theme rounded-xl text-theme focus:ring-2 focus:ring-tecsisa-yellow transition h-12 px-4">
+                                        class="w-full bg-theme-card border border-theme rounded-xl text-theme focus:ring-2 focus:ring-tecsisa-yellow transition h-12 px-4 shadow-sm">
                                     <option value="">-- Seleccione Sistema --</option>
-                                    @foreach($systems as $sys)
-                                        <option value="{{ $sys->id }}">{{ $sys->name }}</option>
-                                    @endforeach
+                                    <optgroup label="Sistemas de Infraestructura">
+                                        @foreach($systems->where('is_core', true) as $sys)
+                                            <option value="{{ $sys->id }}">{{ $sys->name }}</option>
+                                        @endforeach
+                                    </optgroup>
+                                    <optgroup label="Sistemas Personalizados">
+                                        @foreach($systems->where('is_core', false) as $sys)
+                                            <option value="{{ $sys->id }}">{{ $sys->name }}</option>
+                                        @endforeach
+                                    </optgroup>
                                 </select>
+
                             </div>
+
+
 
                             <!-- Ubicación -->
                             <div>
                                 <label class="block text-theme-muted text-[10px] font-bold uppercase mb-1.5 tracking-widest">Ubicación Física</label>
                                 <select name="location_id" x-model="formData.location_id" 
-                                        class="w-full bg-theme/5 border border-theme rounded-xl text-theme focus:ring-2 focus:ring-tecsisa-yellow transition h-12 px-4">
+                                        class="w-full bg-theme-card border border-theme rounded-xl text-theme focus:ring-2 focus:ring-tecsisa-yellow transition h-12 px-4 shadow-sm">
                                     <option value="">Seleccione ubicación...</option>
                                     @foreach($locationsFlat as $loc)
                                         <option value="{{ $loc->id }}">{{ $loc->name }}</option>
@@ -635,93 +619,189 @@
                                 </select>
                             </div>
 
+
+
                             <!-- Networking: HUB Capacity -->
                             <div x-show="getSelectedSystemSlug() === 'NET-HUB'" x-transition class="md:col-span-2 grid grid-cols-1 gap-4 bg-purple-500/5 p-4 rounded-xl border border-purple-500/10 mt-4">
                                 <h4 class="text-[10px] font-black text-purple-500 uppercase tracking-widest">Capacidad del Nodo</h4>
                                 <div>
                                     <label class="block text-theme-muted text-[9px] font-bold uppercase mb-1">Número de Bocas / Puertos Totales</label>
-                                    <input type="number" name="port_capacity" x-model="formData.port_capacity" class="w-full bg-theme/5 border border-theme rounded-xl text-xs h-10 px-3 transition" placeholder="Ej: 24">
+                                    <input type="number" name="port_capacity" x-model="formData.port_capacity" class="w-full bg-theme-card border border-theme rounded-xl text-xs h-10 px-3 transition" placeholder="Ej: 24">
                                 </div>
                             </div>
 
-                            <!-- Networking: Origen (Solo NET-LINK) -->
-                            <div x-show="getSelectedSystemSlug() === 'NET-LINK'" x-transition class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 bg-blue-500/5 p-4 rounded-xl border border-blue-500/10 mt-4">
-                                <h4 class="md:col-span-2 text-[10px] font-black text-blue-500 uppercase tracking-widest">Connection: Start Point (HUB/Panel)</h4>
-                                <div>
-                                    <label class="block text-theme-muted text-[9px] font-bold uppercase mb-1">Source Equipment</label>
-                                    <select name="source_equipment_id" x-model="formData.source_equipment_id" class="w-full bg-theme/5 border border-theme rounded-xl text-xs h-10 px-3 transition shadow-sm">
-                                        <option value="">-- No Source / Peer to Peer --</option>
-                                        <template x-for="pEq in allEquipments" :key="pEq.id">
-                                            <option :value="pEq.id" x-text="pEq.internal_id + ' - ' + pEq.name"></option>
-                                        </template>
-                                    </select>
+                            <!-- Networking: Configuración de Enlace (Solo NET-LINK) -->
+                            <div x-show="getSelectedSystemSlug() === 'NET-LINK'" x-transition 
+                                 class="md:col-span-2 bg-slate-500/5 dark:bg-white/5 p-6 rounded-[2.5rem] border border-theme mt-6 space-y-6">
+                                
+                                <div class="flex items-center gap-3 border-b border-theme pb-4 mb-2">
+                                    <div class="w-10 h-10 rounded-2xl bg-tecsisa-yellow/10 flex items-center justify-center text-tecsisa-yellow">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-sm font-black uppercase tracking-widest text-theme">Configuración de Conectividad</h3>
+                                        <p class="text-[9px] text-theme-muted font-bold uppercase tracking-widest">Detalles del enlace lógico y físico</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label class="block text-theme-muted text-[9px] font-bold uppercase mb-1">Source Port / Lane</label>
-                                    <input type="text" name="source_port" x-model="formData.source_port" class="w-full bg-theme/5 border border-theme rounded-xl text-xs h-10 px-3 transition" placeholder="Ej: Port 01A">
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <!-- Origen -->
+                                    <div class="bg-blue-500/5 p-5 rounded-3xl border border-blue-500/10 space-y-4">
+                                        <h4 class="text-[10px] font-black text-blue-500 uppercase tracking-widest flex items-center gap-2">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path></svg>
+                                            Punto de Origen (Distribución)
+                                        </h4>
+                                        <div class="space-y-3">
+                                            <div>
+                                                <label class="block text-theme-muted text-[10px] font-bold uppercase mb-1.5 tracking-widest">Equipo de Origen</label>
+                                                <select name="source_equipment_id" x-model="formData.source_equipment_id" 
+                                                        class="w-full bg-theme-card border border-theme rounded-xl text-xs h-11 px-4 transition shadow-sm text-theme">
+                                                    <option value="">-- Sin Origen (Directo) --</option>
+                                                    <template x-for="pEq in allEquipments" :key="pEq.id">
+                                                        <option :value="pEq.id" x-text="pEq.internal_id + ' - ' + pEq.name"></option>
+                                                    </template>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label class="block text-theme-muted text-[10px] font-bold uppercase mb-1.5 tracking-widest">Puerto / Posición</label>
+                                                <input type="text" name="source_port" x-model="formData.source_port" class="w-full bg-theme-card border border-theme rounded-xl text-xs h-11 px-4 transition" placeholder="Ej: Puerto 01-A">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Destino -->
+                                    <div class="bg-emerald-500/5 p-5 rounded-3xl border border-emerald-500/10 space-y-4">
+                                        <h4 class="text-[10px] font-black text-emerald-500 uppercase tracking-widest flex items-center gap-2">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                                            Punto de Destino (Terminal)
+                                        </h4>
+                                        <div class="space-y-3">
+                                            <div>
+                                                <label class="block text-theme-muted text-[10px] font-bold uppercase mb-1.5 tracking-widest">Equipo Destino</label>
+                                                <select name="destination_equipment_id" x-model="formData.destination_equipment_id" 
+                                                        class="w-full bg-theme-card border border-theme rounded-xl text-xs h-11 px-4 transition shadow-sm text-theme">
+                                                    <option value="">-- Sin Destino (Abierto) --</option>
+                                                    <template x-for="pEq in allEquipments" :key="pEq.id">
+                                                        <option :value="pEq.id" x-text="pEq.internal_id + ' - ' + pEq.name"></option>
+                                                    </template>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label class="block text-theme-muted text-[10px] font-bold uppercase mb-1.5 tracking-widest">Puerto / Salida</label>
+                                                <input type="text" name="destination_port" x-model="formData.destination_port" class="w-full bg-theme-card border border-theme rounded-xl text-xs h-11 px-4 transition" placeholder="Ej: Roseta 3 / Toma A">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Certificación -->
+                                <div class="bg-amber-500/5 p-5 rounded-3xl border border-amber-500/10 space-y-4">
+                                    <h4 class="text-[10px] font-black text-amber-500 uppercase tracking-widest flex items-center gap-2">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        Certificación de Enlace (Pruebas de Campo)
+                                    </h4>
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        <div>
+                                            <label class="block text-theme-muted text-[10px] font-bold uppercase mb-1.5 tracking-widest">Estado de Prueba</label>
+                                            <select name="certification_status" x-model="formData.certification_status" 
+                                                    class="w-full bg-theme-card border border-theme rounded-xl text-xs h-11 px-4 transition shadow-sm text-theme">
+                                                <option value="">Pendiente</option>
+                                                <option value="certified">Certificado (PASS)</option>
+                                                <option value="failed">FALLIDO (FAIL)</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-theme-muted text-[10px] font-bold uppercase mb-1.5 tracking-widest">Fecha de Certif.</label>
+                                            <input type="date" name="certification_date" x-model="formData.certification_date" 
+                                                   class="w-full bg-theme-card border border-theme rounded-xl text-xs h-11 px-4 transition">
+                                        </div>
+                                        <div>
+                                            <label class="block text-theme-muted text-[10px] font-bold uppercase mb-1.5 tracking-widest">Subir Reporte PDF</label>
+                                            <div class="relative group">
+                                                <input type="file" name="certification_pdf" 
+                                                       class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                                       @change="fileName = $event.target.files[0]?.name">
+                                                <div class="w-full bg-theme-card border border-theme rounded-xl text-xs h-11 px-4 transition flex items-center gap-3 overflow-hidden group-hover:border-tecsisa-yellow/50">
+                                                    <div class="bg-tecsisa-yellow/10 p-1.5 rounded-lg text-tecsisa-yellow">
+                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                                                    </div>
+                                                    <span class="text-theme-muted truncate" x-text="fileName || 'Seleccionar archivo PDF...'"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
                                 </div>
                             </div>
 
-                            <!-- Networking: Destino (Solo NET-LINK) -->
-                            <div x-show="getSelectedSystemSlug() === 'NET-LINK'" x-transition class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 bg-emerald-500/5 p-4 rounded-xl border border-emerald-500/10 mt-4">
-                                <h4 class="md:col-span-2 text-[10px] font-black text-emerald-500 uppercase tracking-widest">Connection: End Point (Outlet/Device)</h4>
-                                <div>
-                                    <label class="block text-theme-muted text-[9px] font-bold uppercase mb-1">Target Asset</label>
-                                    <select name="destination_equipment_id" x-model="formData.destination_equipment_id" class="w-full bg-theme/5 border border-theme rounded-xl text-xs h-10 px-3 transition shadow-sm">
-                                        <option value="">-- No Target / Open End --</option>
-                                        <template x-for="pEq in allEquipments" :key="pEq.id">
-                                            <option :value="pEq.id" x-text="pEq.internal_id + ' - ' + pEq.name"></option>
-                                        </template>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-theme-muted text-[9px] font-bold uppercase mb-1">Target Port / Box</label>
-                                    <input type="text" name="destination_port" x-model="formData.destination_port" class="w-full bg-theme/5 border border-theme rounded-xl text-xs h-10 px-3 transition" placeholder="Ej: Roseta 3">
-                                </div>
-                            </div>
 
-                            <!-- Certification: Solo NET-LINK -->
-                            <div x-show="getSelectedSystemSlug() === 'NET-LINK'" x-transition class="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4 bg-amber-500/5 p-4 rounded-xl border border-amber-500/10 mt-4">
-                                <h4 class="md:col-span-3 text-[10px] font-black text-amber-500 uppercase tracking-widest">Field Certification Data</h4>
-                                <div>
-                                    <label class="block text-theme-muted text-[9px] font-bold uppercase mb-1">Cert. Status</label>
-                                    <select name="certification_status" x-model="formData.certification_status" class="w-full bg-theme/5 border border-theme rounded-xl text-xs h-10 px-3 transition">
-                                        <option value="">Pending</option>
-                                        <option value="certified">Certified / PASS</option>
-                                        <option value="failed">FAILED</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-theme-muted text-[9px] font-bold uppercase mb-1">Cert. Date</label>
-                                    <input type="date" name="certification_date" x-model="formData.certification_date" class="w-full bg-theme/5 border border-theme rounded-xl text-xs h-10 px-3 transition">
-                                </div>
-                                <div>
-                                    <label class="block text-theme-muted text-[9px] font-bold uppercase mb-1">PDF Report URL</label>
-                                    <input type="text" name="certification_pdf" x-model="formData.certification_pdf" class="w-full bg-theme/5 border border-theme rounded-xl text-xs h-10 px-3 transition" placeholder="URL o Ruta al PDF">
-                                </div>
-                            </div>
+
 
                             <!-- Estatus -->
-                            <div>
+                            <div class="md:col-span-2">
                                 <label class="block text-theme-muted text-[10px] font-bold uppercase mb-1.5 tracking-widest">Estado Operativo</label>
+
                                 <select name="status" x-model="formData.status" 
-                                        class="w-full bg-theme/5 border border-theme rounded-xl text-theme focus:ring-2 focus:ring-tecsisa-yellow transition h-12 px-4">
+                                        class="w-full bg-theme-card border border-theme rounded-xl text-theme focus:ring-2 focus:ring-tecsisa-yellow transition h-12 px-4 shadow-sm">
                                     <option value="">-- Seleccione Estado --</option>
                                     <option value="operative">Operativo</option>
                                     <option value="under_maintenance">En Mantenimiento</option>
                                     <option value="out_of_service">Fuera de Servicio</option>
                                 </select>
                             </div>
+
+
+
+                             <!-- Rack Configuration Group (Relocated after Status) -->
+                             <div class="md:col-span-2 bg-theme-card dark:bg-black/20 p-5 rounded-2xl border border-theme flex flex-col justify-center min-h-[96px]">
+                                <div class="flex items-center justify-between">
+                                    <label class="flex items-center gap-3 cursor-pointer group leading-none">
+                                        <div class="relative flex items-center">
+                                            <input type="checkbox" 
+                                                   name="is_rackmount_bool"
+                                                   x-model="formData.is_rackmount"
+                                                   @change="document.getElementById('form_factor_hidden').value = $el.checked ? 'rackmount' : 'standalone'"
+                                                   class="sr-only peer">
+                                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-tecsisa-yellow rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 shadow-inner"></div>
+                                        </div>
+                                        <div class="flex flex-col gap-0.5">
+                                            <span class="text-[10px] font-black text-theme-muted uppercase tracking-widest group-hover:text-theme transition-colors">Montaje en Rack</span>
+                                            <span class="text-[8px] text-gray-500 font-bold uppercase tracking-widest">(Unidad para Cabinet)</span>
+                                        </div>
+                                    </label>
+                                    
+                                    <!-- Altura en U (Always occupies space, toggles visibility) -->
+                                    <div :class="formData.is_rackmount ? 'opacity-100 translate-x-0 pointer-events-auto' : 'opacity-0 translate-x-4 pointer-events-none'" 
+                                         class="flex flex-col items-end transition-all duration-300">
+                                        <label class="text-[8px] font-black text-theme-muted uppercase mb-1">Altura (U)</label>
+                                        <div class="flex items-center bg-black/10 dark:bg-black/40 border border-theme rounded-xl overflow-hidden shadow-inner h-10">
+                                            <button type="button" @click="formData.u_height = Math.max(1, (formData.u_height || 1) - 1)" 
+                                                    class="px-3 h-full hover:bg-red-500/20 text-theme-muted hover:text-red-400 transition flex items-center justify-center border-r border-theme">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M20 12H4"/></svg>
+                                            </button>
+                                            <input type="number" name="u_height" x-model="formData.u_height" min="1" max="42" readonly
+                                                   class="w-12 bg-transparent border-none text-theme text-center font-black text-sm focus:ring-0 appearance-none pointer-events-none" 
+                                                   style="-moz-appearance: textfield; appearance: textfield;">
+                                            <button type="button" @click="formData.u_height = Math.min(42, (formData.u_height || 1) + 1)" 
+                                                    class="px-3 h-full hover:bg-green-500/20 text-theme-muted hover:text-green-400 transition flex items-center justify-center border-l border-theme">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"/></svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
 
 
                         <!-- SECCIÓN DINÁMICA: Especificaciones Técnicas -->
-                        <div x-show="activeSchema.length > 0" x-transition class="mt-8 p-6 bg-black/5 dark:bg-white/5 border border-theme rounded-2xl transition-colors duration-500">
+                        <div x-show="activeSchema.length > 0" x-transition class="mt-8 p-6 bg-black/10 dark:bg-black/40 border border-theme rounded-2xl transition-colors duration-500">
                             <h3 class="text-sm font-bold text-tecsisa-yellow uppercase tracking-widest mb-4 flex items-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                                 Parámetros Técnicos
                             </h3>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                             <div class="grid grid-cols-1 gap-4" 
+                                  :class="activeSchema.length === 3 ? 'md:grid-cols-3' : 'md:grid-cols-2'">
                                 <template x-for="(field, index) in activeSchema" :key="index">
                                     <div>
                                         <label class="block text-[10px] font-black text-gray-500 uppercase mb-1" x-text="field.label"></label>
@@ -729,12 +809,13 @@
                                         <!-- Case: Select -->
                                         <template x-if="field.type === 'select'">
                                             <select :name="'specs[' + field.label + ']'" x-model="formData.specs[field.label]"
-                                                    class="w-full bg-black/5 dark:bg-black/40 border border-theme rounded-lg text-sm text-theme focus:border-tecsisa-yellow focus:ring-0 transition h-9 px-3">
+                                                    class="w-full bg-black/5 dark:bg-black/40 border border-theme rounded-lg text-sm text-theme focus:border-tecsisa-yellow focus:ring-2 focus:ring-tecsisa-yellow transition h-10 px-3 shadow-inner">
                                                 <option value="">-- Seleccione --</option>
                                                 <template x-for="(opt, idx) in getDropdownOptions(field.options)" :key="idx">
                                                     <option :value="opt" x-text="opt"></option>
                                                 </template>
                                             </select>
+
                                         </template>
 
                                         <!-- Case: Date (Flatpickr) -->
@@ -766,12 +847,12 @@
                                                    class="w-full bg-black/5 dark:bg-black/40 border border-theme rounded-lg text-sm text-theme focus:border-tecsisa-yellow focus:ring-0 transition h-9 px-3">
                                         </template>
 
-                                        <!-- Case: Text (Default) -->
-                                        <template x-if="field.type === 'text' || !field.type">
+                                        <!-- Case: Text (Default fallback) -->
+                                        <template x-if="!['select', 'date', 'long_text', 'number'].includes(field.type)">
                                             <input type="text" :name="'specs[' + field.label + ']'" 
                                                    x-model="formData.specs[field.label]"
-                                                   class="w-full bg-black/5 dark:bg-black/40 border border-theme rounded-lg text-sm text-theme focus:border-tecsisa-yellow focus:ring-0 transition h-9 px-3"
-                                                   :placeholder="'Valor ' + field.label.toLowerCase()">
+                                                   class="w-full bg-black/5 dark:bg-black/40 border border-theme rounded-lg text-sm text-theme focus:border-tecsisa-yellow focus:ring-0 transition h-10 px-3 shadow-inner"
+                                                   placeholder="Ingrese valor...">
                                         </template>
                                     </div>
                                 </template>
@@ -802,7 +883,12 @@
     </div>
 
 <script>
-    function inventoryManager(locations, systems, racks, equipments) {
+    function inventoryManager(locs, syss, rks, eqs) {
+        const locations = locs || [];
+        const systems = syss || [];
+        const racks = rks || [];
+        const equipments = eqs || [];
+
         const params = new URLSearchParams(window.location.search);
         return {
             activeTab: params.get('tab') || 'equipment',
@@ -810,6 +896,8 @@
             allSystems: systems,
             allRacks: racks,
             allEquipments: equipments,
+            fileName: '',
+
 
             init() {
                 this.$watch('activeTab', tab => {
@@ -822,6 +910,9 @@
                     if(val) {
                         document.body.classList.add('overflow-hidden');
                         document.documentElement.classList.add('overflow-hidden');
+                        setTimeout(() => {
+                            document.querySelectorAll('.overflow-y-auto, .custom-scrollbar').forEach(el => el.scrollTop = 0);
+                        }, 50);
                     } else {
                         document.body.classList.remove('overflow-hidden');
                         document.documentElement.classList.remove('overflow-hidden');
@@ -841,9 +932,13 @@
             formData: {
                 id: '',
                 internal_id: '',
+                serial_number: '',
                 name: '',
-                form_factor: '',
+                form_factor: 'standalone',
+                is_rackmount: false,
                 u_height: 1,
+                system_id: '',
+                location_id: '',
                 source_equipment_id: '',
                 source_port: '',
                 destination_equipment_id: '',
@@ -852,12 +947,13 @@
                 certification_pdf: '',
                 certification_status: '',
                 certification_date: '',
-                status: '',
+                status: 'operative',
                 installation_date: '',
                 last_maintenance_at: '',
                 specs: {},
                 notes: ''
             },
+
 
             getSelectedSystemSlug() {
                 if (!this.formData.system_id) return null;
@@ -906,8 +1002,9 @@
                 if (!this.formData.system_id) return [];
                 const sysId = String(this.formData.system_id);
                 const found = this.allSystems.find(s => String(s.id) === sysId);
-                return found ? (found.form_schema || []) : [];
+                return found ? (found.form_schema?.specs || found.form_schema || []) : [];
             },
+
 
             getDropdownOptions(optionsStr) {
                 if (!optionsStr) return [];
@@ -918,8 +1015,9 @@
                 this.editMode = false;
                 this.formAction = '/catalogos/equipment';
                 this.formData = {
-                    id: '', internal_id: '', serial_number: '', name: '', form_factor: '',
-                    u_height: 1, system_id: '', location_id: '', status: '', 
+                    id: '', internal_id: '', serial_number: '', name: '', form_factor: 'standalone',
+                    is_rackmount: false,
+                    u_height: 1, system_id: '', location_id: '', status: 'operative', 
                     source_equipment_id: '', source_port: '',
                     destination_equipment_id: '', destination_port: '',
                     port_capacity: '',
@@ -927,6 +1025,8 @@
                     installation_date: '', last_maintenance_at: '',
                     specs: {}, notes: ''
                 };
+
+                this.fileName = '';
                 this.showEquipmentModal = true;
             },
 
@@ -939,7 +1039,9 @@
                     serial_number: String(eq.serial_number || ''),
                     name: String(eq.name || ''),
                     form_factor: String(eq.form_factor || 'standalone'),
+                    is_rackmount: (eq.form_factor === 'rackmount'),
                     u_height: eq.u_height || 1,
+
                     system_id: eq.system_id ? String(eq.system_id) : '',
                     location_id: eq.location_id ? String(eq.location_id) : '',
                     source_equipment_id: eq.source_equipment_id ? String(eq.source_equipment_id) : '',
@@ -956,7 +1058,9 @@
                     specs: eq.specs ? JSON.parse(JSON.stringify(eq.specs)) : {},
                     notes: String(eq.notes || '')
                 };
+                this.fileName = eq.certification_pdf ? eq.certification_pdf.split('/').pop() : '';
                 this.showEquipmentModal = true;
+
             },
 
             // --- Systems Logic ---
@@ -977,9 +1081,16 @@
             openEditSystemModal(sys) {
                 this.systemEditMode = true;
                 this.systemFormAction = `/catalogos/systems/${sys.id}`;
-                const schema = sys.form_schema || {};
+                
+                let schema = sys.form_schema || {};
+                // Force parsing if it's a string (double encoded JSON scenario)
+                if (typeof schema === 'string') {
+                    try { schema = JSON.parse(schema); } catch (e) { schema = {}; }
+                }
+
                 const specFields = Array.isArray(schema) ? schema : (schema.specs || []);
                 const checklistItems = Array.isArray(schema) ? [] : (schema.checklist || []);
+
                 this.systemFormData = {
                     id: sys.id,
                     name: sys.name,
