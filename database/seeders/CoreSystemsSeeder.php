@@ -13,12 +13,12 @@ class CoreSystemsSeeder extends Seeder
         System::updateOrCreate(
             ['slug' => 'NET-HUB'],
             [
-                'name' => 'Network Hub / Panel',
+                'name' => 'Dispositivos de Red (Paneles/Switches)',
                 'is_core' => true,
                 'form_schema' => [
                     'specs' => [
-                        ['label' => 'Manufacturer', 'type' => 'text'],
-                        ['label' => 'Model', 'type' => 'text'],
+                        ['label' => 'Marca / Fabricante', 'type' => 'text'],
+                        ['label' => 'Modelo / Serie', 'type' => 'text'],
                     ]
                 ]
             ]
@@ -28,11 +28,11 @@ class CoreSystemsSeeder extends Seeder
         System::updateOrCreate(
             ['slug' => 'NET-OUTLET'],
             [
-                'name' => 'Network Outlet / Box',
+                'name' => 'Puntos de Red (Cajillas/Rosetas)',
                 'is_core' => true,
                 'form_schema' => [
                     'specs' => [
-                        ['label' => 'Outlet Color', 'type' => 'text'],
+                        ['label' => 'Color de Identificación', 'type' => 'text'],
                     ]
                 ]
             ]
@@ -42,11 +42,11 @@ class CoreSystemsSeeder extends Seeder
         System::updateOrCreate(
             ['slug' => 'NET-LINK'],
             [
-                'name' => 'Network Link / Cable',
+                'name' => 'Cableado Estructurado (Enlaces)',
                 'is_core' => true,
                 'form_schema' => [
                     'specs' => [
-                        ['label' => 'Cable Standard', 'type' => 'select', 'options' => 'Cat 6, Cat 6A, Fiber OM3, Fiber OM4'],
+                        ['label' => 'Estándar del Cable', 'type' => 'select', 'options' => 'Cat 6, Cat 6A, Fibra OM3, Fibra OM4'],
                     ]
                 ]
             ]

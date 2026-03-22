@@ -191,26 +191,26 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach($systems as $sys)
                     <div class="bg-theme-card border p-6 rounded-[2rem] group transition-all duration-500 shadow-lg relative overflow-hidden" 
-                         :class="{{ $sys->is_core ? 'true' : 'false' }} ? 'border-indigo-500/30 bg-indigo-500/5' : 'border-theme hover:border-tecsisa-yellow/50'">
+                         :class="{{ $sys->is_core ? 'true' : 'false' }} ? 'border-violet-500/30 bg-violet-500/5' : 'border-theme hover:border-tecsisa-yellow/50'">
                         
                         @if($sys->is_core)
-                        <div class="absolute -right-4 -top-4 w-20 h-20 bg-indigo-500/10 rounded-full blur-xl pointer-events-none transition-all duration-700 group-hover:scale-150 group-hover:bg-indigo-500/20"></div>
+                        <div class="absolute -right-4 -top-4 w-20 h-20 bg-violet-500/10 rounded-full blur-xl pointer-events-none transition-all duration-700 group-hover:scale-150 group-hover:bg-violet-500/20"></div>
                         @endif
 
                         <div class="flex justify-between items-start mb-4 relative z-10">
                             <div class="flex flex-col gap-1">
-                                <h4 class="font-bold text-lg text-theme transition-colors" :class="{{ $sys->is_core ? 'true' : 'false' }} ? 'text-indigo-400 font-black' : 'group-hover:text-tecsisa-yellow'">{{ $sys->name }}</h4>
+                                <h4 class="font-bold text-lg text-theme transition-colors" :class="{{ $sys->is_core ? 'true' : 'false' }} ? 'text-violet-400 font-black' : 'group-hover:text-tecsisa-yellow'">{{ $sys->name }}</h4>
                                 @if($sys->is_core)
-                                    <span class="text-[7px] bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 px-2 py-0.5 rounded-full font-black uppercase tracking-[0.2em] w-fit italic">Native Module</span>
+                                    <span class="text-[7px] bg-violet-500/20 text-violet-400 border border-violet-500/30 px-2 py-0.5 rounded-full font-black uppercase tracking-[0.2em] w-fit italic">Módulo de Sistema</span>
                                 @else
-                                    <span class="text-[7px] bg-yellow-500/10 text-yellow-500/70 border border-yellow-500/20 px-2 py-0.5 rounded-full font-black uppercase tracking-[0.2em] w-fit">Innova Custom</span>
+                                    <span class="text-[7px] bg-yellow-500/10 text-yellow-500/70 border border-yellow-500/20 px-2 py-0.5 rounded-full font-black uppercase tracking-[0.2em] w-fit">Personalizado (Innova)</span>
                                 @endif
                             </div>
 
                             @if(Auth::user()->hasRole('Administrador'))
                             <div class="flex gap-2">
                                 @if($sys->is_core)
-                                    <button @click="openEditSystemModal(@js($sys))" class="text-indigo-400 hover:text-indigo-300 transition p-1.5 bg-indigo-500/10 rounded-xl border border-indigo-500/20" title="Ver Propiedades">
+                                    <button @click="openEditSystemModal(@js($sys))" class="text-violet-400 hover:text-violet-300 transition p-1.5 bg-violet-500/10 rounded-xl border border-violet-500/20 shadow-inner" title="Consultar Definición">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                     </button>
                                 @else
@@ -229,7 +229,7 @@
                         
                         <div class="space-y-4 relative z-10">
                             <div class="space-y-2">
-                                <p class="text-[10px] text-gray-500 uppercase font-black tracking-widest opacity-60">Schema Definitions:</p>
+                                <p class="text-[10px] text-gray-500 uppercase font-black tracking-widest opacity-60">Esquema Definido:</p>
                                 <div class="flex flex-wrap gap-2">
                                     @php
                                         $fields = $sys->form_schema['specs'] ?? (isset($sys->form_schema[0]['label']) ? $sys->form_schema : []);
@@ -240,19 +240,19 @@
                                             {{ $field['label'] ?? 'Campo' }} <span class="text-tecsisa-yellow/50">({{ $field['type'] ?? 'text' }})</span>
                                         </span>
                                     @empty
-                                        <span class="text-[9px] text-gray-600 italic">No custom attributes defined</span>
+                                        <span class="text-[9px] text-gray-600 italic">Sin campos adicionales</span>
                                     @endforelse
                                 </div>
                                 @if(count($checklistItems) > 0)
                                 <div class="flex items-center gap-2 mt-2">
                                     <span class="inline-flex items-center gap-1 text-[9px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-black">
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                                        {{ count($checklistItems) }} core activities
+                                        {{ count($checklistItems) }} actividades base
                                     </span>
                                 </div>
                                 @else
                                 <div class="mt-2">
-                                    <span class="text-[9px] text-gray-600 italic">Static maintenance profile</span>
+                                    <span class="text-[9px] text-gray-600 italic">Perfil de mantenimiento fijo</span>
                                 </div>
                                 @endif
                             </div>
@@ -425,8 +425,9 @@
                         <div class="space-y-6 max-h-[60vh] overflow-y-auto px-1 custom-scrollbar">
                             <div>
                                 <label class="block text-theme-muted text-[10px] font-bold uppercase mb-1.5 tracking-widest">Nombre del Sistema</label>
-                                <input type="text" name="name" x-model="systemFormData.name" required 
+                                <input type="text" name="name" x-model="systemFormData.name" required :disabled="systemFormData.is_core" 
                                        class="w-full bg-theme/5 border border-theme rounded-xl text-theme focus:ring-2 focus:ring-tecsisa-yellow transition h-12 px-4 shadow-inner" 
+                                       :class="systemFormData.is_core ? 'opacity-50 cursor-not-allowed' : ''"
                                        placeholder="Ej: CCTV, Control de Acceso, Redes...">
                             </div>
 
@@ -441,7 +442,7 @@
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                                         Esquema de Especificaciones (Campos Dinámicos)
                                     </h3>
-                                    <button type="button" @click="addFieldToSchema()" class="text-[10px] bg-tecsisa-yellow text-tecsisa-dark px-4 py-1.5 rounded-full font-black hover:bg-yellow-400 transition uppercase tracking-widest">
+                                    <button x-show="!systemFormData.is_core" type="button" @click="addFieldToSchema()" class="text-[10px] bg-tecsisa-yellow text-tecsisa-dark px-4 py-1.5 rounded-full font-black hover:bg-yellow-400 transition uppercase tracking-widest">
                                         + Agregar Campo
                                     </button>
                                 </div>
@@ -470,7 +471,7 @@
                                                 <input type="text" :name="'form_schema[' + index + '][options]'" x-model="field.options" 
                                                        class="w-full bg-theme/5 border border-theme rounded-lg text-[10px] text-theme h-10 px-3 uppercase tracking-widest font-bold font-mono" placeholder="Op 1, Op 2, Op 3...">
                                             </div>
-                                            <button type="button" @click="removeFieldFromSchema(index)" class="text-theme-muted hover:text-red-400 p-2.5 transition">
+                                            <button x-show="!systemFormData.is_core" type="button" @click="removeFieldFromSchema(index)" class="text-theme-muted hover:text-red-400 p-2.5 transition">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                             </button>
                                         </div>
@@ -489,7 +490,7 @@
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
                                         Checklist de Actividades de Mantenimiento
                                     </h3>
-                                    <button type="button" @click="addChecklistItem()" class="text-[10px] bg-emerald-500 text-white px-4 py-1.5 rounded-full font-black hover:bg-emerald-400 transition uppercase tracking-widest">
+                                    <button x-show="!systemFormData.is_core" type="button" @click="addChecklistItem()" class="text-[10px] bg-emerald-500 text-white px-4 py-1.5 rounded-full font-black hover:bg-emerald-400 transition uppercase tracking-widest">
                                         + Añadir Actividad
                                     </button>
                                 </div>
@@ -504,7 +505,7 @@
                                                    :value="item"
                                                    class="flex-1 bg-transparent border-0 border-b border-theme/30 focus:border-emerald-400 text-[11px] text-theme h-8 px-1 font-bold uppercase tracking-wide outline-none transition"
                                                    placeholder="Ej: CABLEADO (UTP): REVISIÓN DE ESTADO FÍSICO, ETIQUETADO Y CERTIFICACIÓN">
-                                            <button type="button" @click="removeChecklistItem(idx)"
+                                            <button x-show="!systemFormData.is_core" type="button" @click="removeChecklistItem(idx)"
                                                     class="text-theme-muted hover:text-red-400 p-1.5 transition opacity-0 group-hover:opacity-100">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                                             </button>
@@ -523,10 +524,10 @@
 
                         <div class="mt-8 flex justify-end gap-3">
                             <button type="button" @click="showSystemModal = false" class="px-6 py-4 border border-theme rounded-2xl text-theme-muted font-bold uppercase tracking-widest text-[10px] hover:bg-theme/5 transition">
-                                Cancelar
+                                <span x-text="systemFormData.is_core ? 'Cerrar Consulta' : 'Cancelar'"></span>
                             </button>
 
-                             <button type="submit" class="bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-black px-8 py-4 rounded-2xl transition shadow-xl shadow-tecsisa-yellow/20 uppercase text-[10px] tracking-widest active:scale-95">
+                             <button x-show="!systemFormData.is_core" type="submit" class="bg-tecsisa-yellow hover:bg-yellow-400 text-tecsisa-dark font-black px-8 py-4 rounded-2xl transition shadow-xl shadow-tecsisa-yellow/20 uppercase text-[10px] tracking-widest active:scale-95">
                                 <span>Guardar</span>
                             </button>
                         </div>
@@ -977,12 +978,12 @@
                 this.systemEditMode = true;
                 this.systemFormAction = `/catalogos/systems/${sys.id}`;
                 const schema = sys.form_schema || {};
-                // Soporte para ambos formatos: array plano (viejo) o objeto con claves
                 const specFields = Array.isArray(schema) ? schema : (schema.specs || []);
                 const checklistItems = Array.isArray(schema) ? [] : (schema.checklist || []);
                 this.systemFormData = {
                     id: sys.id,
                     name: sys.name,
+                    is_core: !!sys.is_core,
                     form_schema: JSON.parse(JSON.stringify(specFields)),
                     checklist: JSON.parse(JSON.stringify(checklistItems)),
                     maintenance_interval_days: sys.maintenance_interval_days || 90,
