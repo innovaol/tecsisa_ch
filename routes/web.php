@@ -8,26 +8,8 @@ use Illuminate\Support\Facades\Route;
 Route::redirect('/', '/login');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', function () {
-            $user = \Illuminate\Support\Facades\Auth::user();
+    Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 
-            if ($user->hasRole('Administrador')) {
-                $equipos_operativos = \App\Models\Equipment::where('status', 'operative')->count();
-                $trabajos_pendientes = \App\Models\Task::where('status', '!=', 'completed')->count();
-                $cable_instalado = "5,420";
-                $recent_activity = \App\Models\Task::with(['equipment.location'])->orderBy('updated_at', 'desc')->take(5)->get();
-            }
-            else {
-                // Technician Specific Stats
-                $equipos_operativos = \App\Models\Task::where('assigned_to', $user->id)->where('status', 'completed')->count();
-                $trabajos_pendientes = \App\Models\Task::where('assigned_to', $user->id)->where('status', '!=', 'completed')->count();
-                $cable_instalado = \App\Models\Task::where('assigned_to', $user->id)->count(); // Use this slot for "Total Asignadas"
-                $recent_activity = \App\Models\Task::with(['equipment.location'])->where('assigned_to', $user->id)->orderBy('updated_at', 'desc')->take(5)->get();
-            }
-
-            return view('dashboard', compact('equipos_operativos', 'trabajos_pendientes', 'cable_instalado', 'recent_activity'));
-        }
-        )->name('dashboard');
 
         // Módulo Técnico Móvil (Buscador Activos y Tareas)
         Route::middleware('role:Tecnico|Administrador')->prefix('technician')->name('technician.')->group(function () {
