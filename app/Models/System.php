@@ -11,6 +11,8 @@ class System extends Model
 
     protected $fillable = [
         'name',
+        'slug',
+        'is_core',
         'form_schema',
         'maintenance_interval_days',
         'maintenance_guide'
@@ -18,6 +20,7 @@ class System extends Model
 
     protected $casts = [
         'form_schema' => 'array',
+        'is_core' => 'boolean',
     ];
 
     public function equipments()

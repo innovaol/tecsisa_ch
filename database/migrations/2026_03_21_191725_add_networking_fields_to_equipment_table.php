@@ -6,33 +6,24 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::table('equipment', function (Blueprint $table) {
-            // Campos para Enlaces/Cables (Networking)
+            // Relaciones de Red (Solo para sistemas tipo NET-LINK)
             $table->foreignId('source_equipment_id')->nullable()->constrained('equipment')->onDelete('set null');
             $table->string('source_port')->nullable();
             
             $table->foreignId('destination_equipment_id')->nullable()->constrained('equipment')->onDelete('set null');
             $table->string('destination_port')->nullable();
 
-            // Metadatos de Certificación
-            $table->string('certification_pdf')->nullable();
-            $table->string('certification_status')->nullable(); // Pasa, Falla, Pendiente
+            // Atributos base de Red (Fisicos)
+            $table->integer('port_capacity')->nullable(); // Para Patch Panels y Switches
+            $table->string('certification_pdf')->nullable(); // Para cables
+            $table->string('certification_status')->nullable(); // Certified/Failed
             $table->date('certification_date')->nullable();
-            
-            // Atributos físicos del tramo
-            $table->string('cable_category')->nullable(); // Cat 6, 6A, etc.
-            $table->decimal('cable_length', 8, 2)->nullable();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::table('equipment', function (Blueprint $table) {
@@ -41,8 +32,8 @@ return new class extends Migration
             $table->dropColumn([
                 'source_equipment_id', 'source_port', 
                 'destination_equipment_id', 'destination_port',
-                'certification_pdf', 'certification_status', 'certification_date',
-                'cable_category', 'cable_length'
+                'port_capacity', 'certification_pdf', 
+                'certification_status', 'certification_date'
             ]);
         });
     }

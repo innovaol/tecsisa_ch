@@ -28,7 +28,7 @@ class CatalogController extends Controller
             'internal_id' => 'required|unique:equipment,internal_id,' . $equipment->id,
             'serial_number' => 'nullable|string|unique:equipment,serial_number,' . $equipment->id,
             'name' => 'required|string|max:255',
-            'form_factor' => 'required|in:rackmount,peripheral,network_point,cable',
+            'form_factor' => 'required|in:rackmount,standalone',
             'u_height' => 'required_if:form_factor,rackmount|nullable|integer|min:1|max:42',
             'system_id' => 'required|exists:systems,id',
             'location_id' => 'nullable|exists:locations,id',
@@ -37,11 +37,10 @@ class CatalogController extends Controller
             'source_port' => 'nullable|string',
             'destination_equipment_id' => 'nullable|exists:equipment,id',
             'destination_port' => 'nullable|string',
+            'port_capacity' => 'nullable|integer|min:1',
             'certification_pdf' => 'nullable|string',
             'certification_status' => 'nullable|string',
             'certification_date' => 'nullable|date',
-            'cable_category' => 'nullable|string',
-            'cable_length' => 'nullable|numeric',
             'installation_date' => 'nullable|date',
             'last_maintenance_at' => 'nullable|date',
             'notes' => 'nullable|string',
@@ -67,7 +66,7 @@ class CatalogController extends Controller
             'internal_id' => 'required|unique:equipment,internal_id',
             'serial_number' => 'nullable|string|unique:equipment,serial_number',
             'name' => 'required|string|max:255',
-            'form_factor' => 'required|in:rackmount,peripheral,network_point,cable',
+            'form_factor' => 'required|in:rackmount,standalone',
             'u_height' => 'required_if:form_factor,rackmount|nullable|integer|min:1|max:42',
             'system_id' => 'required|exists:systems,id',
             'location_id' => 'nullable|exists:locations,id',
@@ -76,11 +75,10 @@ class CatalogController extends Controller
             'source_port' => 'nullable|string',
             'destination_equipment_id' => 'nullable|exists:equipment,id',
             'destination_port' => 'nullable|string',
+            'port_capacity' => 'nullable|integer|min:1',
             'certification_pdf' => 'nullable|string',
             'certification_status' => 'nullable|string',
             'certification_date' => 'nullable|date',
-            'cable_category' => 'nullable|string',
-            'cable_length' => 'nullable|numeric',
             'installation_date' => 'nullable|date',
             'last_maintenance_at' => 'nullable|date',
             'notes' => 'nullable|string',
@@ -132,6 +130,10 @@ class CatalogController extends Controller
 
     public function updateSystem(Request $request, System $system)
     {
+        if ($system->is_core) {
+            return redirect()->back()->with('error', 'No se pueden editar los atributos base de un sistema core.');
+        }
+
         $validated = $request->validate([
             'name'                      => 'required|string|max:255',
             'form_schema'               => 'nullable|array',
@@ -154,6 +156,10 @@ class CatalogController extends Controller
 
     public function destroySystem(System $system)
     {
+        if ($system->is_core) {
+            return redirect()->back()->with('error', 'No se pueden eliminar sistemas core del sistema.');
+        }
+
         if ($system->equipments()->count() > 0) {
             return redirect()->back()->with('error', 'No se puede eliminar un sistema que tiene equipos asociados.');
         }

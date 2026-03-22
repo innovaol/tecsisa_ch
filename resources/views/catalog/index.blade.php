@@ -121,24 +121,24 @@
                                 </td>
                                 <td class="py-5 px-4">
                                     @if($eq->form_factor === 'rackmount')
-                                        <span class="text-[8px] bg-blue-500/10 text-blue-400 px-2 py-1 rounded-lg border border-blue-500/20 uppercase font-black tracking-widest whitespace-nowrap">Rack {{ $eq->u_height }}U</span>
-                                    @elseif($eq->form_factor === 'cable')
-                                        <span class="text-[8px] bg-amber-500/10 text-amber-500 px-2 py-1 rounded-lg border border-amber-500/20 uppercase font-black tracking-widest whitespace-nowrap">Cable / Tramo</span>
-                                    @elseif($eq->form_factor === 'peripheral')
-                                        <span class="text-[8px] bg-purple-500/10 text-purple-400 px-2 py-1 rounded-lg border border-purple-500/20 uppercase font-black tracking-widest">Periférico</span>
+                                        <span class="text-[8px] bg-blue-500/10 text-blue-400 px-2 py-1 rounded-lg border border-blue-500/20 uppercase font-black tracking-widest">Rack {{ $eq->u_height }}U</span>
                                     @else
-                                        <span class="text-[8px] bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded-lg border border-emerald-500/20 uppercase font-black tracking-widest">Pto. Red</span>
+                                        <span class="text-[8px] bg-gray-500/10 text-gray-400 px-2 py-1 rounded-lg border border-gray-500/20 uppercase font-black tracking-widest">Standalone</span>
                                     @endif
                                 </td>
                                 <td class="py-5 px-4 text-xs font-bold transition-colors duration-500" :class="theme === 'light' ? 'text-slate-600' : 'text-gray-400'">
-                                    @if($eq->form_factor === 'cable' && $eq->source)
-                                        <div class="flex flex-col gap-0.5">
-                                            <span class="text-[8px] text-gray-500">Origen: {{ $eq->source->internal_id }} / {{ $eq->source_port }}</span>
-                                            <span class="text-[8px] text-gray-500">Destino: {{ $eq->destination->internal_id ?? '?' }} / {{ $eq->destination_port }}</span>
-                                        </div>
-                                    @else
-                                        {{ $eq->system->name ?? 'N/A' }}
-                                    @endif
+                                    <div class="flex flex-col gap-1">
+                                        <span class="text-tecsisa-yellow uppercase text-[10px]">{{ $eq->system->name ?? 'N/A' }}</span>
+                                        @if($eq->system->slug === 'NET-LINK')
+                                            <div class="flex items-center gap-1 text-[8px] text-gray-500">
+                                                <span class="opacity-50">De:</span> {{ $eq->source?->internal_id ?? '?' }}
+                                                <span class="px-1 opacity-20">|</span>
+                                                <span class="opacity-50">A:</span> {{ $eq->destination?->internal_id ?? '?' }}
+                                            </div>
+                                        @elseif($eq->system->slug === 'NET-HUB')
+                                            <span class="text-[8px] text-gray-500 opacity-70">{{ $eq->port_capacity ?? '0' }} Puertos</span>
+                                        @endif
+                                    </div>
                                 </td>
                                 <td class="py-5 px-4 text-center">
                                     <div class="flex items-center justify-center">
@@ -578,10 +578,8 @@
                                 <select name="form_factor" x-model="formData.form_factor" 
                                         class="w-full bg-theme/5 border border-theme rounded-xl text-theme focus:ring-2 focus:ring-tecsisa-yellow transition h-12 px-4">
                                     <option value="">-- Seleccione Tipo --</option>
-                                    <option value="rackmount">Rackmount (Switch/Servidor)</option>
-                                    <option value="cable">Cable / Tramo de Enlace</option>
-                                    <option value="peripheral">Periférico (Cámara/PC/AP)</option>
-                                    <option value="network_point">Punto de Red (Roseta/Pared)</option>
+                                    <option value="rackmount">Equipment Rackmount (Switch/NVR/Servidor)</option>
+                                    <option value="standalone">Equipment Standalone (Cámara/UPS/PC)</option>
                                 </select>
                             </div>
 
@@ -617,60 +615,69 @@
                                 </select>
                             </div>
 
-                            <!-- Networking: Origen (Solo Cables) -->
-                            <div x-show="formData.form_factor === 'cable'" x-transition class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 bg-blue-500/5 p-4 rounded-xl border border-blue-500/10">
-                                <h4 class="md:col-span-2 text-[10px] font-black text-blue-500 uppercase tracking-widest">Punto de Origen (Panel/Switch)</h4>
+                            <!-- Networking: HUB Capacity -->
+                            <div x-show="getSelectedSystemSlug() === 'NET-HUB'" x-transition class="md:col-span-2 grid grid-cols-1 gap-4 bg-purple-500/5 p-4 rounded-xl border border-purple-500/10 mt-4">
+                                <h4 class="text-[10px] font-black text-purple-500 uppercase tracking-widest">Capacidad del Nodo</h4>
                                 <div>
-                                    <label class="block text-theme-muted text-[9px] font-bold uppercase mb-1">Equipo Origen</label>
-                                    <select name="source_equipment_id" x-model="formData.source_equipment_id" class="w-full bg-theme/5 border border-theme rounded-xl text-xs h-10 px-3 transition">
-                                        <option value="">-- Seleccione Origen --</option>
+                                    <label class="block text-theme-muted text-[9px] font-bold uppercase mb-1">Número de Bocas / Puertos Totales</label>
+                                    <input type="number" name="port_capacity" x-model="formData.port_capacity" class="w-full bg-theme/5 border border-theme rounded-xl text-xs h-10 px-3 transition" placeholder="Ej: 24">
+                                </div>
+                            </div>
+
+                            <!-- Networking: Origen (Solo NET-LINK) -->
+                            <div x-show="getSelectedSystemSlug() === 'NET-LINK'" x-transition class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 bg-blue-500/5 p-4 rounded-xl border border-blue-500/10 mt-4">
+                                <h4 class="md:col-span-2 text-[10px] font-black text-blue-500 uppercase tracking-widest">Connection: Start Point (HUB/Panel)</h4>
+                                <div>
+                                    <label class="block text-theme-muted text-[9px] font-bold uppercase mb-1">Source Equipment</label>
+                                    <select name="source_equipment_id" x-model="formData.source_equipment_id" class="w-full bg-theme/5 border border-theme rounded-xl text-xs h-10 px-3 transition shadow-sm">
+                                        <option value="">-- No Source / Peer to Peer --</option>
                                         <template x-for="pEq in allEquipments" :key="pEq.id">
-                                            <option :value="pEq.id" x-text="pEq.internal_id + ' - ' + pEq.name" x-show="pEq.form_factor !== 'cable'"></option>
+                                            <option :value="pEq.id" x-text="pEq.internal_id + ' - ' + pEq.name"></option>
                                         </template>
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-theme-muted text-[9px] font-bold uppercase mb-1">Puerto Origen</label>
-                                    <input type="text" name="source_port" x-model="formData.source_port" class="w-full bg-theme/5 border border-theme rounded-xl text-xs h-10 px-3 transition" placeholder="Ej: Port 07">
+                                    <label class="block text-theme-muted text-[9px] font-bold uppercase mb-1">Source Port / Lane</label>
+                                    <input type="text" name="source_port" x-model="formData.source_port" class="w-full bg-theme/5 border border-theme rounded-xl text-xs h-10 px-3 transition" placeholder="Ej: Port 01A">
                                 </div>
                             </div>
 
-                            <!-- Networking: Destino (Solo Cables) -->
-                            <div x-show="formData.form_factor === 'cable'" x-transition class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 bg-emerald-500/5 p-4 rounded-xl border border-emerald-500/10">
-                                <h4 class="md:col-span-2 text-[10px] font-black text-emerald-500 uppercase tracking-widest">Punto de Destino (Roseta/Equipo)</h4>
+                            <!-- Networking: Destino (Solo NET-LINK) -->
+                            <div x-show="getSelectedSystemSlug() === 'NET-LINK'" x-transition class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 bg-emerald-500/5 p-4 rounded-xl border border-emerald-500/10 mt-4">
+                                <h4 class="md:col-span-2 text-[10px] font-black text-emerald-500 uppercase tracking-widest">Connection: End Point (Outlet/Device)</h4>
                                 <div>
-                                    <label class="block text-theme-muted text-[9px] font-bold uppercase mb-1">Equipo Destino</label>
-                                    <select name="destination_equipment_id" x-model="formData.destination_equipment_id" class="w-full bg-theme/5 border border-theme rounded-xl text-xs h-10 px-3 transition">
-                                        <option value="">-- Seleccione Destino --</option>
+                                    <label class="block text-theme-muted text-[9px] font-bold uppercase mb-1">Target Asset</label>
+                                    <select name="destination_equipment_id" x-model="formData.destination_equipment_id" class="w-full bg-theme/5 border border-theme rounded-xl text-xs h-10 px-3 transition shadow-sm">
+                                        <option value="">-- No Target / Open End --</option>
                                         <template x-for="pEq in allEquipments" :key="pEq.id">
-                                            <option :value="pEq.id" x-text="pEq.internal_id + ' - ' + pEq.name" x-show="pEq.form_factor !== 'cable'"></option>
+                                            <option :value="pEq.id" x-text="pEq.internal_id + ' - ' + pEq.name"></option>
                                         </template>
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-theme-muted text-[9px] font-bold uppercase mb-1">Puerto Destino</label>
-                                    <input type="text" name="destination_port" x-model="formData.destination_port" class="w-full bg-theme/5 border border-theme rounded-xl text-xs h-10 px-3 transition" placeholder="Ej: Roseta A-01">
+                                    <label class="block text-theme-muted text-[9px] font-bold uppercase mb-1">Target Port / Box</label>
+                                    <input type="text" name="destination_port" x-model="formData.destination_port" class="w-full bg-theme/5 border border-theme rounded-xl text-xs h-10 px-3 transition" placeholder="Ej: Roseta 3">
                                 </div>
                             </div>
 
-                            <!-- Certificación: Solo Cables -->
-                            <div x-show="formData.form_factor === 'cable'" x-transition class="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4 bg-amber-500/5 p-4 rounded-xl border border-amber-500/10">
-                                <h4 class="md:col-span-3 text-[10px] font-black text-amber-500 uppercase tracking-widest">Certificación de Fluke</h4>
+                            <!-- Certification: Solo NET-LINK -->
+                            <div x-show="getSelectedSystemSlug() === 'NET-LINK'" x-transition class="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4 bg-amber-500/5 p-4 rounded-xl border border-amber-500/10 mt-4">
+                                <h4 class="md:col-span-3 text-[10px] font-black text-amber-500 uppercase tracking-widest">Field Certification Data</h4>
                                 <div>
-                                    <label class="block text-theme-muted text-[9px] font-bold uppercase mb-1">Estatus</label>
+                                    <label class="block text-theme-muted text-[9px] font-bold uppercase mb-1">Cert. Status</label>
                                     <select name="certification_status" x-model="formData.certification_status" class="w-full bg-theme/5 border border-theme rounded-xl text-xs h-10 px-3 transition">
-                                        <option value="">Pendiente</option>
-                                        <option value="certified">Certified / Pass</option>
-                                        <option value="failed">Failed</option>
+                                        <option value="">Pending</option>
+                                        <option value="certified">Certified / PASS</option>
+                                        <option value="failed">FAILED</option>
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-theme-muted text-[9px] font-bold uppercase mb-1">Fecha</label>
+                                    <label class="block text-theme-muted text-[9px] font-bold uppercase mb-1">Cert. Date</label>
                                     <input type="date" name="certification_date" x-model="formData.certification_date" class="w-full bg-theme/5 border border-theme rounded-xl text-xs h-10 px-3 transition">
                                 </div>
                                 <div>
-                                    <label class="block text-theme-muted text-[9px] font-bold uppercase mb-1">URL Reporte PDF</label>
-                                    <input type="text" name="certification_pdf" x-model="formData.certification_pdf" class="w-full bg-theme/5 border border-theme rounded-xl text-xs h-10 px-3 transition" placeholder="Enlace al PDF">
+                                    <label class="block text-theme-muted text-[9px] font-bold uppercase mb-1">PDF Report URL</label>
+                                    <input type="text" name="certification_pdf" x-model="formData.certification_pdf" class="w-full bg-theme/5 border border-theme rounded-xl text-xs h-10 px-3 transition" placeholder="URL o Ruta al PDF">
                                 </div>
                             </div>
 
@@ -817,18 +824,25 @@
                 name: '',
                 form_factor: '',
                 u_height: 1,
-                system_id: '',
-                location_id: '',
                 source_equipment_id: '',
                 source_port: '',
                 destination_equipment_id: '',
                 destination_port: '',
+                port_capacity: '',
                 certification_pdf: '',
                 certification_status: '',
                 certification_date: '',
-                cable_category: 'Cat 6',
-                cable_length: '',
                 status: '',
+                installation_date: '',
+                last_maintenance_at: '',
+                specs: {},
+                notes: ''
+            },
+
+            getSelectedSystemSlug() {
+                if (!this.formData.system_id) return null;
+                const sys = this.allSystems.find(s => String(s.id) === String(this.formData.system_id));
+                return sys ? sys.slug : null;
             },
 
             // Systems Modal state
@@ -888,8 +902,8 @@
                     u_height: 1, system_id: '', location_id: '', status: '', 
                     source_equipment_id: '', source_port: '',
                     destination_equipment_id: '', destination_port: '',
+                    port_capacity: '',
                     certification_pdf: '', certification_status: '', certification_date: '',
-                    cable_category: 'Cat 6', cable_length: '',
                     installation_date: '', last_maintenance_at: '',
                     specs: {}, notes: ''
                 };
@@ -904,7 +918,7 @@
                     internal_id: String(eq.internal_id || ''),
                     serial_number: String(eq.serial_number || ''),
                     name: String(eq.name || ''),
-                    form_factor: String(eq.form_factor || 'rackmount'),
+                    form_factor: String(eq.form_factor || 'standalone'),
                     u_height: eq.u_height || 1,
                     system_id: eq.system_id ? String(eq.system_id) : '',
                     location_id: eq.location_id ? String(eq.location_id) : '',
@@ -912,11 +926,10 @@
                     source_port: String(eq.source_port || ''),
                     destination_equipment_id: eq.destination_equipment_id ? String(eq.destination_equipment_id) : '',
                     destination_port: String(eq.destination_port || ''),
+                    port_capacity: eq.port_capacity || '',
                     certification_pdf: String(eq.certification_pdf || ''),
                     certification_status: String(eq.certification_status || ''),
                     certification_date: eq.certification_date ? String(eq.certification_date).split('T')[0] : '',
-                    cable_category: String(eq.cable_category || 'Cat 6'),
-                    cable_length: eq.cable_length || '',
                     status: String(eq.status || 'operative'),
                     installation_date: eq.installation_date ? String(eq.installation_date).split('T')[0] : '',
                     last_maintenance_at: eq.last_maintenance_at ? String(eq.last_maintenance_at).split('T')[0] : '',
