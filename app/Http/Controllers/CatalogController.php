@@ -14,7 +14,7 @@ class CatalogController extends Controller
     {
         $locationsTree = Location::with(['children', 'equipments'])->whereNull('parent_id')->get();
         $locationsFlat = Location::all();
-        $systems = System::all();
+        $systems = System::orderBy('is_core', 'desc')->orderBy('name')->get();
         $equipments = Equipment::with(['location', 'system', 'source', 'destination'])->orderBy('created_at', 'desc')->get();
         $allEquipments = Equipment::select('id', 'name', 'internal_id', 'form_factor')->orderBy('name')->get();
         $racks = Rack::with('location')->get();

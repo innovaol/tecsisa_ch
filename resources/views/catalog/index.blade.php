@@ -190,50 +190,69 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach($systems as $sys)
-                    <div class="bg-theme-card border border-theme p-6 rounded-[2rem] group hover:border-tecsisa-yellow/50 transition-all duration-500 shadow-lg">
-                        <div class="flex justify-between items-start mb-4">
-                            <h4 class="font-bold text-lg text-theme group-hover:text-tecsisa-yellow transition-colors">{{ $sys->name }}</h4>
+                    <div class="bg-theme-card border p-6 rounded-[2rem] group transition-all duration-500 shadow-lg relative overflow-hidden" 
+                         :class="{{ $sys->is_core ? 'true' : 'false' }} ? 'border-indigo-500/30 bg-indigo-500/5' : 'border-theme hover:border-tecsisa-yellow/50'">
+                        
+                        @if($sys->is_core)
+                        <div class="absolute -right-4 -top-4 w-20 h-20 bg-indigo-500/10 rounded-full blur-xl pointer-events-none transition-all duration-700 group-hover:scale-150 group-hover:bg-indigo-500/20"></div>
+                        @endif
+
+                        <div class="flex justify-between items-start mb-4 relative z-10">
+                            <div class="flex flex-col gap-1">
+                                <h4 class="font-bold text-lg text-theme transition-colors" :class="{{ $sys->is_core ? 'true' : 'false' }} ? 'text-indigo-400 font-black' : 'group-hover:text-tecsisa-yellow'">{{ $sys->name }}</h4>
+                                @if($sys->is_core)
+                                    <span class="text-[7px] bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 px-2 py-0.5 rounded-full font-black uppercase tracking-[0.2em] w-fit italic">Native Module</span>
+                                @else
+                                    <span class="text-[7px] bg-yellow-500/10 text-yellow-500/70 border border-yellow-500/20 px-2 py-0.5 rounded-full font-black uppercase tracking-[0.2em] w-fit">Innova Custom</span>
+                                @endif
+                            </div>
+
                             @if(Auth::user()->hasRole('Administrador'))
-                            <div class="flex gap-2 relative z-10">
-                                <button @click="openEditSystemModal(@js($sys))" class="text-theme hover:text-tecsisa-yellow transition p-1">
-                                    <svg class="w-5 h-5 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                </button>
-                                <form action="{{ route('catalog.systems.destroy', $sys) }}" method="POST" onsubmit="return confirm('¿Eliminar este sistema? No podrá eliminarse si tiene equipos asociados.')">
-                                    @csrf @method('DELETE')
-                                    <button class="text-theme-muted hover:text-red-400 transition p-1"><svg class="w-5 h-5 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
-                                </form>
+                            <div class="flex gap-2">
+                                @if($sys->is_core)
+                                    <button @click="openEditSystemModal(@js($sys))" class="text-indigo-400 hover:text-indigo-300 transition p-1.5 bg-indigo-500/10 rounded-xl border border-indigo-500/20" title="Ver Propiedades">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                    </button>
+                                @else
+                                    <button @click="openEditSystemModal(@js($sys))" class="text-theme hover:text-tecsisa-yellow transition p-1.5 bg-theme-border border border-theme rounded-xl">
+                                        <svg class="w-5 h-5 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                    </button>
+                                    <form action="{{ route('catalog.systems.destroy', $sys) }}" method="POST" onsubmit="return confirm('¿Eliminar este sistema? No podrá eliminarse si tiene equipos asociados.')">
+                                        @csrf @method('DELETE')
+                                        <button class="text-theme-muted hover:text-red-400 transition p-1.5 bg-red-500/5 rounded-xl border border-red-500/10"><svg class="w-5 h-5 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg></button>
+                                    </form>
+                                @endif
+                                
                             </div>
                             @endif
                         </div>
                         
-                        <div class="space-y-4">
-                            <!-- Ciclo de Servicio Removed -->
-
+                        <div class="space-y-4 relative z-10">
                             <div class="space-y-2">
-                                <p class="text-[10px] text-gray-500 uppercase font-black tracking-widest">Esquema de Especificaciones:</p>
+                                <p class="text-[10px] text-gray-500 uppercase font-black tracking-widest opacity-60">Schema Definitions:</p>
                                 <div class="flex flex-wrap gap-2">
                                     @php
                                         $fields = $sys->form_schema['specs'] ?? (isset($sys->form_schema[0]['label']) ? $sys->form_schema : []);
                                         $checklistItems = $sys->form_schema['checklist'] ?? [];
                                     @endphp
                                     @forelse($fields as $field)
-                                        <span class="text-[10px] bg-black/5 dark:bg-white/5 border border-theme px-2 py-1 rounded text-theme-muted">
+                                        <span class="text-[9px] bg-black/5 dark:bg-white/5 border border-theme px-2 py-1 rounded-lg text-theme-muted font-bold">
                                             {{ $field['label'] ?? 'Campo' }} <span class="text-tecsisa-yellow/50">({{ $field['type'] ?? 'text' }})</span>
                                         </span>
                                     @empty
-                                        <span class="text-[10px] text-gray-600 italic">Sin campos personalizados</span>
+                                        <span class="text-[9px] text-gray-600 italic">No custom attributes defined</span>
                                     @endforelse
                                 </div>
                                 @if(count($checklistItems) > 0)
                                 <div class="flex items-center gap-2 mt-2">
-                                    <span class="inline-flex items-center gap-1 text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-black">
+                                    <span class="inline-flex items-center gap-1 text-[9px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-full font-black">
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                                        {{ count($checklistItems) }} actividades en checklist
+                                        {{ count($checklistItems) }} core activities
                                     </span>
                                 </div>
                                 @else
                                 <div class="mt-2">
-                                    <span class="text-[10px] text-gray-600 italic">Sin checklist de mantenimiento</span>
+                                    <span class="text-[9px] text-gray-600 italic">Static maintenance profile</span>
                                 </div>
                                 @endif
                             </div>
