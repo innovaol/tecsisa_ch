@@ -64,6 +64,35 @@
             </div>
         </div>
 
+        {{-- Report Requirements (Inteligencia Visual) --}}
+        <div class="mb-6">
+            <p class="text-[9px] text-slate-400 dark:text-gray-500 uppercase font-black tracking-widest mb-3 opacity-60">Requisitos del Reporte:</p>
+            <div class="flex flex-wrap gap-2">
+                @php
+                    $features = $sys->form_schema['features'] ?? [];
+                    $requiresCert = $features['requires_certification'] ?? false;
+                @endphp
+                
+                {{-- Siempre lleva fotos --}}
+                <div class="px-2 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-1.5 shadow-sm">
+                    <svg class="w-2.5 h-2.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path></svg>
+                    <span class="text-[9px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-tighter">Fotos (A/D)</span>
+                </div>
+
+                @if($requiresCert)
+                    <div class="px-2 py-1 rounded-md bg-amber-500/10 border border-amber-500/20 flex items-center gap-1.5 shadow-sm">
+                        <svg class="w-2.5 h-2.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        <span class="text-[9px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-tighter">Certificación Fluke</span>
+                    </div>
+                @endif
+                
+                <div class="px-2 py-1 rounded-md bg-blue-500/10 border border-blue-500/20 flex items-center gap-1.5 shadow-sm">
+                    <svg class="w-2.5 h-2.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                    <span class="text-[9px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-tighter">Insumos</span>
+                </div>
+            </div>
+        </div>
+
         {{-- Línea Divisoria Separada --}}
         <div class="w-full h-px bg-slate-200 dark:bg-white/10 mb-6 mt-auto"></div>
 

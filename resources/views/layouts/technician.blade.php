@@ -21,6 +21,7 @@
         /* Variables System */
         :root {
             --theme-bg: #0A0F1C;
+            --theme-bg-rgb: 10, 15, 28;
             --theme-text: #d1d5db;
             --theme-text-muted: #9ca3af;
             --theme-card: rgba(17, 24, 39, 0.82);
@@ -35,6 +36,7 @@
 
         .light {
             --theme-bg: #f3f4f6;
+            --theme-bg-rgb: 243, 244, 246;
             --theme-text: #1a1a1a;
             --theme-text-muted: #64748b;
             --theme-card: #ffffff;
@@ -49,6 +51,7 @@
 
         .dark {
             --theme-bg: #0A0F1C;
+            --theme-bg-rgb: 10, 15, 28;
             --theme-text: #d1d5db;
             --theme-text-muted: #9ca3af;
             --theme-card: rgba(17, 24, 39, 0.82);
@@ -74,6 +77,7 @@
         html, body {
             max-width: 100%;
             overflow-x: hidden;
+            scrollbar-gutter: stable;
         }
 
         @media (max-width: 768px) {
@@ -89,6 +93,28 @@
         .border-theme { border-color: var(--theme-border); }
         .bg-theme-header { background-color: var(--theme-header); }
         .text-theme-muted { color: var(--theme-text-muted); }
+
+        /* Force Transparent Inputs */
+        [type='text'], [type='email'], [type='number'], [type='password'], textarea, select {
+            background-color: transparent !important;
+            color: var(--theme-text) !important;
+        }
+
+        /* Autocomplete Chrome Autofill Override */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover, 
+        input:-webkit-autofill:focus, 
+        textarea:-webkit-autofill,
+        textarea:-webkit-autofill:hover,
+        textarea:-webkit-autofill:focus,
+        select:-webkit-autofill,
+        select:-webkit-autofill:hover,
+        select:-webkit-autofill:focus {
+            -webkit-text-fill-color: var(--theme-text) !important;
+            -webkit-box-shadow: 0 0 0px 1000px var(--theme-bg) inset !important;
+            transition: background-color 5000s ease-in-out 0s !important;
+            background-color: transparent !important;
+        }
 
         /* Safe Area Utilities */
         @supports (padding: env(safe-area-inset-top)) {

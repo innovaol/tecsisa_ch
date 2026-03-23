@@ -71,4 +71,19 @@ class RackBuilderController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Error al guardar la topología: ' . $e->getMessage()], 500);
         }
     }
+
+    public function generatePDF(Rack $rack)
+    {
+        $rack->load(['location', 'units.equipment.system']);
+        
+        // Sorting units decresing to show the rack top-to-bottom
+        $units = $rack->units->sortByDesc('unit_number');
+        
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('rack.pdf_template', compact('rack', 'units'))
+            ->setPaper('a4', 'portrait');
+
+        $filename = 'Certificado-Rack-' . str_replace(' ', '_', $rack->name) . '-' . date('Ymd') . '.pdf';
+
+        return $pdf->download($filename);
+    }
 }

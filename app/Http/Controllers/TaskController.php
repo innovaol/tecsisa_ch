@@ -77,7 +77,7 @@ class TaskController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'priority' => 'required|in:low,medium,high,critical',
-            'task_type' => 'required|in:maintenance,replacement,installation',
+            'task_type' => 'required|in:maintenance,replacement,installation,Mantenimiento,Instalación,Sustitución',
             'assigned_to' => 'nullable|exists:users,id',
             'status' => 'nullable|in:draft,pending,in_progress,completed',
             'form_data' => 'nullable|array',

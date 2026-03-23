@@ -101,8 +101,12 @@
                         </select>
 
                         <!-- Edificio -->
-                        <input type="text" name="building" value="{{ request('building') }}" placeholder="Edificio..." 
-                            class="bg-theme/5 border border-theme rounded-xl text-[10px] font-bold h-11 px-4 text-theme focus:bg-theme-card focus:border-tecsisa-yellow focus:ring-0 transition-all">
+                        <select name="building" class="bg-theme/5 border border-theme rounded-xl text-[10px] font-bold h-11 px-3 text-theme focus:bg-theme-card focus:border-tecsisa-yellow focus:ring-0 transition-all appearance-none cursor-pointer">
+                            <option value="">Todos los Edificios</option>
+                            @foreach($buildings as $b)
+                                <option value="{{ $b->name }}" {{ request('building') == $b->name ? 'selected' : '' }}>{{ $b->name }}</option>
+                            @endforeach
+                        </select>
 
                         <!-- Técnico -->
                         <select name="technician_id" class="bg-theme/5 border border-theme rounded-xl text-[10px] font-bold h-11 px-3 text-theme focus:bg-theme-card focus:border-tecsisa-yellow focus:ring-0 transition-all appearance-none cursor-pointer">

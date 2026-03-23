@@ -189,15 +189,9 @@
                     @endif
                 </div>
 
-                {{-- Grid Dinámico Continuo (Equilibrio 3/4) --}}
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-                    @foreach($systems->take(3) as $sys)
-                        @include('catalog.partials.system-card', ['sys' => $sys])
-                    @endforeach
-                </div>
-
+                {{-- Unified 4-Column Grid --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    @foreach($systems->skip(3) as $sys)
+                    @foreach($systems as $sys)
                         @include('catalog.partials.system-card', ['sys' => $sys])
                     @endforeach
                 </div>
@@ -365,7 +359,7 @@
                              <div class="flex justify-between items-center mb-6 border-b border-theme pb-4">
                                 <h2 class="text-xl font-bold text-theme flex items-center gap-2">
                                     <svg class="w-6 h-6 text-tecsisa-yellow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg>
-                                    <span x-text="systemEditMode ? 'Editar Sistema Técnico' : 'Definir Nuevo Sistema'"></span>
+                                    <span x-text="systemEditMode ? 'Configurar Sistema: ' + systemFormData.name : 'Crear Nuevo Sistema'"></span>
                                 </h2>
                                 <button type="button" @click="showSystemModal = false" class="text-theme-muted hover:text-theme transition">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -383,11 +377,43 @@
                                 <input type="hidden" name="maintenance_interval_days" :value="systemFormData.maintenance_interval_days">
                                 <input type="hidden" name="maintenance_guide" :value="systemFormData.maintenance_guide">
 
-                                <div class="bg-theme-card rounded-2xl p-6 border border-theme">
-                                    <div class="flex justify-between items-center mb-4 pb-2 border-b border-theme">
-                                        <h3 class="text-xs font-black text-theme-muted uppercase tracking-widest">Esquema Técnico</h3>
-                                        <button type="button" @click="addFieldToSchema()" class="text-[9px] bg-tecsisa-yellow text-tecsisa-dark px-3 py-1 rounded-lg font-black uppercase tracking-widest">+ Agregar</button>
+                                {{-- Selector de Requisito: SÍ / NO --}}
+                                <div class="bg-black/50 rounded-3xl p-8 border-2 border-theme mb-8 shadow-2xl">
+                                    <div class="flex items-center justify-between gap-10">
+                                        <div class="flex items-center gap-5">
+                                            <div class="w-16 h-16 rounded-2xl bg-tecsisa-yellow flex items-center justify-center border-2 border-white/20 shrink-0 shadow-lg">
+                                                <svg class="w-8 h-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12h6m-6 4h6m2 5H7a2-2V5a2 2h5.586a1.707.293l5.414 5.414a1.293.707V19a2 2z"></path></svg>
+                                            </div>
+                                            <div>
+                                                <h3 class="text-[14px] font-black text-tecsisa-yellow uppercase tracking-tight leading-loose">CERTIFICAR ESTA RED (FLUKE)?</h3>
+                                                <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest leading-none">EXIGIR PDF DE CERTIFICACIÓN OBLIGATORIO</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex items-center bg-black/60 p-2 rounded-2xl border-2 border-white/10 shrink-0">
+                                            <input type="hidden" name="requires_certification" :value="systemFormData.requires_certification ? '1' : '0'">
+                                            <button type="button" 
+                                                    @click="systemFormData.requires_certification = true"
+                                                    :class="systemFormData.requires_certification ? 'bg-tecsisa-yellow text-black' : 'bg-transparent text-gray-500'"
+                                                    class="w-24 py-4 rounded-xl font-black text-[14px] uppercase tracking-tighter transition-all duration-300 active:scale-95 border-2 border-transparent">
+                                                SÍ
+                                            </button>
+                                            <button type="button" 
+                                                    @click="systemFormData.requires_certification = false"
+                                                    :class="!systemFormData.requires_certification ? 'bg-white text-black' : 'bg-transparent text-gray-500'"
+                                                    class="w-24 py-4 rounded-xl font-black text-[14px] uppercase tracking-tighter transition-all duration-300 active:scale-95 border-2 border-transparent">
+                                                NO
+                                            </button>
+                                        </div>
                                     </div>
+                                </div>
+
+                                <div class="bg-theme-card rounded-2xl p-6 border border-theme">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <h3 class="text-xs font-black text-tecsisa-yellow uppercase tracking-widest">1. Campos Técnicos (Ficha del Activo)</h3>
+                                        <button type="button" @click="addFieldToSchema()" class="text-[9px] bg-tecsisa-yellow text-tecsisa-dark px-3 py-1 rounded-lg font-black uppercase tracking-widest">+ Agregar Campo</button>
+                                    </div>
+                                    <p class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-4">Estos campos aparecen en TODAS las tareas (Mantenimiento, Instalación, Sustitución).</p>
 
                                     <div class="space-y-3">
                                         <template x-for="(field, index) in systemFormData.form_schema" :key="index">
@@ -409,10 +435,12 @@
                                 </div>
 
                                 <div class="bg-emerald-500/5 rounded-2xl p-6 border border-emerald-500/10">
-                                    <div class="flex justify-between items-center mb-4">
-                                        <h3 class="text-xs font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Protocolos</h3>
-                                        <button type="button" @click="addChecklistItem()" class="text-[9px] bg-emerald-500 text-white px-3 py-1 rounded-lg font-black uppercase tracking-widest">+ Añadir</button>
+                                    <div class="flex justify-between items-center mb-1">
+                                        <h3 class="text-xs font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">2. Checklist (Solo Mantenimiento)</h3>
+                                        <button type="button" @click="addChecklistItem()" class="text-[9px] bg-emerald-500 text-white px-3 py-1 rounded-lg font-black uppercase tracking-widest">+ Añadir Actividad</button>
                                     </div>
+                                    <p class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mb-4">Estos puntos SOLO aparecerán cuando se realice una tarea de "Mantenimiento".</p>
+
                                     <div class="space-y-2">
                                         <template x-for="(item, idx) in systemFormData.checklist" :key="idx">
                                             <div class="flex gap-2 items-center bg-black/5 dark:bg-black/20 p-2 rounded-xl transition-all border border-theme">
@@ -448,6 +476,24 @@
                                         <h2 class="text-3xl font-black text-theme tracking-tight leading-none" x-text="systemFormData.name"></h2>
                                         <div class="flex items-center gap-3 text-[10px] text-theme-muted font-bold uppercase tracking-widest">
                                             <span>Tipo: <span class="text-theme uppercase">Infraestructura Core</span></span>
+                                        </div>
+
+                                        {{-- DNA del Reporte (Badges) --}}
+                                        <div class="flex flex-wrap gap-2 pt-2">
+                                            <div class="px-2.5 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-2 shadow-sm">
+                                                <svg class="w-3 h-3 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path></svg>
+                                                <span class="text-[9px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-tighter">Fotos A/D Obligatorias</span>
+                                            </div>
+                                            <template x-if="systemFormData.requires_certification">
+                                                <div class="px-2.5 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center gap-2 shadow-sm">
+                                                    <svg class="w-3 h-3 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                                    <span class="text-[9px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-tighter">Certificación Fluke</span>
+                                                </div>
+                                            </template>
+                                            <div class="px-2.5 py-1.5 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center gap-2 shadow-sm">
+                                                <svg class="w-3 h-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                                                <span class="text-[9px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-tighter">Insumos y Repuestos</span>
+                                            </div>
                                         </div>
                                     </div>
                                     <button @click="showSystemModal = false" class="w-10 h-10 rounded-2xl flex items-center justify-center bg-theme/5 text-theme-muted hover:text-red-500 transition-all border border-theme active:scale-95 shadow-sm">
@@ -622,114 +668,47 @@
 
 
                             <!-- Networking: HUB Capacity -->
-                            <div x-show="getSelectedSystemSlug() === 'NET-HUB'" x-transition class="md:col-span-2 grid grid-cols-1 gap-4 bg-purple-500/5 p-4 rounded-xl border border-purple-500/10 mt-4">
-                                <h4 class="text-[10px] font-black text-purple-500 uppercase tracking-widest">Capacidad del Nodo</h4>
-                                <div>
-                                    <label class="block text-theme-muted text-[9px] font-bold uppercase mb-1">Número de Bocas / Puertos Totales</label>
-                                    <input type="number" name="port_capacity" x-model="formData.port_capacity" class="w-full bg-theme-card border border-theme rounded-xl text-xs h-10 px-3 transition" placeholder="Ej: 24">
-                                </div>
-                            </div>
-
-                            <!-- Networking: Configuración de Enlace (Solo NET-LINK) -->
-                            <div x-show="getSelectedSystemSlug() === 'NET-LINK'" x-transition 
-                                 class="md:col-span-2 bg-slate-500/5 dark:bg-white/5 p-6 rounded-[2.5rem] border border-theme mt-6 space-y-6">
+                             {{-- SECCIÓN: Conectividad Lógica (Solo para Sistemas de Red) --}}
+                            <div x-show="isNetworkRelated()" x-transition 
+                                 class="md:col-span-2 bg-blue-500/5 p-6 rounded-[2rem] border border-blue-500/10 mt-4 space-y-6">
                                 
-                                <div class="flex items-center gap-3 border-b border-theme pb-4 mb-2">
-                                    <div class="w-10 h-10 rounded-2xl bg-tecsisa-yellow/10 flex items-center justify-center text-tecsisa-yellow">
+                                <div class="flex items-center gap-3 border-b border-blue-500/10 pb-4 mb-2">
+                                    <div class="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-500">
                                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                                     </div>
                                     <div>
-                                        <h3 class="text-sm font-black uppercase tracking-widest text-theme">Configuración de Conectividad</h3>
-                                        <p class="text-[9px] text-theme-muted font-bold uppercase tracking-widest">Detalles del enlace lógico y físico</p>
+                                        <h3 class="text-xs font-black uppercase tracking-widest text-theme">Configuración de Conectividad</h3>
+                                        <p class="text-[9px] text-theme-muted font-bold uppercase tracking-widest">Mapa de origen y destino del enlace</p>
                                     </div>
                                 </div>
 
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <!-- Origen -->
-                                    <div class="bg-blue-500/5 p-5 rounded-3xl border border-blue-500/10 space-y-4">
-                                        <h4 class="text-[10px] font-black text-blue-500 uppercase tracking-widest flex items-center gap-2">
-                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path></svg>
-                                            Punto de Origen (Distribución)
-                                        </h4>
-                                        <div class="space-y-3">
-                                            <div>
-                                                <label class="block text-theme-muted text-[10px] font-bold uppercase mb-1.5 tracking-widest">Equipo de Origen</label>
-                                                <select name="source_equipment_id" x-model="formData.source_equipment_id" 
-                                                        class="w-full bg-theme-card border border-theme rounded-xl text-xs h-11 px-4 transition shadow-sm text-theme">
-                                                    <option value="">-- Sin Origen (Directo) --</option>
-                                                    <template x-for="pEq in allEquipments" :key="pEq.id">
-                                                        <option :value="pEq.id" x-text="pEq.internal_id + ' - ' + pEq.name"></option>
-                                                    </template>
-                                                </select>
-                                            </div>
-                                            <div>
-                                                <label class="block text-theme-muted text-[10px] font-bold uppercase mb-1.5 tracking-widest">Puerto / Posición</label>
-                                                <input type="text" name="source_port" x-model="formData.source_port" class="w-full bg-theme-card border border-theme rounded-xl text-xs h-11 px-4 transition" placeholder="Ej: Puerto 01-A">
-                                            </div>
-                                        </div>
+                                    <div class="space-y-3">
+                                        <label class="block text-theme-muted text-[10px] font-bold uppercase mb-1.5 tracking-widest">Equipo de Origen (Distribución)</label>
+                                        <select name="source_equipment_id" x-model="formData.source_equipment_id" 
+                                                class="w-full bg-theme-card border border-theme rounded-xl text-xs h-11 px-4 transition shadow-sm text-theme focus:ring-2 focus:ring-blue-500">
+                                            <option value="">-- Sin Origen (Directo) --</option>
+                                            <template x-for="pEq in allEquipments" :key="pEq.id">
+                                                <option :value="pEq.id" x-text="pEq.internal_id + ' - ' + pEq.name"></option>
+                                            </template>
+                                        </select>
+                                        <input type="text" name="source_port" x-model="formData.source_port" 
+                                               class="w-full bg-theme-card border border-theme rounded-xl text-[11px] h-10 px-4 transition" placeholder="Puerto / Posición (Ej: 01-A)">
                                     </div>
 
                                     <!-- Destino -->
-                                    <div class="bg-emerald-500/5 p-5 rounded-3xl border border-emerald-500/10 space-y-4">
-                                        <h4 class="text-[10px] font-black text-emerald-500 uppercase tracking-widest flex items-center gap-2">
-                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                                            Punto de Destino (Terminal)
-                                        </h4>
-                                        <div class="space-y-3">
-                                            <div>
-                                                <label class="block text-theme-muted text-[10px] font-bold uppercase mb-1.5 tracking-widest">Equipo Destino</label>
-                                                <select name="destination_equipment_id" x-model="formData.destination_equipment_id" 
-                                                        class="w-full bg-theme-card border border-theme rounded-xl text-xs h-11 px-4 transition shadow-sm text-theme">
-                                                    <option value="">-- Sin Destino (Abierto) --</option>
-                                                    <template x-for="pEq in allEquipments" :key="pEq.id">
-                                                        <option :value="pEq.id" x-text="pEq.internal_id + ' - ' + pEq.name"></option>
-                                                    </template>
-                                                </select>
-                                            </div>
-                                            <div>
-                                                <label class="block text-theme-muted text-[10px] font-bold uppercase mb-1.5 tracking-widest">Puerto / Salida</label>
-                                                <input type="text" name="destination_port" x-model="formData.destination_port" class="w-full bg-theme-card border border-theme rounded-xl text-xs h-11 px-4 transition" placeholder="Ej: Roseta 3 / Toma A">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Certificación -->
-                                <div class="bg-amber-500/5 p-5 rounded-3xl border border-amber-500/10 space-y-4">
-                                    <h4 class="text-[10px] font-black text-amber-500 uppercase tracking-widest flex items-center gap-2">
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                        Certificación de Enlace (Pruebas de Campo)
-                                    </h4>
-                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                        <div>
-                                            <label class="block text-theme-muted text-[10px] font-bold uppercase mb-1.5 tracking-widest">Estado de Prueba</label>
-                                            <select name="certification_status" x-model="formData.certification_status" 
-                                                    class="w-full bg-theme-card border border-theme rounded-xl text-xs h-11 px-4 transition shadow-sm text-theme">
-                                                <option value="">Pendiente</option>
-                                                <option value="certified">Certificado (PASS)</option>
-                                                <option value="failed">FALLIDO (FAIL)</option>
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label class="block text-theme-muted text-[10px] font-bold uppercase mb-1.5 tracking-widest">Fecha de Certif.</label>
-                                            <input type="date" name="certification_date" x-model="formData.certification_date" 
-                                                   class="w-full bg-theme-card border border-theme rounded-xl text-xs h-11 px-4 transition">
-                                        </div>
-                                        <div>
-                                            <label class="block text-theme-muted text-[10px] font-bold uppercase mb-1.5 tracking-widest">Subir Reporte PDF</label>
-                                            <div class="relative group">
-                                                <input type="file" name="certification_pdf" 
-                                                       class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                                                       @change="fileName = $event.target.files[0]?.name">
-                                                <div class="w-full bg-theme-card border border-theme rounded-xl text-xs h-11 px-4 transition flex items-center gap-3 overflow-hidden group-hover:border-tecsisa-yellow/50">
-                                                    <div class="bg-tecsisa-yellow/10 p-1.5 rounded-lg text-tecsisa-yellow">
-                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
-                                                    </div>
-                                                    <span class="text-theme-muted truncate" x-text="fileName || 'Seleccionar archivo PDF...'"></span>
-                                                </div>
-                                            </div>
-                                        </div>
-
+                                    <div class="space-y-3">
+                                        <label class="block text-theme-muted text-[10px] font-bold uppercase mb-1.5 tracking-widest">Equipo Destino (Terminal)</label>
+                                        <select name="destination_equipment_id" x-model="formData.destination_equipment_id" 
+                                                class="w-full bg-theme-card border border-theme rounded-xl text-xs h-11 px-4 transition shadow-sm text-theme focus:ring-2 focus:ring-emerald-500">
+                                            <option value="">-- Sin Destino (Terminal) --</option>
+                                            <template x-for="pEq in allEquipments" :key="pEq.id">
+                                                <option :value="pEq.id" x-text="pEq.internal_id + ' - ' + pEq.name"></option>
+                                            </template>
+                                        </select>
+                                        <input type="text" name="destination_port" x-model="formData.destination_port" 
+                                               class="w-full bg-theme-card border border-theme rounded-xl text-[11px] h-10 px-4 transition" placeholder="Toma / Salida (Ej: Roseta 3A)">
                                     </div>
                                 </div>
                             </div>
@@ -795,65 +774,56 @@
 
 
                         <!-- SECCIÓN DINÁMICA: Especificaciones Técnicas -->
-                        <div x-show="activeSchema.length > 0" x-transition class="mt-8 p-6 bg-black/10 dark:bg-black/40 border border-theme rounded-2xl transition-colors duration-500">
-                            <h3 class="text-sm font-bold text-tecsisa-yellow uppercase tracking-widest mb-4 flex items-center gap-2">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                                Parámetros Técnicos
-                            </h3>
-                             <div class="grid grid-cols-1 gap-4" 
-                                  :class="activeSchema.length === 3 ? 'md:grid-cols-3' : 'md:grid-cols-2'">
+                        {{-- SECCIÓN: Ficha Técnica Dinámica --}}
+                        <div x-show="activeSchema.length > 0" x-transition
+                             class="md:col-span-2 bg-theme-card p-6 rounded-[2.5rem] border border-theme mt-6 space-y-6">
+                            
+                            <div class="flex items-center gap-3 border-b border-theme pb-4 mb-2">
+                                <div class="w-10 h-10 rounded-xl bg-tecsisa-yellow/10 flex items-center justify-center text-tecsisa-yellow">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-xs font-black uppercase tracking-widest text-theme">Parámetros Técnicos</h3>
+                                    <p class="text-[9px] text-theme-muted font-bold uppercase tracking-widest">Especificaciones según el sistema</p>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <template x-for="(field, index) in activeSchema" :key="index">
-                                    <div>
-                                        <label class="block text-[10px] font-black text-gray-500 uppercase mb-1" x-text="field.label"></label>
+                                    <div class="space-y-1.5">
+                                        <label class="block text-[10px] font-black text-theme-muted uppercase tracking-wider" x-text="field.label"></label>
                                         
-                                        <!-- Case: Select -->
-                                        <template x-if="field.type === 'select'">
-                                            <select :name="'specs[' + field.label + ']'" x-model="formData.specs[field.label]"
-                                                    class="w-full bg-black/5 dark:bg-black/40 border border-theme rounded-lg text-sm text-theme focus:border-tecsisa-yellow focus:ring-2 focus:ring-tecsisa-yellow transition h-10 px-3 shadow-inner">
-                                                <option value="">-- Seleccione --</option>
-                                                <template x-for="(opt, idx) in getDropdownOptions(field.options)" :key="idx">
-                                                    <option :value="opt" x-text="opt"></option>
-                                                </template>
-                                            </select>
+                                        <!-- Inputs dinámicos -->
+                                        <div class="relative">
+                                            <!-- Texto / Por Defecto -->
+                                            <template x-if="!['select', 'date', 'long_text', 'number'].includes(field.type)">
+                                                <input type="text" :name="'specs[' + field.label + ']'" x-model="formData.specs[field.label]"
+                                                       class="w-full bg-black/20 border border-theme rounded-xl text-xs h-11 px-4 text-theme focus:ring-2 focus:ring-tecsisa-yellow transition shadow-inner">
+                                            </template>
 
-                                        </template>
+                                            <!-- Select -->
+                                            <template x-if="field.type === 'select'">
+                                                <select :name="'specs[' + field.label + ']'" x-model="formData.specs[field.label]"
+                                                        class="w-full bg-black/20 border border-theme rounded-xl text-xs h-11 px-4 text-theme focus:ring-2 focus:ring-tecsisa-yellow transition">
+                                                    <option value="">-- Seleccione --</option>
+                                                    <template x-for="opt in getDropdownOptions(field.options)" :key="opt">
+                                                        <option :value="opt" x-text="opt"></option>
+                                                    </template>
+                                                </select>
+                                            </template>
 
-                                        <!-- Case: Date (Flatpickr) -->
-                                        <template x-if="field.type === 'date'">
-                                            <div class="relative">
-                                                <input type="text" :name="'specs[' + field.label + ']'" 
-                                                       x-init="flatpickr($el, { dateFormat: 'Y-m-d', allowInput: true, theme: 'dark', locale: 'es' })"
-                                                       x-model="formData.specs[field.label]"
-                                                       class="w-full bg-black/5 dark:bg-black/40 border border-theme rounded-lg text-sm text-theme focus:border-tecsisa-yellow focus:ring-0 transition h-9 px-3"
-                                                       placeholder="YYYY-MM-DD">
-                                                <div class="absolute right-3 top-2.5 text-theme-muted opacity-50 pointer-events-none">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                                </div>
-                                            </div>
-                                        </template>
+                                            <!-- Número -->
+                                            <template x-if="field.type === 'number'">
+                                                <input type="number" :name="'specs[' + field.label + ']'" x-model="formData.specs[field.label]"
+                                                       class="w-full bg-black/20 border border-theme rounded-xl text-xs h-11 px-4 text-theme focus:ring-2 focus:ring-tecsisa-yellow transition shadow-inner">
+                                            </template>
 
-                                        <!-- Case: Long Text -->
-                                        <template x-if="field.type === 'long_text'">
-                                            <textarea :name="'specs[' + field.label + ']'" 
-                                                   x-model="formData.specs[field.label]"
-                                                   class="w-full bg-black/5 dark:bg-black/40 border border-theme rounded-lg text-sm text-theme focus:border-tecsisa-yellow focus:ring-0 transition p-3 h-24"
-                                                   :placeholder="'Detalles de ' + field.label.toLowerCase()"></textarea>
-                                        </template>
-
-                                        <!-- Case: Number -->
-                                        <template x-if="field.type === 'number'">
-                                            <input type="number" :name="'specs[' + field.label + ']'" 
-                                                   x-model="formData.specs[field.label]"
-                                                   class="w-full bg-black/5 dark:bg-black/40 border border-theme rounded-lg text-sm text-theme focus:border-tecsisa-yellow focus:ring-0 transition h-9 px-3">
-                                        </template>
-
-                                        <!-- Case: Text (Default fallback) -->
-                                        <template x-if="!['select', 'date', 'long_text', 'number'].includes(field.type)">
-                                            <input type="text" :name="'specs[' + field.label + ']'" 
-                                                   x-model="formData.specs[field.label]"
-                                                   class="w-full bg-black/5 dark:bg-black/40 border border-theme rounded-lg text-sm text-theme focus:border-tecsisa-yellow focus:ring-0 transition h-10 px-3 shadow-inner"
-                                                   placeholder="Ingrese valor...">
-                                        </template>
+                                            <!-- Fecha -->
+                                            <template x-if="field.type === 'date'">
+                                                <input type="date" :name="'specs[' + field.label + ']'" x-model="formData.specs[field.label]"
+                                                       class="w-full bg-black/20 border border-theme rounded-xl text-xs h-11 px-4 text-theme focus:ring-2 focus:ring-tecsisa-yellow transition">
+                                            </template>
+                                        </div>
                                     </div>
                                 </template>
                             </div>
@@ -1000,9 +970,27 @@
 
             get activeSchema() {
                 if (!this.formData.system_id) return [];
-                const sysId = String(this.formData.system_id);
-                const found = this.allSystems.find(s => String(s.id) === sysId);
-                return found ? (found.form_schema?.specs || found.form_schema || []) : [];
+                const found = this.allSystems.find(s => String(s.id) === String(this.formData.system_id));
+                if (!found) return [];
+                
+                // Extraer specs del form_schema (que es un objeto {specs, checklist})
+                let schema = found.form_schema || {};
+                if (typeof schema === 'string') {
+                    try { schema = JSON.parse(schema); } catch (e) { schema = {}; }
+                }
+                
+                return schema.specs || (Array.isArray(schema) ? schema : []);
+            },
+
+            getSelectedSystemSlug() {
+                if (!this.formData.system_id) return '';
+                const found = this.allSystems.find(s => String(s.id) === String(this.formData.system_id));
+                return found ? found.slug : '';
+            },
+
+            isNetworkRelated() {
+                const slug = this.getSelectedSystemSlug();
+                return ['DISP-RED', 'FIBRA-OPTICA', 'PUNTOS-RED', 'ENLACES-RED'].includes(slug);
             },
 
 
@@ -1064,7 +1052,7 @@
             },
 
             // --- Systems Logic ---
-            openCreateSystemModal() {
+            openSystemModal() {
                 this.systemEditMode = false;
                 this.systemFormAction = '/catalogos/systems';
                 this.systemFormData = {
@@ -1073,7 +1061,8 @@
                     form_schema: [],
                     checklist: [],
                     maintenance_interval_days: 90,
-                    maintenance_guide: ''
+                    maintenance_guide: '',
+                    requires_certification: false
                 };
                 this.showSystemModal = true;
             },
@@ -1090,6 +1079,7 @@
 
                 const specFields = Array.isArray(schema) ? schema : (schema.specs || []);
                 const checklistItems = Array.isArray(schema) ? [] : (schema.checklist || []);
+                const features = Array.isArray(schema) ? {} : (schema.features || {});
 
                 this.systemFormData = {
                     id: sys.id,
@@ -1098,7 +1088,8 @@
                     form_schema: JSON.parse(JSON.stringify(specFields)),
                     checklist: JSON.parse(JSON.stringify(checklistItems)),
                     maintenance_interval_days: sys.maintenance_interval_days || 90,
-                    maintenance_guide: sys.maintenance_guide || ''
+                    maintenance_guide: sys.maintenance_guide || '',
+                    requires_certification: !!features.requires_certification
                 };
                 this.showSystemModal = true;
             },

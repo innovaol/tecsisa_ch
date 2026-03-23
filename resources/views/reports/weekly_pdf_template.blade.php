@@ -349,7 +349,17 @@ body { font-family: 'DejaVu Sans', Arial, sans-serif; font-size: 8.5pt; color: #
         </div>
         <div class="cover-divider"></div>
         <div class="cover-pre">Informe Técnico de Operaciones</div>
-        <div class="cover-title">Reporte<br>Hospital Anita Moreno<br>Sistemas Especiales</div>
+        <div class="cover-title">
+            Reporte<br>
+            @php
+                $buildingFilter = request('building');
+                $systemNameReport = $system->name ?? 'Sistemas Especiales';
+            @endphp
+            @if($buildingFilter)
+                {{ strtoupper($buildingFilter) }}<br>
+            @endif
+            {{ strtoupper($systemNameReport) }}
+        </div>
         <div class="cover-city">Ciudad Hospitalaria Dr. Enrique Tejera</div>
         <div class="cover-box">
             <div class="cover-box-lbl">Período &mdash; Semana {{ $weekNum }}</div>
@@ -370,20 +380,30 @@ body { font-family: 'DejaVu Sans', Arial, sans-serif; font-size: 8.5pt; color: #
 </div>
 
 {{-- =====================================================
-     SECCIONES POR SISTEMA
+     SECCIONES POR EDIFICIO O SISTEMA
      ===================================================== --}}
 @php
-    $bySystem = $tasks->groupBy(function($t) {
-        return $t->system->name ?? $t->equipment->system->name ?? 'GENERAL';
-    });
+    $groupBy = $group_by ?? 'building';
+    
+    if ($groupBy === 'building') {
+        $groupedTasks = $tasks->groupBy(function($t) {
+            return $t->form_data['building'] ?? ($t->equipment->location->parent->name ?? ($t->equipment->location->name ?? 'SIN EDIFICIO'));
+        });
+        $preTitle = "Edificio / Área";
+    } else {
+        $groupedTasks = $tasks->groupBy(function($t) {
+            return $t->system->name ?? $t->equipment->system->name ?? 'GENERAL';
+        });
+        $preTitle = "Sistemas Especiales";
+    }
 @endphp
 
-@foreach($bySystem as $sysName => $sysTasks)
+@foreach($groupedTasks as $sysName => $sysTasks)
 
-{{-- SEPARADOR DE SISTEMA --}}
+{{-- SEPARADOR DE SECCIÓN (EDIFICIO O SISTEMA) --}}
 <div class="sep-page">
     <div class="sep-inner">
-        <div class="sep-pre">Sistemas Especiales &mdash; Detalle Técnico</div>
+        <div class="sep-pre">{{ $preTitle }} &mdash; Detalle Técnico</div>
         <div class="sep-title">{{ strtoupper($sysName) }}</div>
         <div class="sep-count">
             {{ $sysTasks->count() }} {{ $sysTasks->count() == 1 ? 'intervención' : 'intervenciones' }} registrada{{ $sysTasks->count() == 1 ? '' : 's' }} en el período

@@ -35,6 +35,11 @@
                         <svg class="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
                         <span x-text="saving ? 'Guardando...' : 'Guardar Topología'"></span>
                     </button>
+                    
+                    <a href="{{ route('rack.pdf', $rack->id) }}" target="_blank" class="bg-red-600 hover:bg-red-500 text-white font-black px-6 py-4 rounded-2xl text-[10px] uppercase tracking-widest transition-all duration-300 shadow-[0_15px_40px_rgba(239,68,68,0.2)] flex items-center justify-center gap-3 active:scale-95 whitespace-nowrap group w-full md:w-auto">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                        <span>Exportar PDF</span>
+                    </a>
                 </div>
             </div>
         </div>

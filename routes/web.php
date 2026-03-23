@@ -48,6 +48,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
             Route::get('/racks', [\App\Http\Controllers\RackBuilderController::class , 'index'])->name('rack.builder');
             Route::post('/racks/{rack}/save', [\App\Http\Controllers\RackBuilderController::class , 'save'])->name('rack.save');
+            Route::get('/racks/{rack}/pdf', [\App\Http\Controllers\RackBuilderController::class , 'generatePDF'])->name('rack.pdf');
 
             // User and Role Management
             Route::resource('users', \App\Http\Controllers\UserController::class);

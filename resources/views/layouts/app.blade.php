@@ -27,6 +27,7 @@
             /* Variables System */
             :root {
                 --theme-bg: #0A0F1C;
+                --theme-bg-rgb: 10, 15, 28;
                 --theme-text: #d1d5db;
                 --theme-text-muted: #9ca3af;
                 --theme-card: rgba(17, 24, 39, 0.82);
@@ -41,6 +42,7 @@
 
             .light {
                 --theme-bg: #f3f4f6;
+                --theme-bg-rgb: 243, 244, 246;
                 --theme-text: #1a1a1a;
                 --theme-text-muted: #64748b;
                 --theme-card: #ffffff;
@@ -55,6 +57,7 @@
 
             .dark {
                 --theme-bg: #0A0F1C;
+                --theme-bg-rgb: 10, 15, 28;
                 --theme-text: #d1d5db;
                 --theme-text-muted: #9ca3af;
                 --theme-card: rgba(17, 24, 39, 0.82);

@@ -86,13 +86,13 @@
                 <div class="flex flex-col items-start md:items-end gap-1.5 min-w-[220px]">
                     <label class="text-[8px] font-black text-theme-muted uppercase tracking-[0.2em] opacity-60">Reasignar Responsable</label>
                     <div class="relative w-full group">
-                        <select name="assigned_to" @change="doSubmit('reassign')" class="w-full bg-theme/5 border-[1.5px] border-theme-muted/20 rounded-2xl text-[12px] font-black h-12 px-5 appearance-none focus:ring-2 focus:ring-tecsisa-yellow/30 text-theme cursor-pointer pr-12 transition-all hover:border-tecsisa-yellow/40">
+                        <select name="assigned_to" @change="doSubmit('reassign')" style="background-image: none;" class="w-full bg-theme/5 border-[1.5px] border-theme-muted/20 rounded-2xl text-[12px] font-black h-12 px-5 appearance-none focus:ring-2 focus:ring-tecsisa-yellow/30 text-theme cursor-pointer pr-12 transition-all hover:border-tecsisa-yellow/40">
                             @foreach($users as $user)
                                 <option value="{{ $user->id }}" {{ $task->assigned_to == $user->id ? 'selected' : '' }} class="bg-theme-card text-theme">{{ $user->name }}</option>
                             @endforeach
                         </select>
                         <div class="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-theme-muted">
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M19 9l-7 7-7-7"></path></svg>
+                            <svg class="w-3 h-3 text-theme-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M19 9l-7 7-7-7"></path></svg>
                         </div>
                     </div>
                 </div>

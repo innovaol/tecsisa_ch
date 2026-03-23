@@ -116,10 +116,13 @@ class CatalogController extends Controller
             'maintenance_guide'         => 'nullable|string',
         ]);
 
-        // Guardar form_schema como objeto estructurado {specs, checklist}
+        // Guardar form_schema con specs, checklist y features
         $validated['form_schema'] = [
             'specs'     => array_values(array_filter($validated['form_schema'] ?? [], fn($f) => !empty($f['label']))),
-            'checklist' => array_values(array_filter($validated['checklist'] ?? [], fn($i) => trim($i) !== '')),
+            'checklist' => array_values(array_filter($request->input('checklist') ?? [], fn($i) => trim($i) !== '')),
+            'features'  => [
+                'requires_certification' => $request->input('requires_certification') == '1'
+            ]
         ];
         unset($validated['checklist']);
 
@@ -142,10 +145,13 @@ class CatalogController extends Controller
             'maintenance_guide'         => 'nullable|string',
         ]);
 
-        // Guardar form_schema como objeto estructurado {specs, checklist}
+        // Guardar form_schema con specs, checklist y features
         $validated['form_schema'] = [
             'specs'     => array_values(array_filter($validated['form_schema'] ?? [], fn($f) => !empty($f['label']))),
-            'checklist' => array_values(array_filter($validated['checklist'] ?? [], fn($i) => trim($i) !== '')),
+            'checklist' => array_values(array_filter($request->input('checklist') ?? [], fn($i) => trim($i) !== '')),
+            'features'  => [
+                'requires_certification' => $request->input('requires_certification') == '1'
+            ]
         ];
         unset($validated['checklist']);
 

@@ -80,8 +80,9 @@ class ReportController extends Controller
         // Data for dropdowns
         $systems = System::all();
         $technicians = \App\Models\User::whereHas('roles', function($q) { $q->where('name', 'Tecnico'); })->get();
+        $buildings = \App\Models\Location::where('level', 'edificio')->get();
 
-        return view('reports.index', compact('tasks', 'systems', 'technicians', 'startDate', 'endDate'));
+        return view('reports.index', compact('tasks', 'systems', 'technicians', 'buildings', 'startDate', 'endDate'));
     }
 
     public function generateWeekly(Request $request)
@@ -105,8 +106,8 @@ class ReportController extends Controller
         $statusFilter = $request->input('status_filter', []);
         $statusesToInclude = !empty($statusFilter) ? array_intersect($statusFilter, $allStatuses) : $allStatuses;
 
+        // Base Query
         $query = Task::with(['equipment.location', 'equipment.rack', 'assignee', 'system', 'equipment.system'])
-            ->whereIn('status', $statusesToInclude)
             ->where(function($q) use ($startDateObj, $endDateObj) {
                 // Match tasks created OR updated in the period
                 $q->whereBetween('created_at', [$startDateObj, $endDateObj])
@@ -114,14 +115,37 @@ class ReportController extends Controller
             })
             ->orderBy('created_at', 'asc');
 
+        // Apply Status Filter
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        } else {
+            // Include everything by default if not specified
+            $query->whereIn('status', $allStatuses);
+        }
+
+        // Apply Building Filter (from JSON form_data)
+        if ($request->filled('building')) {
+            $query->where('form_data->building', 'LIKE', '%' . $request->building . '%');
+        }
+
+        // Apply Technician Filter
+        if ($request->filled('technician_id')) {
+            $query->where('assigned_to', $request->technician_id);
+        }
+
         $systemName = "GLOBAL";
         $systemObj = null;
 
-        if (!empty($validated['system_id'])) {
-            $systemObj = System::findOrFail($validated['system_id']);
+        if ($request->filled('system_id')) {
+            $systemObj = System::findOrFail($request->system_id);
             $systemName = $systemObj->name;
-            $query->whereHas('equipment', function ($q) use ($validated) {
-                $q->where('system_id', $validated['system_id']);
+            
+            // Filter by system (either on task directly or on equipment)
+            $query->where(function($q) use ($request) {
+                $q->where('system_id', $request->system_id)
+                  ->orWhereHas('equipment', function($sq) use ($request) {
+                      $sq->where('system_id', $request->system_id);
+                  });
             });
         }
 
@@ -163,6 +187,7 @@ class ReportController extends Controller
             'company_name'         => $settings['company_name'] ?? 'TECSISA',
             'company_logo'         => $settings['company_logo'] ?? null,
             'company_footer'       => $settings['company_footer'] ?? 'Reporte de Operaciones Tecnológicas',
+            'group_by'             => 'system' // Keep system grouping as primary order
         ];
 
         $pdf = Pdf::loadView('reports.weekly_pdf_template', $reportData)

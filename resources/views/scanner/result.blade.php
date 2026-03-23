@@ -105,7 +105,7 @@
                             <input type="hidden" name="equipment_id" value="{{ $equipment->id }}">
                             <input type="hidden" name="title" value="Mantenimiento de Equipo">
                             <input type="hidden" name="priority" value="medium">
-                            <input type="hidden" name="task_type" value="maintenance">
+                            <input type="hidden" name="task_type" value="Mantenimiento">
                             <input type="hidden" name="description" value="Procedimiento de mantenimiento preventivo y/o correctivo.">
                             <button type="submit" class="w-full group flex items-center gap-4 bg-black/5 hover:bg-tecsisa-yellow border border-theme hover:border-tecsisa-yellow rounded-2xl p-4 transition-all active:scale-95">
                                 <div class="w-12 h-12 bg-black/5 rounded-xl flex items-center justify-center text-tecsisa-yellow group-hover:text-black transition-colors duration-500">
@@ -124,7 +124,7 @@
                             <input type="hidden" name="equipment_id" value="{{ $equipment->id }}">
                             <input type="hidden" name="title" value="Instalación / Configuración">
                             <input type="hidden" name="priority" value="medium">
-                            <input type="hidden" name="task_type" value="installation">
+                            <input type="hidden" name="task_type" value="Instalación">
                             <input type="hidden" name="description" value="Procedimiento de instalación y puesta a punto de un nuevo activo.">
                             <button type="submit" class="w-full group flex items-center gap-4 bg-black/5 hover:bg-cyan-500 border border-theme hover:border-cyan-400 rounded-2xl p-4 transition-all active:scale-95">
                                 <div class="w-12 h-12 bg-black/5 rounded-xl flex items-center justify-center text-cyan-400 group-hover:text-white transition-colors duration-500">
@@ -143,7 +143,7 @@
                             <input type="hidden" name="equipment_id" value="{{ $equipment->id }}">
                             <input type="hidden" name="title" value="Sustitución / Reemplazo Físico">
                             <input type="hidden" name="priority" value="high">
-                            <input type="hidden" name="task_type" value="replacement">
+                            <input type="hidden" name="task_type" value="Sustitución">
                             <input type="hidden" name="description" value="Procedimiento de extracción y cambio de equipo por otro.">
                             <button type="submit" class="w-full group flex items-center gap-4 bg-black/5 hover:bg-red-500 border border-theme hover:border-red-400 rounded-2xl p-4 transition-all active:scale-95">
                                 <div class="w-12 h-12 bg-black/5 rounded-xl flex items-center justify-center text-red-400 group-hover:text-white transition-colors duration-500">

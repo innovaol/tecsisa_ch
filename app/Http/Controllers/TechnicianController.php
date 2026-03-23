@@ -76,17 +76,38 @@ class TechnicianController extends Controller
         }
 
         if (isset($validated['form_data'])) {
-            $task->form_data = $validated['form_data'];
+            $task->form_data = array_merge($task->form_data ?? [], $validated['form_data']);
         }
 
-        if ($task->status === 'completed') {
+        // Handle Photo Uploads (Before / After)
+        $photos = $task->form_data['photos'] ?? [];
+        if ($request->hasFile('photo_before')) {
+            $photos['before'] = $request->file('photo_before')->store('tasks/' . $task->id, 'public');
+        }
+        if ($request->hasFile('photo_after')) {
+            $photos['after'] = $request->file('photo_after')->store('tasks/' . $task->id, 'public');
+        }
+        
+        $currentFormData = $task->form_data;
+        $currentFormData['photos'] = $photos;
+        $task->form_data = $currentFormData;
+
+        if ($task->status === 'completed' || $validated['status'] === 'completed') {
             $task->completed_at = now();
+            
             if ($task->equipment) {
-                $task->equipment->update([
+                $updateData = [
                     'status' => 'operative',
                     'last_maintenance_at' => now(),
                     'next_maintenance_at' => now()->addMonths(6)
-                ]);
+                ];
+
+                // If it's a Substitution, update the serial in the equipment record
+                if (($task->task_type === 'Sustitución' || $task->task_type === 'replacement') && !empty($task->form_data['swap']['serial_in'])) {
+                    $updateData['serial_number'] = $task->form_data['swap']['serial_in'];
+                }
+
+                $task->equipment->update($updateData);
             }
         }
 

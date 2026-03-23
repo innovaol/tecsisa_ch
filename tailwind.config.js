@@ -28,6 +28,9 @@ export default {
                 'theme-border': 'var(--theme-border)',
                 'theme-header': 'var(--theme-header)',
             },
+            backgroundColor: {
+                'theme': 'rgb(var(--theme-bg-rgb) / <alpha-value>)',
+            },
         },
     },
 
